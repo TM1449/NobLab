@@ -32,6 +32,9 @@ import Project_Graph
 #・実行時の時刻でフォルダを作成するプログラムは、「TimeLine」「PhaseSpace」「OldNullcline」で実装済み
 #・Nullclineの描写、プログラムコードが汚いので、うまい具合に描写、プログラムコードを整理する。
 #・大、中、小の区切りを全体のプログラムに適用する
+
+
+#・相平面、Nullclineの3Dを作成する
 #====================================================================
 
 #メイン
@@ -47,9 +50,9 @@ print("###Main Program has started###\n")
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #Project_Graph.Project_Chialvo_TimeLine_2024_09_24_14_17()
-#Project_Graph.Project_Chialvo_PhaseSpace_2024_09_24_14_17()
+Project_Graph.Project_Chialvo_PhaseSpace_2024_09_24_14_17()
 #Project_Graph.Project_Chialvo_OldNullcline_2024_09_24_14_17()
-Project_Graph.Project_Chialvo_NewNullcline_2024_09_24_14_17()
+#Project_Graph.Project_Chialvo_NewNullcline_2024_09_24_14_17()
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 

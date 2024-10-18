@@ -194,16 +194,16 @@ def Project_Chialvo_PhaseSpace_2024_09_24_14_17():
         "Chialvo_k0"                : 0.06,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -0.2,
+        "Chialvo_k"                 : -2.2,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
         "Chialvo_beta"              : 0.2,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
-        "RunTime" : 30000,
-        "Plot_Start" : 29500,
-        "Plot_End" : 30000,
+        "RunTime" : 3100,
+        "Plot_Start" : 100,
+        "Plot_End" : 3100,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,
