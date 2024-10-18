@@ -565,7 +565,7 @@ class Module_SishuReservoir(Module_Reservoir):
                 Star_Matrix[i,i] += 1
 
             #リングスターネットワークの生成
-            Matrix = Ring_Matrix + Star_Matrix
+            Matrix = (Ring_Matrix + Star_Matrix)
 
         elif (self.sigma == "False") and (self.mu == "False"):
             

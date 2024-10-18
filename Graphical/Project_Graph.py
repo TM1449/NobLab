@@ -280,7 +280,7 @@ def Project_Chialvo_NewNullcline_2024_09_24_14_17():
         #Nullclineの描写
         "Project_Plot_NewNullcline"         : True,
         #相平面における解の軌道の描写
-        "Project_Plot_PhaseSpace"           : True,
+        "Project_Plot_PhaseSpace"           : False,
 
         #+++++++++++++++++++++++++s+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #従来のChialvoパラメータ
@@ -290,7 +290,7 @@ def Project_Chialvo_NewNullcline_2024_09_24_14_17():
         "Chialvo_k0"                : 0.025,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -0.2,
+        "Chialvo_k"                 : -0.25,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
@@ -308,11 +308,11 @@ def Project_Chialvo_NewNullcline_2024_09_24_14_17():
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #どこからどこまでプロット図の点を作成するか
-        "Plot_x_Start" : 0,
-        "Plot_x_End" : 3,
+        "Plot_x_Start" : -1,
+        "Plot_x_End" : 1,
 
-        "Plot_y_Start" : 0,
-        "Plot_y_End" : 3,
+        "Plot_y_Start" : -1,
+        "Plot_y_End" : 1,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,
