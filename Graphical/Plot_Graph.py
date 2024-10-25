@@ -289,7 +289,7 @@ class Plot_Nullcline(Plot):
         fig.tight_layout()
         New_DirPath()
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
-        plt.close()
+        plt.show()
 
 class Plot_Nullcline3D(Plot):
     """

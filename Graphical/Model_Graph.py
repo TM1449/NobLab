@@ -138,6 +138,9 @@ class Model_Chialvo_OldNullcline(Model):
         self.Plot_Start = self.Param["Plot_Start"]
         self.Plot_End = self.Param["Plot_End"]
 
+        #入力信号
+        self.Input_Signal = self.Param["Input_Signal"]
+
         #ベクトル場の間隔
         self.Vdt = self.Param["Vdt"]
         
@@ -164,7 +167,7 @@ class Model_Chialvo_OldNullcline(Model):
 
         self.X, self.Y = np.meshgrid(self.Vdx, self.Vdy)
         
-        self.Vx = (pow(self.X, 2) * np.exp(self.Y - self.X) + self.k0) + 2 - self.X
+        self.Vx = (pow(self.X, 2) * np.exp(self.Y - self.X) + self.k0) + self.Input_Signal - self.X
         self.Vy = (self.a * self.Y  - self.b * self.X + self.c) - self.Y
 
         #--------------------------------------------------------------------
@@ -174,7 +177,7 @@ class Model_Chialvo_OldNullcline(Model):
         self.dx = np.arange(self.Plot_x_Start, self.Plot_x_End, self.dt)
         self.dy = np.arange(self.Plot_y_Start, self.Plot_y_End, self.dt)
 
-        self.fx = np.log(self.dx - self.k0 - 2) - 2 * np.log(self.dx) + self.dx
+        self.fx = np.log(self.dx - self.k0 - self.Input_Signal) - 2 * np.log(self.dx) + self.dx
         self.fy = (self.a * self.dy + self.c - self.dy) / self.b
 
         #--------------------------------------------------------------------
@@ -232,6 +235,9 @@ class Model_Chialvo_NewNullcline(Model):
         self.RunTime = self.Param["RunTime"]
         self.Plot_Start = self.Param["Plot_Start"]
         self.Plot_End = self.Param["Plot_End"]
+        
+        #入力信号
+        self.Input_Signal = self.Param["Input_Signal"]
 
         #ベクトル場の間隔
         self.Vdt = self.Param["Vdt"]
@@ -261,7 +267,7 @@ class Model_Chialvo_NewNullcline(Model):
         
         self.Vx = (pow(self.X, 2) * np.exp(((self.b  - self.a + 1) * self.X - self.c) / (self.a - 1)) + self.k0 \
             + ((3 * self.k * self.beta * pow(self.k1, 2)) / pow((1 + self.k2), 2)) * pow(self.X, 3) \
-                + self.X * self.k * self.alpha) - self.X
+                + self.X * self.k * self.alpha) + self.Input_Signal - self.X
         self.Vy = self.X - self.Y
         
         #--------------------------------------------------------------------
@@ -273,7 +279,7 @@ class Model_Chialvo_NewNullcline(Model):
 
         self.fx = pow(self.dx, 2) * np.exp(((self.b  - self.a + 1) * self.dx - self.c) / (self.a - 1)) + self.k0 \
             + ((3 * self.k * self.beta * pow(self.k1, 2)) / pow((1 + self.k2), 2)) * pow(self.dx, 3) \
-                + self.dx * self.k * self.alpha
+                + self.dx * self.k * self.alpha + self.Input_Signal
         self.fy = self.dx
 
         #--------------------------------------------------------------------

@@ -291,6 +291,9 @@ def Project_Chialvo_OldNullcline_2024_09_27_15_07():
         "Plot_Start" : 0,
         "Plot_End" : 3000,
 
+        #入力信号：uについて
+        "Input_Signal"  : 2,
+
         #ベクトル場の間隔
         "Vdt" : 0.05,
         #Nullclineの間隔
@@ -347,6 +350,9 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
         "RunTime" : 3000,
         "Plot_Start" : 0,
         "Plot_End" : 3000,
+
+        #入力信号：uについて
+        "Input_Signal"  : 2,
 
         #ベクトル場の間隔
         "Vdt" : 0.05,
