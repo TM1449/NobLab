@@ -195,11 +195,11 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
         "RunTime" : 3500,
-        "Plot_Start" : 3400,
+        "Plot_Start" : 2500,
         "Plot_End" : 3500,
 
         #入力信号：uについて
-        "Input_Signal"  : 7.55,
+        "Input_Signal"  : np.sin,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,
@@ -297,11 +297,11 @@ def Project_Chialvo_OldNullcline_2024_09_27_15_07():
         "dt" : 0.0001,
 
         #どこからどこまでプロット図の点を作成するか
-        "Plot_x_Start" : 0,
+        "Plot_x_Start" : 1,
         "Plot_x_End" : 3,
 
-        "Plot_y_Start" : 0,
-        "Plot_y_End" : 3,
+        "Plot_y_Start" : -2,
+        "Plot_y_End" : 0,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,
