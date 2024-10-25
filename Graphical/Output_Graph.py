@@ -163,7 +163,7 @@ class Output_PhaseSpace(Output):
     def __call__(self):
 
         print("--- Chialvo Neuron Map RunStart---\n")
-        self.X, self.Y , self.Phi = self.Model()
+        self.X, self.Y , self.Phi , self.Signal = self.Model()
 
         def TimeDate():
             Time_Delta = datetime.timedelta(hours=9)

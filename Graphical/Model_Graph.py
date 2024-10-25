@@ -101,19 +101,23 @@ class Model_Chialvo(Model):
 
     def __call__(self):
         #入力信号プロットの作成
+        self.Input_Signal = np.zeros(self.RunTime)
         self.Input_Signal_X = np.zeros(self.RunTime)
 
+        for j in range(400):
+            self.Input_Signal[self.RunTime * j // 400 : self.RunTime * (j+1) // 400] = np.random.randint(0, 2)
+        
         #Chialvoニューロンの差分方程式の計算部
         for i in range(self.RunTime - 1):
 
             print("\r%d / %d"%(i, self.RunTime), end = "")
 
             self.x[i+1] = pow(self.x[i], 2) * np.exp(self.y[i] - self.x[i]) + self.k0 \
-                + self.k * self.x[i] * (self.alpha + 3 * self.beta * pow(self.phi[i], 2)) + 0.5 * self.Input_Signal(4 * i * np.pi / 180) ** 2
+                + self.k * self.x[i] * (self.alpha + 3 * self.beta * pow(self.phi[i], 2)) + self.Input_Signal[i]
             self.y[i+1] = self.a * self.y[i] - self.b * self.x[i] + self.c
             self.phi[i+1] = self.k1 * self.x[i] - self.k2 * self.phi[i]
 
-            self.Input_Signal_X[i+1] = 0.2 * self.Input_Signal(4 * i * np.pi / 180) ** 3
+            self.Input_Signal_X[i+1] = self.Input_Signal[i]
 
         return self.x[self.Plot_Start : self.Plot_End - 1], \
             self.y[self.Plot_Start : self.Plot_End - 1], \

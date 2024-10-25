@@ -194,12 +194,12 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         "Chialvo_beta"              : 0.2,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
-        "RunTime" : 3500,
-        "Plot_Start" : 2500,
-        "Plot_End" : 3500,
+        "RunTime" : 4000,
+        "Plot_Start" : 3000,
+        "Plot_End" : 4000,
 
         #入力信号：uについて
-        "Input_Signal"  : np.sin,
+        "Input_Signal"  : 0,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,
