@@ -60,6 +60,9 @@ class Model_Chialvo(Model):
         self.alpha = self.Param["Chialvo_alpha"]
         self.beta = self.Param["Chialvo_beta"]
 
+        #入力信号
+        self.Input_Signal = self.Param["Input_Signal"]
+
         #実行時間
         self.RunTime = self.Param["RunTime"]
         self.Plot_Start = self.Param["Plot_Start"]
@@ -97,6 +100,8 @@ class Model_Chialvo(Model):
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     def __call__(self):
+        #入力信号プロットの作成
+        self.Input_Signal_X = np.zeros(self.RunTime)
 
         #Chialvoニューロンの差分方程式の計算部
         for i in range(self.RunTime - 1):
@@ -104,13 +109,16 @@ class Model_Chialvo(Model):
             print("\r%d / %d"%(i, self.RunTime), end = "")
 
             self.x[i+1] = pow(self.x[i], 2) * np.exp(self.y[i] - self.x[i]) + self.k0 \
-                + self.k * self.x[i] * (self.alpha + 3 * self.beta * pow(self.phi[i], 2)) + 0.8 * np.sin(2 * i * np.pi / 180) * 0.3 * np.cos(3 * i * np.pi / 180) + random.random() * 0.4 - 0.2
+                + self.k * self.x[i] * (self.alpha + 3 * self.beta * pow(self.phi[i], 2)) + self.Input_Signal
             self.y[i+1] = self.a * self.y[i] - self.b * self.x[i] + self.c
             self.phi[i+1] = self.k1 * self.x[i] - self.k2 * self.phi[i]
 
+            self.Input_Signal_X[i+1] = self.Input_Signal
+
         return self.x[self.Plot_Start : self.Plot_End - 1], \
             self.y[self.Plot_Start : self.Plot_End - 1], \
-            self.phi[self.Plot_Start : self.Plot_End - 1]
+            self.phi[self.Plot_Start : self.Plot_End - 1], \
+                self.Input_Signal_X[self.Plot_Start : self.Plot_End - 1]
 
 
 class Model_Chialvo_OldNullcline(Model):

@@ -67,7 +67,7 @@ class Output_TimeLine(Output):
     def __call__(self):
 
         print("--- Chialvo Neuron Map RunStart---\n")
-        self.X, self.Y , self.Phi = self.Model()
+        self.X, self.Y, self.Phi, self.Signal = self.Model()
 
         def TimeDate():
             Time_Delta = datetime.timedelta(hours=9)
@@ -85,6 +85,9 @@ class Output_TimeLine(Output):
             param = self.Param.copy()
             param.update({
                 "PlotData" : self.X,
+                "PlotData_Label" : "Chialvo : X",
+                "PlotSignal" : self.Signal,
+                "PlotSignal_Label" : "Input Signal",
                 "PlotTitle" : "Chialvo Map : Timeline of x",
                 "PlotXLabel" : "Time Step",
                 "PlotYLabel" : "x",
@@ -100,6 +103,9 @@ class Output_TimeLine(Output):
             param = self.Param.copy()
             param.update({
                 "PlotData" : self.Y,
+                "PlotData_Label" : "Chialvo : Y",
+                "PlotSignal" : self.Signal,
+                "PlotSignal_Label" : "Input Signal",
                 "PlotTitle" : "Chialvo Map : Timeline of y",
                 "PlotXLabel" : "Time Step",
                 "PlotYLabel" : "y",
@@ -116,6 +122,9 @@ class Output_TimeLine(Output):
             param = self.Param.copy()
             param.update({
                 "PlotData" : self.Phi,
+                "PlotData_Label" : "Chialvo : Phi",
+                "PlotSignal" : self.Signal,
+                "PlotSignal_Label" : "Input Signal",
                 "PlotTitle" : "Chialvo Map : Timeline of phi",
                 "PlotXLabel" : "Time Step",
                 "PlotYLabel" : "phi",

@@ -46,6 +46,9 @@ class Plot_TimeLine(Plot):
 
         #プロット要素
         self.PlotData = self.Param["PlotData"]
+        self.PlotData_Label = self.Param["PlotData_Label"]
+        self.PlotSignal = self.Param["PlotSignal"]
+        self.PlotSignal_Label = self.Param["PlotSignal_Label"]
         self.PlotTitle = self.Param["PlotTitle"]
         self.PlotXLabel = self.Param["PlotXLabel"]
         self.PlotYLabel = self.Param["PlotYLabel"]
@@ -81,7 +84,10 @@ class Plot_TimeLine(Plot):
         ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Label)
         ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Label)
 
-        ax.plot(self.PlotData,'-',lw = LineWidth)
+        ax.plot(self.PlotData, label = f"{self.PlotData_Label}", linestyle = '-',lw = LineWidth)
+        ax.plot(self.PlotSignal, label = f"{self.PlotSignal_Label}", linestyle = '-',lw = LineWidth)
+        ax.grid()
+        plt.legend()
         fig.tight_layout()
         New_DirPath()
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
