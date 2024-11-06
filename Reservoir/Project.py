@@ -616,10 +616,10 @@ def Project_SishuESN_NRMSE_MC_2024_06_23_00_12():
         "Model_SishuESN_InputScale" : 0.1,                 #入力スケーリング
         "Model_SishuESN_sigma" : "False",    #リング・ネットワークの有無（文字列のTrueは乱数結合。併用禁止、するなら0指定）
         "Model_SishuESN_mu" : "False",        #スター・ネットワークの有無（文字列のTrueは乱数結合。併用禁止、するなら0指定）
-        "Model_SishuESN_k" : -2.2,           #Chialvoの変数：k
+        "Model_SishuESN_k" : -3.2,           #Chialvoの変数：k
 
         "SishuReservoir_Density" : 1,                         #結合密度
-        "Model_SishuESN_Rho" : 0.001,                          #スペクトル半径
+        "Model_SishuESN_Rho" : 0.003,                          #スペクトル半径
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "LinerTransformer_Beta" : 0.2,                      #正規化係数
         }

@@ -69,25 +69,26 @@ class Plot_TimeLine(Plot):
 
         #プロット図全体のフォントサイズ
         FigSize = (16,9)
-        FontSize_Label = 34                 #ラベルのフォントサイズ
-        FontSize_Title = 28                 #タイトルのフォントサイズ
-        Labelsize = 28                      #ラベルサイズ
-        LineWidth = 2                       #線の太さ
+        FontSize_Axis = 32                #「各軸ラベル（Time Stepなど）」のフォントサイズ
+        FontSize_Title = 28               #「タイトル（一番上）」のフォントサイズ
+        FontSize_TickLabel = 14           #「各ラベルの単位（-2.0,-1.9など）」のフォントサイズ
+        FontSize_legend = 10              #「各凡例」のフォントサイズ
+        LineWidth = 2                     #線の太さ
         FileFormat = ".png"          #ファイルフォーマット
 
         fig = plt.figure(figsize = FigSize)
         ax = fig.add_subplot(1,1,1)
 
         Title = self.PlotTitle
-        plt.tick_params(labelsize=Labelsize)
+        ax.tick_params(labelsize=FontSize_TickLabel)
         ax.set_title(Title, fontsize = FontSize_Title)
-        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Label)
-        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Label)
+        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
+        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
 
-        ax.plot(self.PlotData, label = f"{self.PlotData_Label}", linestyle = '-',lw = LineWidth)
-        ax.plot(self.PlotSignal, label = f"{self.PlotSignal_Label}", linestyle = '-',lw = LineWidth)
+        ax.plot(self.PlotData, label = f"{self.PlotData_Label}", linestyle = '-',lw = LineWidth * 0.9)
+        ax.plot(self.PlotSignal, label = f"{self.PlotSignal_Label}", linestyle = '-',lw = LineWidth * 0.85)
         ax.grid()
-        plt.legend()
+        ax.legend(fontsize = FontSize_legend)
         fig.tight_layout()
         New_DirPath()
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
@@ -125,20 +126,20 @@ class Plot_PhaseSpace(Plot):
 
         #プロット図全体のフォントサイズ
         FigSize = (16,9)
-        FontSize_Label = 34                 #ラベルのフォントサイズ
-        FontSize_Title = 28                 #タイトルのフォントサイズ
-        Labelsize = 28                      #ラベルサイズ
-        LineWidth = 2                       #線の太さ
+        FontSize_Axis = 32                #「各軸ラベル（Time Stepなど）」のフォントサイズ
+        FontSize_Title = 28               #「タイトル（一番上）」のフォントサイズ
+        FontSize_TickLabel = 14           #「各ラベルの単位（-2.0,-1.9など）」のフォントサイズ
+        LineWidth = 2                     #線の太さ
         FileFormat = ".png"          #ファイルフォーマット
 
         fig = plt.figure(figsize = FigSize)
         ax = fig.add_subplot(1,1,1)
 
         Title = self.PlotTitle
-        plt.tick_params(labelsize=Labelsize)
+        plt.tick_params(labelsize=FontSize_TickLabel)
         ax.set_title(Title, fontsize = FontSize_Title)
-        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Label)
-        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Label)
+        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
+        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
 
         ax.plot(self.PlotData_Xaxis, self.PlotData_Yaxis,'-',lw = LineWidth)
         ax.grid()
@@ -181,21 +182,22 @@ class Plot_PhaseSpace_3D(Plot):
 
         #プロット図全体のフォントサイズ
         FigSize = (16,9)
-        FontSize_Label = 24                 #ラベルのフォントサイズ
-        FontSize_Title = 18                 #タイトルのフォントサイズ
-        Labelsize = 18                      #ラベルサイズ
-        LineWidth = 1                       #線の太さ
+        FontSize_Axis = 22                #「各軸ラベル（Time Stepなど）」のフォントサイズ
+        FontSize_Title = 18               #「タイトル（一番上）」のフォントサイズ
+        FontSize_TickLabel = 9           #「各ラベルの単位（-2.0,-1.9など）」のフォントサイズ
+        FontSize_legend = 10              #「各凡例」のフォントサイズ
+        LineWidth = 2                     #線の太さ
         FileFormat = ".png"          #ファイルフォーマット
 
         fig = plt.figure(figsize = FigSize)
         ax = fig.add_subplot(1,1,1, projection = '3d')
 
         Title = self.PlotTitle
-        plt.tick_params(labelsize=Labelsize)
+        plt.tick_params(labelsize=FontSize_TickLabel)
         ax.set_title(Title, fontsize = FontSize_Title)
-        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Label)
-        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Label)
-        ax.set_zlabel(self.PlotZLabel, fontsize = FontSize_Label)
+        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
+        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
+        ax.set_zlabel(self.PlotZLabel, fontsize = FontSize_Axis)
 
         ax.plot(self.PlotData_Xaxis, self.PlotData_Yaxis, self.PlotData_Zaxis,'-',lw = LineWidth)
         ax.grid()
@@ -260,19 +262,21 @@ class Plot_Nullcline(Plot):
 
         #プロット図全体のフォントサイズ
         FigSize = (16,9)
-        FontSize_Label = 34                 #ラベルのフォントサイズ
-        FontSize_Title = 28                 #タイトルのフォントサイズ
-        Labelsize = 28                      #ラベルサイズ
-        LineWidth = 2                       #線の太さ
+        FontSize_Axis = 32                #「各軸ラベル（Time Stepなど）」のフォントサイズ
+        FontSize_Title = 28               #「タイトル（一番上）」のフォントサイズ
+        FontSize_TickLabel = 14           #「各ラベルの単位（-2.0,-1.9など）」のフォントサイズ
+        FontSize_legend = 10              #「各凡例」のフォントサイズ
+        LineWidth = 2                     #線の太さ
+        FileFormat = ".png"          #ファイルフォーマット
 
         fig = plt.figure(figsize = FigSize)
         ax = fig.add_subplot(1,1,1)
 
         Title = self.PlotTitle
-        ax.tick_params(labelsize=Labelsize)
+        ax.tick_params(labelsize=FontSize_TickLabel)
         ax.set_title(Title, fontsize = FontSize_Title)
-        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Label)
-        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Label)
+        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
+        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
 
         #Nullclineの描写
         ax.plot(self.PlotData_dx, self.PlotData_fx, '-', lw = LineWidth)
@@ -356,20 +360,22 @@ class Plot_Nullcline3D(Plot):
 
         #プロット図全体のフォントサイズ
         FigSize = (16,9)
-        FontSize_Label = 34                 #ラベルのフォントサイズ
-        FontSize_Title = 28                 #タイトルのフォントサイズ
-        Labelsize = 28                      #ラベルサイズ
-        LineWidth = 2                       #線の太さ
+        FontSize_Axis = 28                #「各軸ラベル（Time Stepなど）」のフォントサイズ
+        FontSize_Title = 32               #「タイトル（一番上）」のフォントサイズ
+        FontSize_TickLabel = 14           #「各ラベルの単位（-2.0,-1.9など）」のフォントサイズ
+        FontSize_legend = 10              #「各凡例」のフォントサイズ
+        LineWidth = 2                     #線の太さ
+        FileFormat = ".png"          #ファイルフォーマット
 
         fig = plt.figure(figsize = FigSize)
         ax = fig.add_subplot(1,1,1, projection = '3d')
 
         Title = self.PlotTitle
-        ax.tick_params(labelsize=Labelsize)
+        ax.tick_params(labelsize=FontSize_TickLabel)
         ax.set_title(Title, fontsize = FontSize_Title)
-        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Label)
-        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Label)
-        ax.set_zlabel(self.PlotZLabel, fontsize = FontSize_Label)
+        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
+        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
+        ax.set_zlabel(self.PlotZLabel, fontsize = FontSize_Axis)
 
         #Nullclineの描写
         ax.plot(self.PlotData_fx, self.PlotData_dy, self.PlotData_dphi,'-', lw = LineWidth)

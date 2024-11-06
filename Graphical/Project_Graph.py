@@ -200,11 +200,12 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         "Plot_End" : 4000,
 
         #入力信号：uについて
-        "Input_Signal"  : 1,
-        "Input_Signal_def" : np.sin,
+        "Input_Signal"  : 7,
+
         #恒等関数：None
         #sin関数：np.sin
         #離散信号：random.randint
+        "Input_Signal_def" : random.randint,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,
@@ -243,23 +244,24 @@ def Project_Chialvo_PhaseSpace_2024_09_26_12_34():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -3.2,
+        "Chialvo_k"                 : 3.2,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
         "Chialvo_beta"              : 0.2,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #時系列描写の実行時間
+        "RunTime" : 4000,
+        "Plot_Start" : 2000,
+        "Plot_End" : 4000,
+
         #入力信号：uについて
-        "Input_Signal"  : 1,
-        "Input_Signal_def" : random.randint,
+        "Input_Signal"  : 0,
+
         #恒等関数：None
         #sin関数：np.sin
         #離散信号：random.randint
-        
-        #時系列描写の実行時間
-        "RunTime" : 4000,
-        "Plot_Start" : 3000,
-        "Plot_End" : 4000,
+        "Input_Signal_def" : np.sin,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,
@@ -285,7 +287,7 @@ def Project_Chialvo_OldNullcline_2024_09_27_15_07():
         #Nullclineの描写
         "Project_Plot_OldNullcline"         : True,
         #相平面における解の軌道の描写
-        "Project_Plot_PhaseSpace"           : False,
+        "Project_Plot_PhaseSpace"           : True,
 
         #+++++++++++++++++++++++++s+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #従来のChialvoパラメータ
@@ -301,24 +303,23 @@ def Project_Chialvo_OldNullcline_2024_09_27_15_07():
         "Plot_End" : 3000,
 
         #入力信号：uについて
-        "Input_Signal"  : 2,
+        "Input_Signal"  : 0,
 
         #ベクトル場の間隔
-        "Vdt" : 0.05,
+        "Vdt" : 0.5,
         #Nullclineの間隔
         "dt" : 0.0001,
 
         #どこからどこまでプロット図の点を作成するか
-        "Plot_x_Start" : 1,
-        "Plot_x_End" : 3,
+        "Plot_x_Start" : -10,
+        "Plot_x_End" : 10,
 
-        "Plot_y_Start" : -2,
-        "Plot_y_End" : 0,
+        "Plot_y_Start" : -10,
+        "Plot_y_End" : 10,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,
         "Initial_Value_Y" : None,
-
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     }
     
@@ -339,7 +340,7 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
         #Nullclineの描写
         "Project_Plot_NewNullcline"         : True,
         #相平面における解の軌道の描写
-        "Project_Plot_PhaseSpace"           : False,
+        "Project_Plot_PhaseSpace"           : True,
 
         #+++++++++++++++++++++++++s+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #従来のChialvoパラメータ
@@ -356,12 +357,12 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
         "Chialvo_beta"              : 0.2,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
-        "RunTime" : 3000,
-        "Plot_Start" : 0,
-        "Plot_End" : 3000,
+        "RunTime" : 30000,
+        "Plot_Start" : 20000,
+        "Plot_End" : 30000,
 
         #入力信号：uについて
-        "Input_Signal"  : -1,
+        "Input_Signal"  : 0,
 
         #ベクトル場の間隔
         "Vdt" : 1,

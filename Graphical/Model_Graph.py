@@ -111,11 +111,13 @@ class Model_Chialvo(Model):
         
         elif self.Input_Signal_def == np.sin:
             for n in range(self.RunTime - 1):
-                self.Input_Signal_In[n+1] = 0.01 * self.Input_Signal_def(4 * n * np.pi / 180) / 0.1 * np.cos(3 * n * np.pi / 180)
+                self.Input_Signal_In[n+1] = 0.1 * self.Input_Signal * self.Input_Signal_def(4 * n * np.pi / 180)
         
         elif self.Input_Signal_def == random.randint:
-            for n in range((self.RunTime) // 10):
-                self.Input_Signal_In[n * 10 : (n+1) * 10] = self.Input_Signal_def(0,1)
+            self.Step_s = self.RunTime // 100
+            self.Step = self.RunTime // self.Step_s
+            for n in range(self.Step):
+                self.Input_Signal_In[n * 100 : (n+1) * 100] = self.Input_Signal_def(0,self.Input_Signal)
 
         #Chialvoニューロンの差分方程式の計算部
         for i in range(self.RunTime - 1):
@@ -214,15 +216,19 @@ class Model_Chialvo_OldNullcline(Model):
             self.y = np.zeros(self.RunTime)
             self.y[0] = self.Initial_Value_Y
         #--------------------------------------------------------------------
+        #入力信号プロットの作成
+        self.Input_Signal_In = np.zeros(self.RunTime)
 
         for n in range(self.RunTime - 1):
-            self.x[n+1] = pow(self.x[n], 2) * np.exp(self.y[n] - self.x[n]) + self.k0
+            self.Input_Signal_In[n+1] = self.Input_Signal
+        #--------------------------------------------------------------------
+        for n in range(self.RunTime - 1):
+            self.x[n+1] = pow(self.x[n], 2) * np.exp(self.y[n] - self.x[n]) + self.k0 + self.Input_Signal_In[n]
             self.y[n+1] = self.a * self.y[n] - self.b * self.x[n] + self.c
 
         return self.X, self.Y, self.Vx, self.Vy, \
                 self.dx, self.dy, self.fx, self.fy, \
                         self.x[self.Plot_Start : self.Plot_End - 1], self.y[self.Plot_Start : self.Plot_End - 1]
-
 
 class Model_Chialvo_NewNullcline(Model):
 
@@ -327,16 +333,21 @@ class Model_Chialvo_NewNullcline(Model):
             self.phi[0] = self.Initial_Value_Phi
         
         #--------------------------------------------------------------------
+        #入力信号プロットの作成
+        self.Input_Signal_In = np.zeros(self.RunTime)
+
+        for n in range(self.RunTime - 1):
+            self.Input_Signal_In[n+1] = self.Input_Signal
+        #--------------------------------------------------------------------
         for n in range(self.RunTime - 1):
             self.x[n+1] = pow(self.x[n], 2) * np.exp(self.y[n] - self.x[n]) + self.k0 \
-                + self.k * self.x[n] * (self.alpha + 3 * self.beta * pow(self.phi[n], 2))
+                + self.k * self.x[n] * (self.alpha + 3 * self.beta * pow(self.phi[n], 2)) + self.Input_Signal_In[n]
             self.y[n+1] = self.a * self.y[n] - self.b * self.x[n] + self.c
             self.phi[n+1] = self.k1 * self.x[n] - self.k2 * self.phi[n]
 
         return self.X, self.Y, self.Vx, self.Vy, \
                 self.dx, self.dy, self.fx, self.fy, \
                         self.x[self.Plot_Start : self.Plot_End - 1], self.y[self.Plot_Start : self.Plot_End - 1]
-
 
 class Model_Chialvo_NewNullcline3D(Model):
 

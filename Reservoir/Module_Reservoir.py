@@ -616,7 +616,7 @@ class Module_SishuReservoir(Module_Reservoir):
         a = 0.89
         b = 0.6
         c = 0.28
-        k0 = 0.06
+        k0 = 0.04
         k1 = 0.1
         k2 = 0.2
         Alph_Chialvo = 0.1
