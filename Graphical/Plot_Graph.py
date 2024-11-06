@@ -378,9 +378,9 @@ class Plot_Nullcline3D(Plot):
         ax.set_zlabel(self.PlotZLabel, fontsize = FontSize_Axis)
 
         #Nullclineの描写
-        ax.plot(self.PlotData_fx, self.PlotData_dy, self.PlotData_dphi,'-', lw = LineWidth)
-        ax.plot(self.PlotData_dx, self.PlotData_fy, np.zeros_like(self.PlotData_dphi),'-', lw = LineWidth)
-        ax.plot(self.PlotData_dx, np.zeros_like(self.PlotData_dy), self.PlotData_fphi, '-', lw = LineWidth)
+        ax.plot(self.PlotData_fx, self.PlotData_dy, self.PlotData_dphi)
+        ax.plot(self.PlotData_dx, self.PlotData_fy, np.zeros_like(self.PlotData_dphi))
+        ax.plot(self.PlotData_dx, np.zeros_like(self.PlotData_dy), self.PlotData_fphi)
         
         #相平面の描写
         if self.Plot_PhaseSpace:
