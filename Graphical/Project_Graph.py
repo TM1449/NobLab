@@ -365,17 +365,17 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
         "Input_Signal"  : 0,
 
         #ベクトル場の間隔
-        "Vdt" : 1,
+        "Vdt" : 0.005,
         #Nullclineの間隔
         "dt" : 0.0001,
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #どこからどこまでプロット図の点を作成するか
-        "Plot_x_Start" : -20,
-        "Plot_x_End" : 20,
+        "Plot_x_Start" : -0.1,
+        "Plot_x_End" : 0.1,
 
-        "Plot_y_Start" : -20,
-        "Plot_y_End" : 20,
+        "Plot_y_Start" : -0.1,
+        "Plot_y_End" : 0.1,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,

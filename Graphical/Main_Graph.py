@@ -49,10 +49,10 @@ print("###Main Program has started###\n")
 #Project_Graph.Project_Chialvo_PhaseSpace_2024_09_26_12_34()
 
 #Project_Graph.Project_Chialvo_OldNullcline_2024_09_27_15_07()
-#Project_Graph.Project_Chialvo_NewNullcline_2024_10_14_18_17()
+Project_Graph.Project_Chialvo_NewNullcline_2024_10_14_18_17()
 
 #未完成
-Project_Graph.Project_Chialvo_NewNullcline3D_2024_10_20_12_17()
+#Project_Graph.Project_Chialvo_NewNullcline3D_2024_10_20_12_17()
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
