@@ -2,19 +2,22 @@ import numpy as np
 from scipy import optimize
 import scipy.linalg
 
-a = 0.89
-b = 0.6
-c = 0.28
-k_0 = 0.04
+a = 0.5
+b = 0.4
+c = 0.89
+k_0 = -0.44
 k_1 = 0.1
 k_2 = 0.2
 alpha = 0.1
-beta = 0.2
-k = -3.2
+beta = 0.1
+k = 7.6
 
-InputSingal = 8
+InputSingal = 0
 
-dt = 0.00001
+dt = 1e-06
+print(dt)
+dt_R = int(np.reciprocal(dt))
+print(dt_R)
 ps = -10
 pe = 10
 
@@ -22,20 +25,23 @@ dx = np.arange(ps,pe,dt)
 dx = np.round(dx, 1)
 
 """------------------------"""
-"""
-for i in range(ps*100000,pe*100000,1):
+sss = 0
+#"""
+for i in range(ps*dt_R, pe*dt_R,1):
     i = i * dt
     fx = pow(i,2) * np.exp(((b - a + 1) * i - c) / (a - 1)) + k_0 \
     + ((3*k*beta*pow(k_1,2)) / pow((1 + k_2), 2)) * pow(i,3) \
         + i * k * alpha + InputSingal
     fg = i
 
-    fx_r = round(fx, 4)
-    fg_r = round(fg, 4)
+    fx_r = round(fx, 6)
+    fg_r = round(fg, 6)
+    print("\r%d / %d , %fper "%(sss, (pe)*2*dt_R, (sss/((pe)*2*dt_R)*100)), end = "")
+    sss += 1
 
     if pow((fx_r - fg_r),2) == 0:
         print(fx_r)
-"""
+#"""
 
 """------------------------"""
 #-0.2118
@@ -43,19 +49,20 @@ for i in range(ps*100000,pe*100000,1):
 #1.755 or 51
 #4.5592 or 3 or 4
 
-dz = 4.9015
+"""
+dz = 0.044843
 fx = pow(dz,2) * np.exp(((b - a + 1) * dz - c) / (a - 1)) + k_0 \
     + ((3*k*beta*pow(k_1,2)) / pow((1 + k_2), 2)) * pow(dz,3) \
         + dz * k * alpha + InputSingal
 print("x=")
 print(dz)
 print("fx=")
-print(round(fx,4))
+print(round(fx,6))
 print("\n")
-
+"""
 """------------------------"""
-
-x = 4.9015
+"""
+x = 0.044843
 
 y = round((-b * x + c) / (1-a),4)
 phi = round(k_1 * x / (1+k_2),4)
@@ -70,3 +77,4 @@ A = np.array\
 val = scipy.linalg.eigvals(A)
 print("Eigenvalue = ")
 print(val)
+"""
