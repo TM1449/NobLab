@@ -416,8 +416,8 @@ class Model_Chialvo_NewNullcline3D(Model):
         self.dphi = np.arange(self.Plot_phi_Start, self.Plot_phi_End, self.dt)
 
         self.fx = (pow(self.dx, 2) * np.exp(self.dy - self.dx) + self.k0 + self.k * self.dx * (self.alpha + 3 * self.beta * pow(self.dphi, 2)))
-        self.fy = (self.b * self.dx - self.c) / (self.a - 1)
-        self.fphi = (self.k1 * self.dx) / (self.k2 + 1)
+        self.fy = (self.a * self.dy - self.b * self.dx + self.c)
+        self.fphi = (self.k1 * self.dx - self.k2 * self.dphi)
 
         #--------------------------------------------------------------------
         """
