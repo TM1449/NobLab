@@ -386,7 +386,7 @@ class Plot_Nullcline3D(Plot):
         if self.Plot_PhaseSpace:
             ax.plot(self.PlotData_x, self.PlotData_y, self.PlotData_phi, '-', lw = LineWidth)
 
-        ax.quiver(self.PlotData_X, self.PlotData_Y, self.PlotData_Phi, self.PlotData_Vx / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)), self.PlotData_Vy / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)), self.PlotData_Vphi / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)))
+        ax.quiver(self.PlotData_X, self.PlotData_Y, self.PlotData_Phi, self.PlotData_Vx / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)), self.PlotData_Vy / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)), self.PlotData_Vphi / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)),linewidth = 1)
 
         ax.set_xlim([self.Plot_x_Start, self.Plot_x_End])
         ax.set_ylim([self.Plot_y_Start, self.Plot_y_End])

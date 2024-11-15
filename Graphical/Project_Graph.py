@@ -405,21 +405,21 @@ def Project_Chialvo_NewNullcline3D_2024_10_20_12_17():
 
         #+++++++++++++++++++++++++s+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #従来のChialvoパラメータ
-        "Chialvo_a"                 : 0.89,
-        "Chialvo_b"                 : 0.6,
-        "Chialvo_c"                 : 0.28,
-        "Chialvo_k0"                : 0.04,
+        "Chialvo_a"                 : 0.5,
+        "Chialvo_b"                 : 0.4,
+        "Chialvo_c"                 : 0.89,
+        "Chialvo_k0"                : -0.44,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -3.2,
+        "Chialvo_k"                 : 0,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
-        "Chialvo_beta"              : 0.2,
+        "Chialvo_beta"              : 0.1,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
         "RunTime" : 3000,
-        "Plot_Start" : 2900,
+        "Plot_Start" : 0,
         "Plot_End" : 3000,
 
         #ベクトル場の間隔

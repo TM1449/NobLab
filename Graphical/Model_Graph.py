@@ -403,7 +403,7 @@ class Model_Chialvo_NewNullcline3D(Model):
 
         self.X, self.Y, self.Phi = np.meshgrid(self.Vdx, self.Vdy, self.Vdphi)
         
-        self.Vx = (pow(self.X, 2) * np.exp(self.Y - self.X) + self.k0 + self.k * self.X * (self.alpha + 3 * self.beta * pow(self.Phi, 2))) - self.X
+        self.Vx = (pow(self.X, 2) * np.exp(self.Y - self.X) + self.k0 + self.k * self.X * (self.alpha + 3 * self.beta * pow(self.Phi, 2))) - self.X + 1
         self.Vy = (self.a * self.Y - self.b * self.X + self.c) - self.Y
         self.Vphi = (self.k1 * self.X - self.k2 * self.Phi) - self.Phi
         
@@ -415,9 +415,9 @@ class Model_Chialvo_NewNullcline3D(Model):
         self.dy = np.arange(self.Plot_y_Start, self.Plot_y_End, self.dt)
         self.dphi = np.arange(self.Plot_phi_Start, self.Plot_phi_End, self.dt)
 
-        self.fx = (pow(self.dx, 2) * np.exp(self.dy - self.dx) + self.k0 + self.k * self.dx * (self.alpha + 3 * self.beta * pow(self.dphi, 2)))
-        self.fy = (self.a * self.dy - self.b * self.dx + self.c)
-        self.fphi = (self.k1 * self.dx - self.k2 * self.dphi)
+        self.fx = (pow(self.dx, 2) * np.exp(self.dy - self.dx) + self.k0 + self.k * self.dx * (self.alpha + 3 * self.beta * pow(self.dphi, 2))) + 1
+        self.fy = (self.b * self.dx - self.c) / (self.a - 1)
+        self.fphi = self.k1 * self.dx / (self.k2 + 1)
 
         #--------------------------------------------------------------------
         """
@@ -454,7 +454,7 @@ class Model_Chialvo_NewNullcline3D(Model):
         #--------------------------------------------------------------------
         for n in range(self.RunTime - 1):
             self.x[n+1] = pow(self.x[n], 2) * np.exp(self.y[n] - self.x[n]) + self.k0 \
-                + self.k * self.x[n] * (self.alpha + 3 * self.beta * pow(self.phi[n], 2))
+                + self.k * self.x[n] * (self.alpha + 3 * self.beta * pow(self.phi[n], 2)) + 1
             self.y[n+1] = self.a * self.y[n] - self.b * self.x[n] + self.c
             self.phi[n+1] = self.k1 * self.x[n] - self.k2 * self.phi[n]
 
