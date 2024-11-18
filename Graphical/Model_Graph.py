@@ -126,7 +126,7 @@ class Model_Chialvo(Model):
 
             self.x[i+1] = pow(self.x[i], 2) * np.exp(self.y[i] - self.x[i]) + self.k0 \
                 + self.k * self.x[i] * (self.alpha + 3 * self.beta * pow(self.phi[i], 2)) + self.Input_Signal_In[i]
-            self.y[i+1] = self.a * self.y[i] - self.b * self.x[i] + self.c
+            self.y[i+1] = self.a * self.y[i] - self.b * self.x[i] + self.c 
             self.phi[i+1] = self.k1 * self.x[i] - self.k2 * self.phi[i]
 
         return self.x[self.Plot_Start : self.Plot_End - 1], \
@@ -373,6 +373,9 @@ class Model_Chialvo_NewNullcline3D(Model):
         self.Plot_Start = self.Param["Plot_Start"]
         self.Plot_End = self.Param["Plot_End"]
 
+        #入力信号
+        self.Input_Signal = self.Param["Input_Signal"]
+
         #ベクトル場の間隔
         self.Vdt = self.Param["Vdt"]
         
@@ -403,7 +406,7 @@ class Model_Chialvo_NewNullcline3D(Model):
 
         self.X, self.Y, self.Phi = np.meshgrid(self.Vdx, self.Vdy, self.Vdphi)
         
-        self.Vx = (pow(self.X, 2) * np.exp(self.Y - self.X) + self.k0 + self.k * self.X * (self.alpha + 3 * self.beta * pow(self.Phi, 2))) - self.X + 1
+        self.Vx = (pow(self.X, 2) * np.exp(self.Y - self.X) + self.k0 + self.k * self.X * (self.alpha + 3 * self.beta * pow(self.Phi, 2))) + self.Input_Signal - self.X
         self.Vy = (self.a * self.Y - self.b * self.X + self.c) - self.Y
         self.Vphi = (self.k1 * self.X - self.k2 * self.Phi) - self.Phi
         
@@ -415,9 +418,11 @@ class Model_Chialvo_NewNullcline3D(Model):
         self.dy = np.arange(self.Plot_y_Start, self.Plot_y_End, self.dt)
         self.dphi = np.arange(self.Plot_phi_Start, self.Plot_phi_End, self.dt)
 
-        self.fx = (pow(self.dx, 2) * np.exp(self.dy - self.dx) + self.k0 + self.k * self.dx * (self.alpha + 3 * self.beta * pow(self.dphi, 2))) + 1
+        self.fx = pow(self.dx, 2) * np.exp(((self.b  - self.a + 1) * self.dx - self.c) / (self.a - 1)) + self.k0 \
+            + ((3 * self.k * self.beta * pow(self.k1, 2)) / pow((1 + self.k2), 2)) * pow(self.dx, 3) \
+                + self.dx * self.k * self.alpha + self.Input_Signal
         self.fy = (self.b * self.dx - self.c) / (self.a - 1)
-        self.fphi = self.k1 * self.dx / (self.k2 + 1)
+        self.fphi = (self.k1 * self.dx) / (self.k2 + 1)
 
         #--------------------------------------------------------------------
         """
@@ -450,11 +455,16 @@ class Model_Chialvo_NewNullcline3D(Model):
         else:
             self.phi = np.zeros(self.RunTime)
             self.phi[0] = self.Initial_Value_Phi
-        
+        #--------------------------------------------------------------------
+        #入力信号プロットの作成
+        self.Input_Signal_In = np.zeros(self.RunTime)
+
+        for n in range(self.RunTime - 1):
+            self.Input_Signal_In[n+1] = self.Input_Signal
         #--------------------------------------------------------------------
         for n in range(self.RunTime - 1):
             self.x[n+1] = pow(self.x[n], 2) * np.exp(self.y[n] - self.x[n]) + self.k0 \
-                + self.k * self.x[n] * (self.alpha + 3 * self.beta * pow(self.phi[n], 2)) + 1
+                + self.k * self.x[n] * (self.alpha + 3 * self.beta * pow(self.phi[n], 2)) + self.Input_Signal_In[n]
             self.y[n+1] = self.a * self.y[n] - self.b * self.x[n] + self.c
             self.phi[n+1] = self.k1 * self.x[n] - self.k2 * self.phi[n]
 

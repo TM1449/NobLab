@@ -3,23 +3,25 @@ import scipy.linalg
 import time
 
 #電磁束下Chialvoのパラメータ
-a = 0.5
-b = 0.4
-c = 0.89
-k0 = -0.44
+a = 0.89
+b = 0.6
+c = 0.28
+k0 = 0.04
+
 k1 = 0.1
 k2 = 0.2
 alpha = 0.1
-beta = 0.1
-k = 0
+beta = 0.2
+
+k = -5
 
 #入力信号
-InputSingal = 0
+InputSingal = 8
 
 setting = {
-    "dx"    : 1e-05,
-    "dx_R"  : 1e+05,
-    "round" : 5
+    "dx"    : 1e-03,
+    "dx_R"  : 1e+03,
+    "round" : 3
 }
 
 #計測間隔
@@ -30,7 +32,7 @@ print(f"計測間隔の逆数：{dx_R}")
 round_Pre = setting["round"]
 
 #開始, 終了地点
-Plot_Start = -10
+Plot_Start = -2
 Plot_End = 10
 
 #交点を求める関数
@@ -39,7 +41,7 @@ Derive_of_Intersections = True
 Derive_of_FixedPoint = True
 
 #固定点を加えるためのリスト
-FixedPoint_List = list()
+FixedPoint_List = list() #list()[]
 
 """------------------------------------------------------------"""
 if Derive_of_Intersections:
@@ -83,8 +85,8 @@ if Derive_of_FixedPoint:
 
         print(f"Fixed Point: x = {x}, y = {y}, phi = {phi}")
         Jac_Matrix = np.array([[np.exp(y - x) * (2 * x - pow(x, 2)) + k * (alpha + 3 * beta * pow(phi, 2)), pow(x, 2) * np.exp(y - x), 6 * k * x * beta * phi],\
-                                [-b, a, 0],\
+                                [-b, a, 0], \
                                     [k1, 0, -k2]])
         
-        Eig_Val = np.linalg.eigvals(Jac_Matrix)
-        print(f"Eigenvalue = {Eig_Val}\n")
+        Eig_Val= np.linalg.eigvals(Jac_Matrix)
+        print(f"Eigenvalue = {Eig_Val}")

@@ -364,7 +364,7 @@ class Plot_Nullcline3D(Plot):
         FontSize_Title = 32               #「タイトル（一番上）」のフォントサイズ
         FontSize_TickLabel = 14           #「各ラベルの単位（-2.0,-1.9など）」のフォントサイズ
         FontSize_legend = 10              #「各凡例」のフォントサイズ
-        LineWidth = 2                     #線の太さ
+        LineWidth = 1.2                     #線の太さ
         FileFormat = ".png"          #ファイルフォーマット
 
         fig = plt.figure(figsize = FigSize)
@@ -386,7 +386,7 @@ class Plot_Nullcline3D(Plot):
         if self.Plot_PhaseSpace:
             ax.plot(self.PlotData_x, self.PlotData_y, self.PlotData_phi, '-', lw = LineWidth)
 
-        ax.quiver(self.PlotData_X, self.PlotData_Y, self.PlotData_Phi, self.PlotData_Vx / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)), self.PlotData_Vy / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)), self.PlotData_Vphi / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)),linewidth = 1)
+        ax.quiver(self.PlotData_X, self.PlotData_Y, self.PlotData_Phi, 0.5*self.PlotData_Vx / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)), 0.5*self.PlotData_Vy / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)), 0.5*self.PlotData_Vphi / np.sqrt(pow(self.PlotData_Vx, 2) + pow(self.PlotData_Vy, 2) + pow(self.PlotData_Vphi, 2)),linewidth = 0.5)
 
         ax.set_xlim([self.Plot_x_Start, self.Plot_x_End])
         ax.set_ylim([self.Plot_y_Start, self.Plot_y_End])
