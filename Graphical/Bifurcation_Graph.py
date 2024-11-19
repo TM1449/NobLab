@@ -13,15 +13,17 @@ k2 = 0.2
 alpha = 0.1
 beta = 0.2
 
-k = -5
+k = -10
 
 #入力信号
-InputSingal = 8
+InputSingal = 0
+
+Runtime = 10000
 
 setting = {
-    "dx"    : 1e-03,
-    "dx_R"  : 1e+03,
-    "round" : 3
+    "dx"    : 1e-05,
+    "dx_R"  : 1e+05,
+    "round" : 5
 }
 
 #計測間隔
@@ -32,13 +34,15 @@ print(f"計測間隔の逆数：{dx_R}")
 round_Pre = setting["round"]
 
 #開始, 終了地点
-Plot_Start = -2
-Plot_End = 10
+Plot_Start = -1
+Plot_End = 1
 
 #交点を求める関数
 Derive_of_Intersections = True
 #固定点の導出
 Derive_of_FixedPoint = True
+#リアプノフ指数
+Lyapunov_expotent = False
 
 #固定点を加えるためのリスト
 FixedPoint_List = list() #list()[]
@@ -90,3 +94,36 @@ if Derive_of_FixedPoint:
         
         Eig_Val= np.linalg.eigvals(Jac_Matrix)
         print(f"Eigenvalue = {Eig_Val}")
+"""------------------------------------------------------------"""
+if Lyapunov_expotent:
+    print("Lyapunov_expotent")
+
+    x = np.random.uniform(-1,1,Runtime)
+    x_Lya = np.random.uniform(x[0] - 1e-04, x[0] + 1e-04, Runtime)
+
+    y = np.random.uniform(-1,1,Runtime)
+    y_Lya = np.random.uniform(y[0] - 1e-04, y[0] + 1e-04,Runtime)
+    
+    phi = np.random.uniform(-1,1,Runtime)
+    phi_Lya = np.random.uniform(phi[0] - 1e-04, phi[0] + 1e-04,Runtime)
+    
+    Input_Signal_In = np.zeros(Runtime)
+    Input_Signal_In[:] = InputSingal
+    
+    Lyapunov_Lambda =  np.zeros(Runtime)
+
+    for i in range(Runtime - 1):
+        print("\r%d / %d"%(i, Runtime), end = "")
+        x[i+1] = pow(x[i], 2) * np.exp(y[i] - x[i]) + k0 \
+              + k * x[i] * (alpha + 3 * beta * pow(phi[i], 2)) \
+                + Input_Signal_In[i]
+        y[i+1] = a * y[i] - b * x[i] + c
+        phi[i+1] = k1 * x[i] - k2 * phi[i]
+
+        x_Lya[i+1] = pow(x_Lya[i], 2) * np.exp(y_Lya[i] - x_Lya[i]) + k0 \
+              + k * x_Lya[i] * (alpha + 3 * beta * pow(phi_Lya[i], 2)) \
+                + Input_Signal_In[i]
+        y_Lya[i+1] = a * y_Lya[i] - b * x_Lya[i] + c
+        phi_Lya[i+1] = k1 * x_Lya[i] - k2 * phi_Lya[i]
+
+        Lyapunov_Lambda = x_Lya[i] - x[i]

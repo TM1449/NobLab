@@ -49,13 +49,13 @@ def Project_Chialvo_All_2024_09_24_14_17():
         
         #==========================================================================================
         #相平面の描写をするかどうか（これがオフだと描写しない）
-        "Project_Plot_PhaseSpace_ALL" : False,
+        "Project_Plot_PhaseSpace_ALL" : True,
         
         #--------------------------------------------------------------------
         #相平面の描写
-        "Project_Plot_PhaseSpace_XandY"         : True,
-        "Project_Plot_PhaseSpace_XandPhi"       : True,
-        "Project_Plot_PhaseSpace_YandPhi"       : True,
+        "Project_Plot_PhaseSpace_XandY"         : False,
+        "Project_Plot_PhaseSpace_XandPhi"       : False,
+        "Project_Plot_PhaseSpace_YandPhi"       : False,
 
         #3次元相平面の描写
         "Project_Plot_PhaseSpace_3D"            : True,
@@ -99,7 +99,7 @@ def Project_Chialvo_All_2024_09_24_14_17():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -5,
+        "Chialvo_k"                 : -10,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
@@ -111,7 +111,7 @@ def Project_Chialvo_All_2024_09_24_14_17():
         "Plot_End" : 1000,
 
         #入力信号：uについて
-        "Input_Signal"  : 8,
+        "Input_Signal"  : 0.2,
 
         #恒等関数：None
         #sin関数：np.sin
@@ -135,9 +135,9 @@ def Project_Chialvo_All_2024_09_24_14_17():
         "Plot_phi_End" : 3,
 
         #時系列描写の初期化指定
-        "Initial_Value_X" : 0,
-        "Initial_Value_Y" : 0,
-        "Initial_Value_Phi" : 0,
+        "Initial_Value_X" : 0.02,
+        "Initial_Value_Y" : 2.42,
+        "Initial_Value_Phi" : 0.0,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     }
 
