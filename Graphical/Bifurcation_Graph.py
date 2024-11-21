@@ -13,7 +13,7 @@ k2 = 0.2
 alpha = 0.1
 beta = 0.2
 
-k = -10
+k = -22
 
 #入力信号
 InputSingal = 0
@@ -21,9 +21,9 @@ InputSingal = 0
 Runtime = 10000
 
 setting = {
-    "dx"    : 1e-05,
-    "dx_R"  : 1e+05,
-    "round" : 5
+    "dx"    : 1e-07,
+    "dx_R"  : 1e+07,
+    "round" : 7
 }
 
 #計測間隔
@@ -38,14 +38,14 @@ Plot_Start = -1
 Plot_End = 1
 
 #交点を求める関数
-Derive_of_Intersections = True
+Derive_of_Intersections = False
 #固定点の導出
 Derive_of_FixedPoint = True
 #リアプノフ指数
 Lyapunov_expotent = False
 
 #固定点を加えるためのリスト
-FixedPoint_List = list() #list()[]
+FixedPoint_List = [0.013131072] #list()[]
 
 """------------------------------------------------------------"""
 if Derive_of_Intersections:

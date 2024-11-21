@@ -99,7 +99,7 @@ def Project_Chialvo_All_2024_09_24_14_17():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -10,
+        "Chialvo_k"                 : -22,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
@@ -111,7 +111,7 @@ def Project_Chialvo_All_2024_09_24_14_17():
         "Plot_End" : 1000,
 
         #入力信号：uについて
-        "Input_Signal"  : 0.2,
+        "Input_Signal"  : 0,
 
         #恒等関数：None
         #sin関数：np.sin
@@ -119,25 +119,25 @@ def Project_Chialvo_All_2024_09_24_14_17():
         "Input_Signal_def" : None,
 
         #ベクトル場の間隔
-        "Vdt" : 1,
+        "Vdt" : 0.05,
         #Nullclineの間隔
         "dt" : 0.0001,
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #どこからどこまでプロット図の点を作成するか
-        "Plot_x_Start" : -20,
-        "Plot_x_End" : 20,
+        "Plot_x_Start" : -2,
+        "Plot_x_End" : 2,
 
-        "Plot_y_Start" : -20,
-        "Plot_y_End" : 20,
+        "Plot_y_Start" : -2,
+        "Plot_y_End" : 2,
 
         "Plot_phi_Start" : -3,
         "Plot_phi_End" : 3,
 
         #時系列描写の初期化指定
-        "Initial_Value_X" : 0.02,
-        "Initial_Value_Y" : 2.42,
-        "Initial_Value_Phi" : 0.0,
+        "Initial_Value_X" : 0.013131072,
+        "Initial_Value_Y" : 2.4738305,
+        "Initial_Value_Phi" : 0.0010943,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     }
 
@@ -196,19 +196,19 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -5,
+        "Chialvo_k"                 : -3.2,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
         "Chialvo_beta"              : 0.2,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
-        "RunTime" : 1000,
+        "RunTime" : 100000,
         "Plot_Start" : 0,
-        "Plot_End" : 1000,
+        "Plot_End" : 100000,
 
         #入力信号：uについて
-        "Input_Signal"  : 8,
+        "Input_Signal"  : 0,
 
         #恒等関数：None
         #sin関数：np.sin
@@ -216,9 +216,9 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         "Input_Signal_def" : None,
 
         #時系列描写の初期化指定
-        "Initial_Value_X" : None,
-        "Initial_Value_Y" : None,
-        "Initial_Value_Phi" : None,
+        "Initial_Value_X" : 0.0448+0.01,
+        "Initial_Value_Y" : 2.3011+0.01,
+        "Initial_Value_Phi" : 0.0037+0.01,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     }
     
