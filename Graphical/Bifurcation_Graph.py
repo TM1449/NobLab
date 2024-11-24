@@ -3,22 +3,24 @@ import scipy.linalg
 import time
 
 #電磁束下Chialvoのパラメータ
-a = 0.89
-b = 0.6
-c = 0.28
-k0 = 0.04
+a = 0.89 #0.89
+b = 0.6 #0.6
+c = 0.28 #0.28
+k0 = 0.04 #0.04
 
-k1 = 0.1
-k2 = 0.2
-alpha = 0.1
-beta = 0.2
+k1 = 0.1 #0.1
+k2 = 0.2 #0.2
+alpha = 0.1 #0.1
+beta = 0.2 #0.2
 
-k = -22
+k = -3.2
 
 #入力信号
 InputSingal = 0
-
-Runtime = 10000
+#空走時間
+Burn_in_time = 5000
+#実行時間
+Runtime = 100000
 
 setting = {
     "dx"    : 1e-07,
@@ -40,9 +42,9 @@ Plot_End = 1
 #交点を求める関数
 Derive_of_Intersections = False
 #固定点の導出
-Derive_of_FixedPoint = True
+Derive_of_FixedPoint = False
 #リアプノフ指数
-Lyapunov_expotent = False
+Lyapunov_expotent = True
 
 #固定点を加えるためのリスト
 FixedPoint_List = [0.013131072] #list()[]
@@ -99,31 +101,76 @@ if Lyapunov_expotent:
     print("Lyapunov_expotent")
 
     x = np.random.uniform(-1,1,Runtime)
-    x_Lya = np.random.uniform(x[0] - 1e-04, x[0] + 1e-04, Runtime)
+    x_L = np.random.uniform(x[0] - 1e-10, x[0] + 1e-10,Runtime)
 
     y = np.random.uniform(-1,1,Runtime)
-    y_Lya = np.random.uniform(y[0] - 1e-04, y[0] + 1e-04,Runtime)
+    y_L = np.random.uniform(y[0] - 1e-10, y[0] + 1e-10,Runtime)
     
     phi = np.random.uniform(-1,1,Runtime)
-    phi_Lya = np.random.uniform(phi[0] - 1e-04, phi[0] + 1e-04,Runtime)
+    phi_L = np.random.uniform(phi[0] - 1e-10, phi[0] + 1e-10,Runtime)
     
     Input_Signal_In = np.zeros(Runtime)
     Input_Signal_In[:] = InputSingal
     
-    Lyapunov_Lambda =  np.zeros(Runtime)
+    Lyapunov_Lambda_x =  np.zeros(Runtime)
+    Lyapunov_Lambda_y =  np.zeros(Runtime)
+    Lyapunov_Lambda_phi =  np.zeros(Runtime)
+    
+    Lyapunov_Lambda_x_Sum = 0
+    Lyapunov_Lambda_y_Sum = 0
+    Lyapunov_Lambda_phi_Sum = 0
 
-    for i in range(Runtime - 1):
-        print("\r%d / %d"%(i, Runtime), end = "")
+    """print("\n空走時間")
+    for i in range(Burn_in_time - 1):
+        print("\r%d / %d"%(i, Burn_in_time), end = "")
         x[i+1] = pow(x[i], 2) * np.exp(y[i] - x[i]) + k0 \
               + k * x[i] * (alpha + 3 * beta * pow(phi[i], 2)) \
                 + Input_Signal_In[i]
         y[i+1] = a * y[i] - b * x[i] + c
         phi[i+1] = k1 * x[i] - k2 * phi[i]
 
-        x_Lya[i+1] = pow(x_Lya[i], 2) * np.exp(y_Lya[i] - x_Lya[i]) + k0 \
-              + k * x_Lya[i] * (alpha + 3 * beta * pow(phi_Lya[i], 2)) \
+        x_L[i+1] = pow(x_L[i], 2) * np.exp(y_L[i] - x_L[i]) + k0 \
+              + k * x_L[i] * (alpha + 3 * beta * pow(phi_L[i], 2)) \
                 + Input_Signal_In[i]
-        y_Lya[i+1] = a * y_Lya[i] - b * x_Lya[i] + c
-        phi_Lya[i+1] = k1 * x_Lya[i] - k2 * phi_Lya[i]
+        y_L[i+1] = a * y_L[i] - b * x_L[i] + c
+        phi_L[i+1] = k1 * x_L[i] - k2 * phi_L[i]"""
 
-        Lyapunov_Lambda = x_Lya[i] - x[i]
+    print("\n実行時間")
+    for i in range(Runtime - 1):
+        print("\r%d / %d"%(i, Burn_in_time + Runtime), end = "")
+        x[i+1] = pow(x[i], 2) * np.exp(y[i] - x[i]) + k0 \
+              + k * x[i] * (alpha + 3 * beta * pow(phi[i], 2)) \
+                + Input_Signal_In[i]
+        y[i+1] = a * y[i] - b * x[i] + c
+        phi[i+1] = k1 * x[i] - k2 * phi[i]
+
+        x_L[i+1] = pow(x_L[i], 2) * np.exp(y_L[i] - x_L[i]) + k0 \
+              + k * x_L[i] * (alpha + 3 * beta * pow(phi_L[i], 2)) \
+                + Input_Signal_In[i]
+        y_L[i+1] = a * y_L[i] - b * x_L[i] + c
+        phi_L[i+1] = k1 * x_L[i] - k2 * phi_L[i]
+
+        Lyapunov_Lambda_x[i] = abs(x_L[i] - x[i])
+        Lyapunov_Lambda_x[i] = np.log(Lyapunov_Lambda_x[i])
+        Lyapunov_Lambda_x_Sum += Lyapunov_Lambda_x[i]
+
+        Lyapunov_Lambda_y[i] = abs(y_L[i] - y[i])
+        Lyapunov_Lambda_y[i] = np.log(Lyapunov_Lambda_y[i])
+        Lyapunov_Lambda_y_Sum += Lyapunov_Lambda_y[i]
+
+        Lyapunov_Lambda_phi[i] = abs(phi_L[i] - phi[i])
+        Lyapunov_Lambda_phi[i] = np.log(Lyapunov_Lambda_phi[i])
+        Lyapunov_Lambda_phi_Sum += Lyapunov_Lambda_phi[i]
+
+    Lyapunov_Lambda_x_Ave = Lyapunov_Lambda_x_Sum / Runtime
+    Lyapunov_Lambda_y_Ave = Lyapunov_Lambda_y_Sum / Runtime
+    Lyapunov_Lambda_phi_Ave = Lyapunov_Lambda_phi_Sum / Runtime
+
+    print("\n xのリアプノフ指数: ")
+    print(Lyapunov_Lambda_x_Ave)
+
+    print("\n yのリアプノフ指数: ")
+    print(Lyapunov_Lambda_y_Ave)
+
+    print("\n phiのリアプノフ指数: ")
+    print(Lyapunov_Lambda_phi_Ave)
