@@ -20,7 +20,7 @@ InputSingal = 0
 #空走時間
 Burn_in_time = 5000
 #実行時間
-Runtime = 100000
+Runtime = 1000
 
 setting = {
     "dx"    : 1e-07,
@@ -136,7 +136,7 @@ if Lyapunov_expotent:
         phi_L[i+1] = k1 * x_L[i] - k2 * phi_L[i]"""
 
     print("\n実行時間")
-    for i in range(Runtime - 1):
+    for i in range(Runtime-1):
         print("\r%d / %d"%(i, Burn_in_time + Runtime), end = "")
         x[i+1] = pow(x[i], 2) * np.exp(y[i] - x[i]) + k0 \
               + k * x[i] * (alpha + 3 * beta * pow(phi[i], 2)) \
