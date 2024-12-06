@@ -196,7 +196,7 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : 4,
+        "Chialvo_k"                 : -1.3,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
@@ -213,7 +213,7 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         #恒等関数：None
         #sin関数：np.sin
         #離散信号：random.randint
-        "Input_Signal_def" : None,
+        "Input_Signal_def" : random.randint,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,
@@ -355,10 +355,11 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
         "Chialvo_a"                 : 0.89,
         "Chialvo_b"                 : 0.6,
         "Chialvo_c"                 : 0.28,
-        "Chialvo_k0"                : 0.02,
+        "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : 0.1,
+        "Chialvo_k"                 : 6.1,
+
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
@@ -373,17 +374,17 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
         "Input_Signal"  : 0,
 
         #ベクトル場の間隔
-        "Vdt" : 0.75,
+        "Vdt" : 0.2,
         #Nullclineの間隔
         "dt" : 0.0001,
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #どこからどこまでプロット図の点を作成するか
         "Plot_x_Start" : -5,
-        "Plot_x_End" : 40,
+        "Plot_x_End" : 5,
 
         "Plot_y_Start" : -5,
-        "Plot_y_End" : 40,
+        "Plot_y_End" : 5,
 
         #時系列描写の初期化指定
         "Initial_Value_X" : None,

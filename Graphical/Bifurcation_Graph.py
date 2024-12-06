@@ -13,19 +13,20 @@ k2 = 0.2 #0.2
 alpha = 0.1 #0.1
 beta = 0.2 #0.2
 
-k = -3.2
+k = 6.2
 
 #入力信号
 InputSingal = 0
+
 #空走時間
 Burn_in_time = 5000
 #実行時間
 Runtime = 1000
 
 setting = {
-    "dx"    : 1e-07,
-    "dx_R"  : 1e+07,
-    "round" : 7
+    "dx"    : 1e-04,
+    "dx_R"  : 1e+04,
+    "round" : 4
 }
 
 #計測間隔
@@ -36,18 +37,18 @@ print(f"計測間隔の逆数：{dx_R}")
 round_Pre = setting["round"]
 
 #開始, 終了地点
-Plot_Start = -1
-Plot_End = 1
+Plot_Start = -2
+Plot_End = 2
 
 #交点を求める関数
-Derive_of_Intersections = False
+Derive_of_Intersections = True
 #固定点の導出
-Derive_of_FixedPoint = False
+Derive_of_FixedPoint = True
 #リアプノフ指数
-Lyapunov_expotent = True
+Lyapunov_expotent = False
 
 #固定点を加えるためのリスト
-FixedPoint_List = [0.013131072] #list()[]
+FixedPoint_List = list() #[]
 
 """------------------------------------------------------------"""
 if Derive_of_Intersections:
@@ -96,81 +97,5 @@ if Derive_of_FixedPoint:
         
         Eig_Val= np.linalg.eigvals(Jac_Matrix)
         print(f"Eigenvalue = {Eig_Val}")
+
 """------------------------------------------------------------"""
-if Lyapunov_expotent:
-    print("Lyapunov_expotent")
-
-    x = np.random.uniform(-1,1,Runtime)
-    x_L = np.random.uniform(x[0] - 1e-10, x[0] + 1e-10,Runtime)
-
-    y = np.random.uniform(-1,1,Runtime)
-    y_L = np.random.uniform(y[0] - 1e-10, y[0] + 1e-10,Runtime)
-    
-    phi = np.random.uniform(-1,1,Runtime)
-    phi_L = np.random.uniform(phi[0] - 1e-10, phi[0] + 1e-10,Runtime)
-    
-    Input_Signal_In = np.zeros(Runtime)
-    Input_Signal_In[:] = InputSingal
-    
-    Lyapunov_Lambda_x =  np.zeros(Runtime)
-    Lyapunov_Lambda_y =  np.zeros(Runtime)
-    Lyapunov_Lambda_phi =  np.zeros(Runtime)
-    
-    Lyapunov_Lambda_x_Sum = 0
-    Lyapunov_Lambda_y_Sum = 0
-    Lyapunov_Lambda_phi_Sum = 0
-
-    """print("\n空走時間")
-    for i in range(Burn_in_time - 1):
-        print("\r%d / %d"%(i, Burn_in_time), end = "")
-        x[i+1] = pow(x[i], 2) * np.exp(y[i] - x[i]) + k0 \
-              + k * x[i] * (alpha + 3 * beta * pow(phi[i], 2)) \
-                + Input_Signal_In[i]
-        y[i+1] = a * y[i] - b * x[i] + c
-        phi[i+1] = k1 * x[i] - k2 * phi[i]
-
-        x_L[i+1] = pow(x_L[i], 2) * np.exp(y_L[i] - x_L[i]) + k0 \
-              + k * x_L[i] * (alpha + 3 * beta * pow(phi_L[i], 2)) \
-                + Input_Signal_In[i]
-        y_L[i+1] = a * y_L[i] - b * x_L[i] + c
-        phi_L[i+1] = k1 * x_L[i] - k2 * phi_L[i]"""
-
-    print("\n実行時間")
-    for i in range(Runtime-1):
-        print("\r%d / %d"%(i, Burn_in_time + Runtime), end = "")
-        x[i+1] = pow(x[i], 2) * np.exp(y[i] - x[i]) + k0 \
-              + k * x[i] * (alpha + 3 * beta * pow(phi[i], 2)) \
-                + Input_Signal_In[i]
-        y[i+1] = a * y[i] - b * x[i] + c
-        phi[i+1] = k1 * x[i] - k2 * phi[i]
-
-        x_L[i+1] = pow(x_L[i], 2) * np.exp(y_L[i] - x_L[i]) + k0 \
-              + k * x_L[i] * (alpha + 3 * beta * pow(phi_L[i], 2)) \
-                + Input_Signal_In[i]
-        y_L[i+1] = a * y_L[i] - b * x_L[i] + c
-        phi_L[i+1] = k1 * x_L[i] - k2 * phi_L[i]
-
-        Lyapunov_Lambda_x[i] = abs(x_L[i] - x[i])
-        Lyapunov_Lambda_x[i] = np.log(Lyapunov_Lambda_x[i])
-        Lyapunov_Lambda_x_Sum += Lyapunov_Lambda_x[i]
-
-        Lyapunov_Lambda_y[i] = abs(y_L[i] - y[i])
-        Lyapunov_Lambda_y[i] = np.log(Lyapunov_Lambda_y[i])
-        Lyapunov_Lambda_y_Sum += Lyapunov_Lambda_y[i]
-
-        Lyapunov_Lambda_phi[i] = abs(phi_L[i] - phi[i])
-        Lyapunov_Lambda_phi[i] = np.log(Lyapunov_Lambda_phi[i])
-        Lyapunov_Lambda_phi_Sum += Lyapunov_Lambda_phi[i]
-
-    Lyapunov_Lambda_x_Ave = Lyapunov_Lambda_x_Sum / Runtime
-    Lyapunov_Lambda_y_Ave = Lyapunov_Lambda_y_Sum / Runtime
-    Lyapunov_Lambda_phi_Ave = Lyapunov_Lambda_phi_Sum / Runtime
-
-    print("\n xのリアプノフ指数: ")
-    print(Lyapunov_Lambda_x_Ave)
-
-    print("\n yのリアプノフ指数: ")
-    print(Lyapunov_Lambda_y_Ave)
-
-    print("\n phiのリアプノフ指数: ")
-    print(Lyapunov_Lambda_phi_Ave)
