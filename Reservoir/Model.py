@@ -1010,10 +1010,10 @@ class Model_SishuESN(Model):
 
     #順伝播（リザバーのみ）
     def forwardReservoir(self, u: np.ndarray) -> np.ndarray:
-        s,p = self.SishuReservoir.forward(u)
+        s = self.SishuReservoir.forward(u)
         z = np.concatenate([s, u])
         self.SishuReservoir.update()
-        return z , s[10:21]
+        return z
     
     #順伝播（リードアウトのみ）
     def forwardReadout(self, z: np.ndarray) -> np.ndarray:
@@ -1029,12 +1029,12 @@ class Model_SishuESN(Model):
     
     #順伝播（エラー出力付き）
     def forwardWithRMSE(self, u: np.ndarray, y_d: np.ndarray) -> tuple: 
-        s,p = self.SishuReservoir.forward(u)
+        s = self.SishuReservoir.forward(u)
         z = np.concatenate([s, u])
         y = self.Readout_LinerTransformer.forward(z)
         e = self.Readout_LinerTransformer.RMSE(z, y_d)
         self.SishuReservoir.update()
-        return y, e, s[10:21]
+        return y, e
     
     #学習
     def fit(self, Z: np.ndarray, Y_d: np.ndarray):

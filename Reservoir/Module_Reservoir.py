@@ -628,7 +628,7 @@ class Module_SishuReservoir(Module_Reservoir):
         self.y = a * self.y_old - b * self.x_old + c
         self.phi = k1 * self.x_old - k2 * self.phi_old
 
-        return self.x , self.y
+        return self.x
 
     #時間発展
     def update(self):

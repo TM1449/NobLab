@@ -18,19 +18,19 @@ k2 = 0.2 #0.2 0.2
 alpha = 0.1 #0.1 0.1
 beta = 0.2 #0.2 0.1
 
-k = -1.1 #-3.2 -0.5
+k = -7 #-3.2 -0.5
 
-k_list = np.arange(-7.1, 7.1, 0.1)
+k_list = np.arange(-7.1, 7.1, 0.01)
 k_list_result = np.zeros(len(k_list))
 k_list_result_M = np.zeros((len(k_list), 10))
 
 #print(k_list_result)
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #入力信号
-InputSingal = 1
+InputSingal = 0
 
 #None, sin, cos（ローレンツ方程式）
-InputSingal_def = np.cos
+InputSingal_def = None
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #空走時間
@@ -67,7 +67,7 @@ if Lyapunov_expotent:
     x = np.zeros(Alltime)
 
     if Initial_x == None:
-        x[0] = np.random.random() * 0.02 - 0.01
+        x[0] = np.random.random() * 0.2 - 0.1
     else:
         x[0] = Initial_x
 
@@ -76,7 +76,7 @@ if Lyapunov_expotent:
     y = np.zeros(Alltime)
 
     if Initial_y == None:
-        y[0] = np.random.random() * 0.02 - 0.01
+        y[0] = np.random.random() * 0.2 - 0.1
     else:
         y[0] = Initial_y
 
@@ -85,7 +85,7 @@ if Lyapunov_expotent:
     phi = np.zeros(Alltime)
 
     if Initial_phi == None:
-        phi[0] = np.random.random() * 0.02 - 0.01
+        phi[0] = np.random.random() * 0.2 - 0.1
     else:
         phi[0] = Initial_phi
 

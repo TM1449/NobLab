@@ -84,12 +84,11 @@ if __name__ == '__main__':
     #Project_GS_Sishu.Project_GridSearch_SishuModel_RingStarNetwork_NRMSEAndMC()
 #====================================================================
     """Sishu提案モデル（結合形態のみ指定、結合強度は乱数）に関連するプロジェクト"""
-    Project.Project_SishuESN_NRMSE_MC_2024_06_23_00_12()
+    #Project.Project_SishuESN_NRMSE_MC_2024_06_23_00_12()
 
     #Project_RS_Sishu.Project_RandomSearch_NRMSE_SishuESN()
 
-    #Project_GS_Sishu.Project_GridSearch_SishuESN_NRMSEAndMC()
-
+    Project_GS_Sishu.Project_GridSearch_SishuESN_NRMSEAndMC()
     #Project_GS_Sishu.Project_GridSearch_SishuESN_NRMSEAndMC_Tau()
 #====================================================================
 #====================================================================

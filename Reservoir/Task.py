@@ -211,7 +211,7 @@ class Task_NDRosslor(Task):
     def makeData(self):
         self.X = np.zeros([self.Length + self.Tau, self.D_u])
 
-        np.random.seed(seed=32)
+        np.random.seed(seed=728)
         
         s = (np.random.rand(self.Systems, 3) - 0.5) * 10
         for t in range(self.InitTerm + self.Length + self.Tau):
@@ -264,7 +264,7 @@ class Task_NDLorenz(Task):
     def makeData(self):
         self.X = np.zeros([self.Length + self.Tau, self.D_u])
 
-        np.random.seed(seed=32)
+        np.random.seed(seed=728)
 
         s = (np.random.rand(self.Systems, 3) - 0.5) * 10
         
