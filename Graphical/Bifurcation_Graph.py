@@ -13,7 +13,7 @@ k2 = 0.2 #0.2
 alpha = 0.1 #0.1
 beta = 0.2 #0.2
 
-k = 6.2
+k = 3
 
 #入力信号
 InputSingal = 0
@@ -24,9 +24,9 @@ Burn_in_time = 5000
 Runtime = 1000
 
 setting = {
-    "dx"    : 1e-04,
-    "dx_R"  : 1e+04,
-    "round" : 4
+    "dx"    : 1e-05,
+    "dx_R"  : 1e+05,
+    "round" : 5
 }
 
 #計測間隔
@@ -37,8 +37,8 @@ print(f"計測間隔の逆数：{dx_R}")
 round_Pre = setting["round"]
 
 #開始, 終了地点
-Plot_Start = -2
-Plot_End = 2
+Plot_Start = 0
+Plot_End = 3
 
 #交点を求める関数
 Derive_of_Intersections = True
@@ -48,7 +48,7 @@ Derive_of_FixedPoint = True
 Lyapunov_expotent = False
 
 #固定点を加えるためのリスト
-FixedPoint_List = list() #[]
+FixedPoint_List = list() #[] #list()
 
 """------------------------------------------------------------"""
 if Derive_of_Intersections:
@@ -87,7 +87,7 @@ if Derive_of_FixedPoint:
 
     for i in FixedPoint_List:
         x = i
-        y = round((-b * x + c) / (1 - a), round_Pre)
+        y = round((b * x - c) / (a - 1), round_Pre)
         phi = round((k1 * x) / (1 + k2), round_Pre)
 
         print(f"Fixed Point: x = {x}, y = {y}, phi = {phi}")

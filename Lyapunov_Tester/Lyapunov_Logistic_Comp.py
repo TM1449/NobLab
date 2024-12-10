@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 a = 4 #0.89 0.6
 
 ##ロジスティック写像のパラメータ配列
-a_list = np.arange(0,4.001,0.1)
+a_list = np.arange(0,4.001,0.01)
 a_list_result = np.copy(a_list)
 #print(a_list)
 
@@ -22,13 +22,17 @@ Burn_in_time = 500
 #実行時間
 Runtime = 10000
 
+#何ステップ後の差を計算するか
+Step = 10
+
+
 #全体時間
 Alltime = Burn_in_time + Runtime
 
 #一回のみ
 Lyapunov_expotent = True
 #リストの分
-Lyapunov_expotent_List = False
+Lyapunov_expotent_List = True
 
 #====================================================================
 if Lyapunov_expotent:
@@ -38,17 +42,17 @@ if Lyapunov_expotent:
     
     #--------------------------------------------------------------------
     #基準軌道xと初期値について
-    x = np.zeros(Alltime)
+    x = np.zeros(Alltime + (Step - 1))
 
     if Initial_x == None:
-        x[0] = np.random.random()
+        x[0] = np.random.random() * 0.1
     else:
         x[0] = Initial_x
 
     #--------------------------------------------------------------------
     #規準軌道の計算部
     print("\n基準軌道の計算")
-    for i in range(Alltime-1):
+    for i in range(Alltime+ (Step - 1) -1):
         print("\r%d / %d"%(i, Alltime), end = "")
         x[i+1] = a * x[i] *(1 - x[i])
     
@@ -57,7 +61,7 @@ if Lyapunov_expotent:
     x_Lyapunov = np.zeros(Runtime-1)
     
     #初期摂動が与えられた軌道
-    x_D = np.zeros(Runtime)
+    x_D = np.zeros(Runtime + (Step - 1))
     
     #総和を取る配列
     x_sum = 0
@@ -75,11 +79,19 @@ if Lyapunov_expotent:
     x_D[0] = x[Burn_in_time] + delta_0_x[0]
     
     #初期摂動を与えたものを1step時間発展させた
-    x_D[1] = a * x_D[0] * (1 - x_D[0])
+    for z in range(1, Step + 1):
+        x_D[z] = a * x_D[z-1] * (1 - x_D[z-1])
 
     #時間発展させた2つの軌道の差の算出
-    delta_tau_x[0] = x_D[1] - x[Burn_in_time+1]
-    
+    delta_tau_x[0] = x_D[Step] - x[Burn_in_time+Step]
+
+    #軌道の差
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    ax.plot(x[Burn_in_time:Burn_in_time+Step+1])
+    ax.plot(x_D[0:Step+1])
+    plt.show()
+
     #絶対値を取り、初期摂動の差と時間発展した差がどれくらいあるかをlogで算出
     #（負ならば差が縮まる、正なら差が広がる）
     x_Lyapunov[0] = np.log(abs(delta_tau_x[0]) / abs(delta_0_x[0]))
@@ -95,10 +107,11 @@ if Lyapunov_expotent:
         x_D[i] = x[Burn_in_time+i] + delta_0_x[i]
         
         #初期摂動を与えたものを1step時間発展させた
-        x_D[i+1] = a * x_D[i] * (1 - x_D[i])
+        for zz in range(1, Step + 1):
+            x_D[i+zz] = a * x_D[i+zz-1] * (1 - x_D[i+zz-1])
     
         #時間発展させた2つの軌道の差の算出
-        delta_tau_x[i] = x_D[i+1] - x[Burn_in_time+i+1]
+        delta_tau_x[i] = x_D[i+Step] - x[Burn_in_time+i+Step]
     
         #絶対値を取り、初期摂動の差と時間発展した差がどれくらいあるかをlogで算出
         #（負ならば差が縮まる、正なら差が広がる）
@@ -106,7 +119,7 @@ if Lyapunov_expotent:
         x_sum += x_Lyapunov[i]
 
     #時間平均でのリアプノフ指数
-    x_ave = x_sum / len(x_Lyapunov)
+    x_ave = (1 / Step) * (x_sum / len(x_Lyapunov))
     
     print("\nロジスティック写像のリアプノフ指数")
     print(x_ave)
@@ -114,7 +127,9 @@ if Lyapunov_expotent:
 if Lyapunov_expotent_List:
     #a_listに入っている変数で実行
     print("\nロジスティック写像: 各パラメータにおけるリアプノフ指数の導出")
+
     z = 0
+    
     for a in a_list:
         print({f"{z+1} / {len(a_list_result)} 回"})
         print({f"aの値: {a}"})
@@ -123,10 +138,10 @@ if Lyapunov_expotent_List:
         
         #--------------------------------------------------------------------
         #基準軌道xと初期値について
-        x = np.zeros(Alltime+1)
+        x = np.zeros(Alltime + (Step - 1))
 
         if Initial_x == None:
-            x[0] = np.random.random()
+            x[0] = np.random.random() * 0.1
         else:
             x[0] = Initial_x
 
@@ -134,7 +149,7 @@ if Lyapunov_expotent_List:
         #規準軌道の計算部
         
         #空走時間の計算部
-        for i in range(Alltime):
+        for i in range(Alltime + (Step - 1) - 1):
             print("\r%d / %d"%(i, Alltime), end = "")
             x[i+1] = a * x[i] *(1 - x[i])
         
@@ -143,7 +158,7 @@ if Lyapunov_expotent_List:
         x_Lyapunov = np.zeros(Runtime-1)
         
         #初期摂動が与えられた軌道
-        x_D = np.zeros(Runtime+1)
+        x_D = np.zeros(Runtime + (Step - 1))
         
         #総和を取る配列
         x_sum = 0
@@ -161,11 +176,11 @@ if Lyapunov_expotent_List:
         x_D[0] = x[Burn_in_time] + delta_0_x[0]
         
         #初期摂動を与えたものを1step時間発展させた
-        x_D[1] = a * x_D[0] * (1 - x_D[0])
-        x_D[2] = a * x_D[1] * (1 - x_D[1])
+        for y in range(1, Step + 1):
+            x_D[y] = a * x_D[y-1] * (1 - x_D[y-1])
 
         #時間発展させた2つの軌道の差の算出
-        delta_tau_x[0] = x_D[2] - x[Burn_in_time+2]
+        delta_tau_x[0] = x_D[Step] - x[Burn_in_time+Step]
         
         #絶対値を取り、初期摂動の差と時間発展した差がどれくらいあるかをlogで算出
         #（負ならば差が縮まる、正なら差が広がる）
@@ -182,18 +197,19 @@ if Lyapunov_expotent_List:
             x_D[i] = x[Burn_in_time+i] + delta_0_x[i]
             
             #初期摂動を与えたものを1step時間発展させた
-            x_D[i+1] = a * x_D[i] * (1 - x_D[i])
-            x_D[i+2] = a * x_D[i+1] * (1 - x_D[i+1])
+            for yy in range(1, Step + 1):
+                x_D[i+yy] = a * x_D[i+yy-1] * (1 - x_D[i+yy-1])
+        
         
             #時間発展させた2つの軌道の差の算出
-            delta_tau_x[i] = x_D[i+2] - x[Burn_in_time+i+2]
+            delta_tau_x[i] = x_D[i+Step] - x[Burn_in_time+i+Step]
         
             #絶対値を取り、初期摂動の差と時間発展した差がどれくらいあるかをlogで算出
             #（負ならば差が縮まる、正なら差が広がる）
             x_Lyapunov[i] = np.log(abs(delta_tau_x[i]) / abs(delta_0_x[i]))
             x_sum += x_Lyapunov[i]
 
-        x_ave = 0.5 * x_sum / len(x_Lyapunov)
+        x_ave = (1 / Step) * (x_sum / len(x_Lyapunov))
         
         print("\nロジスティック写像のリアプノフ指数")
         print(x_ave)
@@ -205,7 +221,7 @@ if Lyapunov_expotent_List:
     ax = fig.add_subplot(1,1,1)
     
     ax.grid()
-    ax.plot(a_list_result)
+    ax.plot(a_list, a_list_result)
     
     plt.show()
 

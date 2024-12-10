@@ -17,7 +17,7 @@ k2 = 0.2 #0.2 0.2
 alpha = 0.1 #0.1 0.1
 beta = 0.2 #0.2 0.1
 
-k = -3.2 #-3.2 -0.5
+k = -6 #-3.2 -0.5
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #入力信号
@@ -103,7 +103,7 @@ if Derive_of_FixedPoint:
 
     for i in FixedPoint_List:
         x = i
-        y = round((-b * x + c) / (1 - a), round_Pre)
+        y = round((b * x - c) / (a - 1), round_Pre)
         phi = round((k1 * x) / (1 + k2), round_Pre)
 
         print(f"不動点: x = {x}, y = {y}, phi = {phi}")
