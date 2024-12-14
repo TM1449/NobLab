@@ -45,7 +45,7 @@ print("###Main Program has started###\n")
 #Project_Graph.Project_Chialvo_All_2024_09_24_14_17()
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#Project_Graph.Project_Chialvo_TimeLine_2024_09_24_17_25()
+Project_Graph.Project_Chialvo_TimeLine_2024_09_24_17_25()
 Project_Graph.Project_Chialvo_PhaseSpace_2024_09_26_12_34()
 
 #Project_Graph.Project_Chialvo_OldNullcline_2024_09_27_15_07()

@@ -307,7 +307,7 @@ class Model_Chialvo_NewNullcline(Model):
         self.Initial_Value_X = self.Param["Initial_Value_X"]
 
         if self.Initial_Value_X == None:
-            self.x = np.random.uniform(-1,1,self.RunTime)
+            self.x = np.random.uniform(-0.1,0.1,self.RunTime)
         else:
             self.x = np.zeros(self.RunTime)
             self.x[0] = self.Initial_Value_X
@@ -317,7 +317,7 @@ class Model_Chialvo_NewNullcline(Model):
         self.Initial_Value_Y = self.Param["Initial_Value_Y"]
 
         if self.Initial_Value_Y == None:
-            self.y = np.random.uniform(-1,1,self.RunTime)
+            self.y = np.random.uniform(-0.1,0.1,self.RunTime)
         else:
             self.y = np.zeros(self.RunTime)
             self.y[0] = self.Initial_Value_Y
@@ -327,7 +327,7 @@ class Model_Chialvo_NewNullcline(Model):
         self.Initial_Value_Phi = self.Param["Initial_Value_Phi"]
 
         if self.Initial_Value_Phi == None:
-            self.phi = np.random.uniform(-1,1,self.RunTime)
+            self.phi = np.random.uniform(-0.1,0.1,self.RunTime)
         else:
             self.phi = np.zeros(self.RunTime)
             self.phi[0] = self.Initial_Value_Phi

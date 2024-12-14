@@ -196,16 +196,16 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -1.0,
+        "Chialvo_k"                 : -1.1,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
         "Chialvo_beta"              : 0.2,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
-        "RunTime" : 10000,
-        "Plot_Start" : 5000,
-        "Plot_End" : 10000,
+        "RunTime" : 6000,
+        "Plot_Start" : 1000,
+        "Plot_End" : 6000,
 
         #入力信号：uについて
         "Input_Signal"  : 0,
@@ -252,16 +252,16 @@ def Project_Chialvo_PhaseSpace_2024_09_26_12_34():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : 7,
+        "Chialvo_k"                 : -1.1,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
         "Chialvo_beta"              : 0.2,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
-        "RunTime" : 10000,
+        "RunTime" : 6000,
         "Plot_Start" : 1000,
-        "Plot_End" : 10000,
+        "Plot_End" : 6000,
 
         #入力信号：uについて
         "Input_Signal"  : 0,
@@ -358,7 +358,7 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -3,
+        "Chialvo_k"                 : -1.1,
 
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
@@ -371,7 +371,7 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
         "Plot_End" : 1000,
 
         #入力信号：uについて
-        "Input_Signal"  : 3,
+        "Input_Signal"  : 0,
 
         #ベクトル場の間隔
         "Vdt" : 0.2,

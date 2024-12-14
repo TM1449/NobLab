@@ -13,7 +13,7 @@ k2 = 0.2 #0.2
 alpha = 0.1 #0.1
 beta = 0.2 #0.2
 
-k = 3
+k = -1.1
 
 #入力信号
 InputSingal = 0
@@ -38,7 +38,7 @@ round_Pre = setting["round"]
 
 #開始, 終了地点
 Plot_Start = 0
-Plot_End = 3
+Plot_End = 1
 
 #交点を求める関数
 Derive_of_Intersections = True

@@ -16,9 +16,9 @@ InputSingal_def = None
 
 #====================================================================
 #パラメータ
-sigma = 10
-rho = 28
-beta = 8/3
+sigma = 16
+rho = 40
+beta = 4
 
 #--------------------------------------------------------------------
 #時間刻み幅
@@ -41,13 +41,13 @@ print(f"時間刻み幅の逆数＋四捨五入: {Reciprocal_dt_round}")
 
 #--------------------------------------------------------------------
 #空走時間
-Burn_in_time = 100 * Reciprocal_dt_round
+Burn_in_time = 50 * Reciprocal_dt_round
 
 #計算回数（計算時間）
-Calculation_Number = 1000
+Calculation_Number = 2000
 
 #何時刻差のリアプノフ指数を計算するか
-Step = 200
+Step = 100
 
 #--------------------------------------------------------------------
 #総合時間
@@ -134,18 +134,18 @@ delta_0_x = np.zeros(Calculation_Number)
 delta_0_y = np.zeros(Calculation_Number)
 delta_0_z = np.zeros(Calculation_Number)
 
-delta_0_x[0] = 1e-08
-delta_0_y[0] = 1e-08
-delta_0_z[0] = 1e-08
+delta_0_x[0] = 1e-06
+delta_0_y[0] = 1e-06
+delta_0_z[0] = 1e-06
 
 #摂動軌道のを発展先の値を確保する配列
 delta_tau_x = np.zeros(Calculation_Number)
 delta_tau_y = np.zeros(Calculation_Number)
 delta_tau_z = np.zeros(Calculation_Number)
 
-delta_tau_x[0] = 1e-08
-delta_tau_y[0] = 1e-08
-delta_tau_z[0] = 1e-08
+delta_tau_x[0] = 1e-06
+delta_tau_y[0] = 1e-06
+delta_tau_z[0] = 1e-06
 
 
 #====================================================================
@@ -246,6 +246,9 @@ for i in range(1, Calculation_Number):
     Norm_0 = np.linalg.norm(Vector_0)
     #時間発展させた差ベクトルの大きさ
     Norm_tau = np.linalg.norm(Vector_tau)
+
+    print(f"\n初期値の差ベクトル: {Vector_0}\n初期値の差ベクトルの大きさ: {Norm_0}")
+    print(f"発展先の差ベクトル: {Vector_tau}\n発展先の差ベクトルの大きさ: {Norm_tau}")
 
     Lyapunov[i] = np.log(Norm_tau / Norm_0) / (Step * dt)
     print(f"\n{i+2}回目の最大リアプノフ指数: {Lyapunov[i]}")
