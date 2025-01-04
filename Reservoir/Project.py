@@ -399,7 +399,7 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         "Model_NormalESN_D_x" : 100,                        #ニューロン数
         "Model_NormalESN_D_y" : 1,                          #出力信号次元
 
-        "SubReservoir_LeakingRate" : 0.5,                     #リーク率
+        "SubReservoir_LeakingRate" : 1,                     #リーク率
         "SubReservoir_InputScale" : 0.1,                    #入力スケーリング
         "SubReservoir_Rho" : 0.9,                             #スペクトル半径
         "SubReservoir_Density" : 0.95,                         #結合密度
@@ -420,7 +420,7 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
             "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
             "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-            "NRMSE_T_Task" : Task.Task_NDLorenz,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task.Task_NDRosslor,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model.Model_NormalESN,                 #モデル（Type型）
             "NRMSE_T_Output" : Output.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
@@ -635,7 +635,7 @@ def Project_SishuESN_NRMSE_MC_2024_06_23_00_12():
             "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
             "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-            "NRMSE_T_Task" : Task.Task_NDLorenz,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task.Task_NDRosslor,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model.Model_SishuESN,                 #モデル（Type型）
             "NRMSE_T_Output" : Output.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
