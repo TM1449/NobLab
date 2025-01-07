@@ -349,7 +349,7 @@ class Model_Chialvo_NewNullcline(Model):
                 self.dx, self.dy, self.fx, self.fy, \
                         self.x[self.Plot_Start : self.Plot_End - 1], self.y[self.Plot_Start : self.Plot_End - 1]
 
-class Model_Chialvo_NewNullcline3D(Model):
+class Model_Chialvo_Neurons_Network(Model):
 
     #コンストラクタ
     def __init__(self, param: dict, parent: any = None):
@@ -368,109 +368,118 @@ class Model_Chialvo_NewNullcline3D(Model):
         self.alpha = self.Param["Chialvo_alpha"]
         self.beta = self.Param["Chialvo_beta"]
 
+        #電磁束下Chialvoニューロンネットワークのパラメータ
+        self.N = self.Param["Chialvo_Neurons"]
+        self.Mu = self.Param["Chialvo_Mu"]
+        self.Sigma = self.Param["Chialvo_Sigma"]
+        self.R = self.Param["Chialvo_R"]
+
+        #電磁束下Chialvoニューロンネットワークの追加パラメータ
+        self.Xi_mu = self.Param["Chialvo_Xi_mu"]
+        self.Xi_sigma = self.Param["Chialvo_Xi_sigma"]
+        self.D_mu = self.Param["Chialvo_D_mu"]
+        self.D_sigma = self.Param["Chialvo_D_sigma"]
+
+        #入力信号
+        self.Input_Signal = self.Param["Input_Signal"]
+        self.Input_Signal_def = self.Param["Input_Signal_def"]
+
         #実行時間
         self.RunTime = self.Param["RunTime"]
         self.Plot_Start = self.Param["Plot_Start"]
         self.Plot_End = self.Param["Plot_End"]
 
-        #入力信号
-        self.Input_Signal = self.Param["Input_Signal"]
-
-        #ベクトル場の間隔
-        self.Vdt = self.Param["Vdt"]
-        
-        #計算用の間隔
-        self.dt = self.Param["dt"]
-
-        #ベクトル場の点分布の範囲
-        self.Plot_x_Start = self.Param["Plot_x_Start"]
-        self.Plot_x_End = self.Param["Plot_x_End"]
-
-        self.Plot_y_Start = self.Param["Plot_y_Start"]
-        self.Plot_y_End = self.Param["Plot_y_End"]
-
-        self.Plot_phi_Start = self.Param["Plot_phi_Start"]
-        self.Plot_phi_End = self.Param["Plot_phi_End"]
-        #====================================================================
-        
-    def __call__(self):
-        #3D-ChialvoニューロンマップのNullclineとベクトル場の計算部
-        print("New_Nullcline_3D")
         #--------------------------------------------------------------------
-        """
-        Vt, Vx, Vy, Vphiはベクトル場の変数.
-        """    
-        self.Vdx = np.arange(self.Plot_x_Start, self.Plot_x_End, self.Vdt)
-        self.Vdy = np.arange(self.Plot_y_Start, self.Plot_y_End, self.Vdt)
-        self.Vdphi = np.arange(self.Plot_phi_Start, self.Plot_phi_End, self.Vdt)
+        #初期値Xについて
+        self.x = np.zeros((self.N, self.RunTime))
+        self.x[:, 0] = np.random.uniform(-1,1)
 
-        self.X, self.Y, self.Phi = np.meshgrid(self.Vdx, self.Vdy, self.Vdphi)
-        
-        self.Vx = (pow(self.X, 2) * np.exp(self.Y - self.X) + self.k0 + self.k * self.X * (self.alpha + 3 * self.beta * pow(self.Phi, 2))) + self.Input_Signal - self.X
-        self.Vy = (self.a * self.Y - self.b * self.X + self.c) - self.Y
-        self.Vphi = (self.k1 * self.X - self.k2 * self.Phi) - self.Phi
-        
-        #--------------------------------------------------------------------
-        """
-        dt, dx, dy, dphiはNullclineの変数.
-        """    
-        self.dx = np.arange(self.Plot_x_Start, self.Plot_x_End, self.dt)
-        self.dy = np.arange(self.Plot_y_Start, self.Plot_y_End, self.dt)
-        self.dphi = np.arange(self.Plot_phi_Start, self.Plot_phi_End, self.dt)
-
-        self.fx = pow(self.dx, 2) * np.exp(((self.b  - self.a + 1) * self.dx - self.c) / (self.a - 1)) + self.k0 \
-            + ((3 * self.k * self.beta * pow(self.k1, 2)) / pow((1 + self.k2), 2)) * pow(self.dx, 3) \
-                + self.dx * self.k * self.alpha + self.Input_Signal
-        self.fy = (self.b * self.dx - self.c) / (self.a - 1)
-        self.fphi = (self.k1 * self.dx) / (self.k2 + 1)
-
-        #--------------------------------------------------------------------
-        """
-        x, y, phiは相平面の変数.
-        """
-        self.Initial_Value_X = self.Param["Initial_Value_X"]
-
-        if self.Initial_Value_X == None:
-            self.x = np.random.uniform(-1,1,self.RunTime)
-        else:
-            self.x = np.zeros(self.RunTime)
-            self.x[0] = self.Initial_Value_X
-        
         #--------------------------------------------------------------------
         #初期値Yについて
-        self.Initial_Value_Y = self.Param["Initial_Value_Y"]
-
-        if self.Initial_Value_Y == None:
-            self.y = np.random.uniform(-1,1,self.RunTime)
-        else:
-            self.y = np.zeros(self.RunTime)
-            self.y[0] = self.Initial_Value_Y
+        self.y = np.zeros((self.N, self.RunTime))
+        self.y[:, 0] = np.random.uniform(-1,1)
         
-        #--------------------------------------------------------------------
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #初期値Phiについて
-        self.Initial_Value_Phi = self.Param["Initial_Value_Phi"]
+        self.phi = np.zeros((self.N, self.RunTime))
+        self.phi[:, 0] = np.random.uniform(-1,1)
 
-        if self.Initial_Value_Phi == None:
-            self.phi = np.random.uniform(-1,1,self.RunTime)
-        else:
-            self.phi = np.zeros(self.RunTime)
-            self.phi[0] = self.Initial_Value_Phi
-        #--------------------------------------------------------------------
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+    def __call__(self):
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
         #入力信号プロットの作成
         self.Input_Signal_In = np.zeros(self.RunTime)
 
-        for n in range(self.RunTime - 1):
-            self.Input_Signal_In[n+1] = self.Input_Signal
-        #--------------------------------------------------------------------
-        for n in range(self.RunTime - 1):
-            self.x[n+1] = pow(self.x[n], 2) * np.exp(self.y[n] - self.x[n]) + self.k0 \
-                + self.k * self.x[n] * (self.alpha + 3 * self.beta * pow(self.phi[n], 2)) + self.Input_Signal_In[n]
-            self.y[n+1] = self.a * self.y[n] - self.b * self.x[n] + self.c
-            self.phi[n+1] = self.k1 * self.x[n] - self.k2 * self.phi[n]
+        if self.Input_Signal_def == None:
+            for n in range(self.RunTime - 1):
+                self.Input_Signal_In[n+1] = self.Input_Signal
+        
+        elif self.Input_Signal_def == np.sin:
+            for n in range(self.RunTime - 1):
+                self.Input_Signal_In[n+1] = 0.1 * self.Input_Signal * self.Input_Signal_def(4 * n * np.pi / 180)
+        
+        elif self.Input_Signal_def == random.randint:
+            self.Step_s = self.RunTime // 100
+            self.Step = self.RunTime // self.Step_s
+            for n in range(self.Step):
+                self.Input_Signal_In[n * 100 : (n+1) * 100] = self.Input_Signal_def(0,self.Input_Signal)
+        
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        return self.X, self.Y, self.Phi, \
-            self.Vx, self.Vy, self.Vphi, \
-                self.dx, self.dy, self.dphi, \
-                    self.fx, self.fy, self.fphi, \
-                        self.x[self.Plot_Start : self.Plot_End - 1], self.y[self.Plot_Start : self.Plot_End - 1], self.phi[self.Plot_Start : self.Plot_End - 1]
-    
+        #Chialvoニューロンの差分方程式の計算部
+
+        #--------------------------------------------------------------------
+        #sigmaの不均質性
+        self.sigma_matrix = (np.ones(self.N, self.N) * self.Sigma) + self.D_sigma * self.Xi_sigma
+
+        #self.ring_matrixは、リングネットワークの隣接行列を生成する
+        self.ring_matrix = np.identity(self.N)
+        self.ring_matrix[0,0] = 0
+
+        for i in range(1,self.N):
+            #これが対角成分周辺の1を生成する
+            self.ring_matrix[i :i+self.R+1 ,i :i+self.R+1] = 1
+            #これらが範囲外でも対応させる部分（左下や右上の1を生成する）
+            self.ring_matrix[self.N-self.R+i-1 :, i] = 1
+            self.ring_matrix[i,self.N-self.R+i-1:] = 1
+        for i in range(1,self.N):
+            self.ring_matrix[i,i] = -2 * self.R
+
+        self.ring_matrix *= (self.sigma_matrix / (2 * self.R))
+
+        #--------------------------------------------------------------------
+        #muの不均質性
+        self.Test_star = (np.ones(self.N, self.N) * self.Mu) + self.D_mu * self.Xi_mu
+        
+        #self.star_matrixは、スターネットワークの隣接行列を生成する
+        self.star_matrix = np.zeros((self.N, self.N))
+
+        self.star_matrix[0,0] = -self.Test_star[0,0] * (self.N-1)
+        self.star_matrix[0,1:] = self.Test_star[0,1:]
+        self.star_matrix[1:,0] = -self.Test_star[1:,0]
+
+        for i in range(1,self.N):
+            self.star_matrix[i,i] += self.Test_star[i,i]
+        
+        #--------------------------------------------------------------------
+        
+        #self.Ring_Star_matrixは、リングスターネットワークの隣接行列を生成する（ただ足し合わせた）
+        self.Ring_Star_matrix = (self.ring_matrix + self.star_matrix)
+
+        #--------------------------------------------------------------------
+        
+        for i in range(self.RunTime - 1):
+
+            print("\r%d / %d"%(i, self.RunTime), end = "")
+
+            self.x[i+1] = pow(self.x[i], 2) * np.exp(self.y[i] - self.x[i]) + self.k0 \
+                + self.k * self.x[i] * (self.alpha + 3 * self.beta * pow(self.phi[i], 2)) + self.Input_Signal_In[i]
+            self.y[i+1] = self.a * self.y[i] - self.b * self.x[i] + self.c 
+            self.phi[i+1] = self.k1 * self.x[i] - self.k2 * self.phi[i]
+
+        return self.x[self.Plot_Start : self.Plot_End - 1], \
+            self.y[self.Plot_Start : self.Plot_End - 1], \
+            self.phi[self.Plot_Start : self.Plot_End - 1], \
+                self.Input_Signal_In[self.Plot_Start : self.Plot_End - 1]

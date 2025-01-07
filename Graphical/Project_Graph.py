@@ -169,13 +169,6 @@ def Project_Chialvo_All_2024_09_24_14_17():
         })
         Output_Graph.Output_NewNullcline(param)()
 
-    if Param["Project_Plot_NewNullcline3D_ALL"]:
-        param = Param.copy()
-        param.update({
-            "Model" : Model_Graph.Model_Chialvo_NewNullcline3D
-        })
-        Output_Graph.Output_NewNullcline3D(param)()
-
 def Project_Chialvo_TimeLine_2024_09_24_17_25():
     """
     変数1つに対して、時間経過における変数の値を描写する関数。
@@ -399,66 +392,68 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
     })
     Output_Graph.Output_NewNullcline(param)()
 
-def Project_Chialvo_NewNullcline3D_2024_10_20_12_17():
+def Project_Chialvo_Neurons_Network_PhaseSpace_2025_01_07_16_00():
     """
-    3次元Chialvo Neuron Mapの3Dマップにおけるベクトル場とNullclineを描写する関数。
+    変数2つに対して、時間経過における変数の値の組み合わせを描写する関数。
+    ただし、Chialvo Neurons Neworkである。
     """
 
     #共通パラメータ
     Param = {
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        #Nullclineの描写
-        "Project_Plot_NewNullcline3D"         : True,
-        #相平面における解の軌道の描写
-        "Project_Plot_PhaseSpace3D"           : True,
+        #相平面の描写
+        "Project_Plot_PhaseSpace_XandY"         : False,
+        "Project_Plot_PhaseSpace_XandPhi"       : False,
+        "Project_Plot_PhaseSpace_YandPhi"       : False,
 
-        #+++++++++++++++++++++++++s+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #3次元相平面の描写
+        "Project_Plot_PhaseSpace_3D"            : True,
+
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #従来のChialvoパラメータ
-        "Chialvo_a"                 : 0.5,
-        "Chialvo_b"                 : 0.4,
-        "Chialvo_c"                 : 0.89,
-        "Chialvo_k0"                : -0.44,
+        "Chialvo_a"                 : 0.89,
+        "Chialvo_b"                 : 0.6,
+        "Chialvo_c"                 : 0.28,
+        "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : 7.6,
+        "Chialvo_k"                 : -1.1,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
-        "Chialvo_beta"              : 0.1,
+        "Chialvo_beta"              : 0.2,
+
+        #電磁束下Chialvoニューロンのネットワークパラメータ
+        "Chialvo_Neurons"           : 100,
+        "Chialvo_Mu"                : 0.1, #中心ニューロン間
+        "Chialvo_Sigma"             : 0.1, #隣接ニューロン間
+        "Chialvo_R"                 : 10,  #ニューロン結合数
+
+        #電磁束下Chialvoニューロンネットワークの追加パラメータ
+        "Chialvo_Xi_mu"             : 0.001,
+        "Chialvo_Xi_sigma"          : 0.002,
+        "Chialvo_D_mu"              : 0.1,
+        "Chialvo_D_sigma"           : 0.1,
+
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
-        "RunTime" : 300,
-        "Plot_Start" : 0,
-        "Plot_End" : 300,
+        "RunTime" : 20000,
+        "Plot_Start" : 10000,
+        "Plot_End" : 20000,
 
         #入力信号：uについて
         "Input_Signal"  : 0,
 
-        #ベクトル場の間隔
-        "Vdt" : 1,
-        #Nullclineの間隔
-        "dt" : 0.0001,
-
-        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        #どこからどこまでプロット図の点を作成するか
-        "Plot_x_Start" : -3,
-        "Plot_x_End" : 7,
-
-        "Plot_y_Start" : -3,
-        "Plot_y_End" : 7,
-
-        "Plot_phi_Start" : -3,
-        "Plot_phi_End" : 7,
-
-        #時系列描写の初期化指定
-        "Initial_Value_X" : 4.5,
-        "Initial_Value_Y" : -1.8,
-        "Initial_Value_Phi" : 0.3,
+        #恒等関数：None
+        #sin関数：np.sin
+        #離散信号：random.randint
+        "Input_Signal_def" : None,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     }
     
     param = Param.copy()
     param.update({
-        "Model" : Model_Graph.Model_Chialvo_NewNullcline3D
+        "Model" : Model_Graph.Model_Chialvo_Neurons_Network
     })
-    Output_Graph.Output_NewNullcline3D(param)()
+    Output_Graph.Output_PhaseSpace(param)()
+
