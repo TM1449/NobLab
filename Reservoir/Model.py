@@ -1013,7 +1013,7 @@ class Model_SishuESN(Model):
         s = self.SishuReservoir.forward(u)
         z = np.concatenate([s, u])
         self.SishuReservoir.update()
-        return z
+        return z , s[10:21]
     
     #順伝播（リードアウトのみ）
     def forwardReadout(self, z: np.ndarray) -> np.ndarray:
@@ -1034,7 +1034,7 @@ class Model_SishuESN(Model):
         y = self.Readout_LinerTransformer.forward(z)
         e = self.Readout_LinerTransformer.RMSE(z, y_d)
         self.SishuReservoir.update()
-        return y, e
+        return y, e, s[10:21]
     
     #学習
     def fit(self, Z: np.ndarray, Y_d: np.ndarray):

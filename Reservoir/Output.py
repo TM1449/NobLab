@@ -108,12 +108,12 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 start = self.Length_Burnin + self.Length_Train
                 end = self.Length_Burnin + self.Length_Train + self.Length_Test
                 T = np.array(result_param["NRMSE_R_T"][start : end])
-                #TS = np.array(result_param["NRMSE_R_T"][start : end])
+                TS = np.array(result_param["NRMSE_R_T"][start : end])
                 U = np.array(result_param["NRMSE_R_U"][start : end])
                 Y = np.array(result_param["NRMSE_R_Y"][start : end])
                 Y_d = np.array(result_param["NRMSE_R_Y_d"][start : end])
                 E = np.array(result_param["NRMSE_R_E"][start : end])
-                #RS = np.array(result_param["Reservoir_Move"][:,start : end])
+                RS = np.array(result_param["Reservoir_Move"][:,start : end])
 
                 #各種波形
                 Title = "UYYdWaves" + self.AxisTag  #図題
@@ -142,20 +142,20 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 fig.savefig(self.Plt_Charts_ErrorWaves.Path + FileFormat)
 
                 #リザバー層内の状態
-                #Title =  None
-                #fig = plt.figure(figsize = FigSize)
-                #ax = fig.add_subplot(1, 1, 1)
-                #plt.tick_params(labelsize=18)
-                #ax.set_title(Title, fontsize = FontSize_Title)
-                #ax.set_xlabel("Time Step", fontsize = FontSize_Label)
-                #ax.set_ylabel(r'$x_{R}$', fontsize = FontSize_Label)
-                #ax.grid(True)
-                #cmap = plt.get_cmap("tab10")
-                #for i in range(10):
-                #    ax.plot(T[:1000], RS[i,:1000], color = cmap(i), label = r'$x_{R}$', lw = LineWidth)
-                #ax.legend()
-                #plt.tight_layout()
-                #fig.savefig(self.Plt_Charts_MOVEWaves.Path + FileFormat)
+                Title =  None
+                fig = plt.figure(figsize = FigSize)
+                ax = fig.add_subplot(1, 1, 1)
+                plt.tick_params(labelsize=18)
+                ax.set_title(Title, fontsize = FontSize_Title)
+                ax.set_xlabel("Time Step", fontsize = FontSize_Label)
+                ax.set_ylabel(r'$x_{R}$', fontsize = FontSize_Label)
+                ax.grid(True)
+                cmap = plt.get_cmap("tab10")
+                for i in range(10):
+                    ax.plot(T[:1000], RS[i,:1000], color = cmap(i), label = r'$x_{R}$', lw = LineWidth)
+                ax.legend()
+                plt.tight_layout()
+                fig.savefig(self.Plt_Charts_MOVEWaves.Path + FileFormat)
 
                 plt.close()
     

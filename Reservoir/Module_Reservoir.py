@@ -473,6 +473,10 @@ class Module_ModifiedDeepReservoir(Module_Reservoir):
 
 #--------------------------------------------------------------------
 #Sishu提案モデル
+
+def ReLU(x):
+    return np.where(x > 0, x , 0.1 * x)
+
 class Module_SishuReservoir(Module_Reservoir):
     """
     Sishu提案モデル
@@ -610,6 +614,10 @@ class Module_SishuReservoir(Module_Reservoir):
         s_w[np.random.choice(len(s_w), (int)(len(s_w) * (1 - self.Density)), replace = False)] = 0.
         return s_w.reshape(w.shape[0], w.shape[1])
     
+    def ReLU(x):
+        #return np.where(x > 0, x , 0.0 * x)
+        return x
+
     #順伝播
     def forward(self, u: np.ndarray) -> np.ndarray: 
         #使用するハイパーパラメータ
@@ -622,7 +630,7 @@ class Module_SishuReservoir(Module_Reservoir):
         Alph_Chialvo = 0.1
         Beta_Chialvo = 0.2
         
-        self.x = (self.x_old ** 2 * np.exp(self.y_old - self.x_old) + k0 \
+        self.x = ReLU(self.x_old ** 2 * np.exp(self.y_old - self.x_old) + k0 \
                         + self.k * self.x_old * (Alph_Chialvo + 3 * Beta_Chialvo * self.phi_old ** 2) \
                                 + np.dot(self.x_old, self.W_rec)) + np.dot(np.concatenate([self.Bias, u]), self.W_in)
         self.y = a * self.y_old - b * self.x_old + c

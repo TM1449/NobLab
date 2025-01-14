@@ -585,7 +585,7 @@ def Project_SishuESN_NRMSE_MC_2024_06_23_00_12():
     Param = {
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Project_F_NRMSE" : True,                           #NRMSEを調査するか
-        "Project_F_MemoryCapacity" : True,                  #MCを調査するか
+        "Project_F_MemoryCapacity" : False,                  #MCを調査するか
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Task_SinCurve_RK_h" : 0.01,                        #ルンゲクッタ法刻み幅
@@ -619,7 +619,7 @@ def Project_SishuESN_NRMSE_MC_2024_06_23_00_12():
         "Model_SishuESN_k" : -3.2,           #Chialvoの変数：k
 
         "SishuReservoir_Density" : 1,                         #結合密度
-        "Model_SishuESN_Rho" : 0.032,                          #スペクトル半径
+        "Model_SishuESN_Rho" : 0.0032,                          #スペクトル半径
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "LinerTransformer_Beta" : 0.2,                      #正規化係数
         }
@@ -635,7 +635,7 @@ def Project_SishuESN_NRMSE_MC_2024_06_23_00_12():
             "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
             "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-            "NRMSE_T_Task" : Task.Task_NDRosslor,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task.Task_NDLorenz,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model.Model_SishuESN,                 #モデル（Type型）
             "NRMSE_T_Output" : Output.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
