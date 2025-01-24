@@ -473,10 +473,6 @@ class Module_ModifiedDeepReservoir(Module_Reservoir):
 
 #--------------------------------------------------------------------
 #Sishu提案モデル
-
-def ReLU(x):
-    return np.where(x > 0, x , 0.1 * x)
-
 class Module_SishuReservoir(Module_Reservoir):
     """
     Sishu提案モデル
@@ -492,9 +488,24 @@ class Module_SishuReservoir(Module_Reservoir):
         self.D_x = self.Param["SishuReservoir_D_x"]                       #ニューロン数
         self.InputScale = self.Param["SishuReservoir_InputScale"]         #入力スケーリング
         
+        self.Ring = self.Param["SishuReservoir_Ring"]
+        self.Star = self.Param["SishuReservoir_Star"]
+
         self.sigma = self.Param["SishuReservoir_sigma"]                     #リング・ネットワークの有無
         self.mu = self.Param["SishuReservoir_mu"]                           #スター・ネットワークの有無
+
+        self.a = self.Param["SishuReservoir_a"]
+        self.b = self.Param["SishuReservoir_b"]
+        self.c = self.Param["SishuReservoir_c"]
+        self.k0 = self.Param["SishuReservoir_k0"]
+
+        self.k1 = self.Param["SishuReservoir_k1"]
+        self.k2 = self.Param["SishuReservoir_k2"]
+        self.alpha = self.Param["SishuReservoir_alpha"]
+        self.beta = self.Param["SishuReservoir_beta"]
+
         self.k = self.Param["SishuReservoir_k"]                             #k
+        
         self.Rho = self.Param["SishuReservoir_Rho"]                         #スペクトル半径
         self.Density = self.Param["SishuReservoir_Density"]
         self.Bias = np.ones([1])                                        #バイアス
@@ -520,92 +531,16 @@ class Module_SishuReservoir(Module_Reservoir):
     
     #再帰重み生成
     def _makeRecurrentWeight(self) -> np.ndarray:
-        #リングスターネットワークの隣接行列
-        #使用するハイパーパラメータ
-        N = 100
-        R = 10
+        #乱数で重み調整
+        np.random.seed(seed=None)
+        #一様分布
+        #W = (np.random.rand(self.D_x,self.D_x) * 2 - 1)
+        W = np.random.randn(self.D_x, self.D_x)
+        W = self._makeWSparse(W)
+        w , v = np.linalg.eig(W)
 
-        if (self.sigma == "True") and (self.mu == "False"):
-            #リングネットワークを乱数で生成
-            Ring_Matrix = np.identity(self.D_x)
-            Ring_Matrix[0,0] = 0
-            for i in range(1,self.D_x):
-                Ring_Matrix[i:i+R+1,i:i+R+1] = 1
-                Ring_Matrix[N-R+i-1:,i] = 1
-                Ring_Matrix[i,N-R+i-1:] = 1
-            for i in range(1,self.D_x):
-                Ring_Matrix[i,i] = 1
-            
-            Matrix = Ring_Matrix
-        
-        elif (self.sigma == "False") and (self.mu == "True"):
-            #スターネットワークの生成
-            Star_Matrix = np.zeros((self.D_x,self.D_x))
-            Star_Matrix[0,0] = 1
-            Star_Matrix[0,1:] = 1
-            Star_Matrix[1:,0] = 1
-            for i in range(1,N):
-                Star_Matrix[i,i] += 1
-            
-            Matrix = Star_Matrix
+        Matrix = self.Rho * W / np.max(np.abs(w))
 
-        elif (self.sigma == "True") and (self.mu == "True"):
-            #リングネットワークの生成
-            Ring_Matrix = np.identity(self.D_x)
-            Ring_Matrix[0,0] = 0
-            for i in range(1,self.D_x):
-                Ring_Matrix[i:i+R+1,i:i+R+1] = 1
-                Ring_Matrix[N-R+i-1:,i] = 1
-                Ring_Matrix[i,N-R+i-1:] = 1
-            for i in range(1,self.D_x):
-                Ring_Matrix[i,i] = 0
-
-            #スターネットワークの生成
-            Star_Matrix = np.zeros((self.D_x,self.D_x))
-            Star_Matrix[0,0] = 1
-            Star_Matrix[0,1:] = 1
-            Star_Matrix[1:,0] = 1
-            for i in range(1,self.D_x):
-                Star_Matrix[i,i] += 1
-
-            #リングスターネットワークの生成
-            Matrix = (Ring_Matrix + Star_Matrix)
-
-        elif (self.sigma == "False") and (self.mu == "False"):
-            
-            #乱数で重み調整
-            np.random.seed(seed=None)
-        
-            W = (np.random.rand(self.D_x,self.D_x) * 2 - 1)
-            W = self._makeWSparse(W)
-            w , v = np.linalg.eig(W)
-
-            Matrix = self.Rho * W / np.amax(w.real)
-
-        else:
-            #リングネットワークの生成
-            Ring_Matrix = np.identity(self.D_x)
-            Ring_Matrix[0,0] = 0
-            for i in range(1,self.D_x):
-                Ring_Matrix[i:i+R+1,i:i+R+1] = 1
-                Ring_Matrix[N-R+i-1:,i] = 1
-                Ring_Matrix[i,N-R+i-1:] = 1
-            for i in range(1,self.D_x):
-                Ring_Matrix[i,i] = -2 * R
-
-            Ring_Matrix *= (self.sigma / (2 * R))
-
-            #スターネットワークの生成
-            Star_Matrix = np.zeros((self.D_x,self.D_x))
-            Star_Matrix[0,0] = -self.mu * (self.D_x-1)
-            Star_Matrix[0,1:] = -self.mu
-            Star_Matrix[1:,0] = self.mu
-            for i in range(1,self.D_x):
-                Star_Matrix[i,i] += self.mu
-
-            #リングスターネットワークの生成
-            Matrix = Ring_Matrix + Star_Matrix
-        
         return Matrix
         
     #疎行列化
@@ -613,28 +548,14 @@ class Module_SishuReservoir(Module_Reservoir):
         s_w = w.reshape([-1])
         s_w[np.random.choice(len(s_w), (int)(len(s_w) * (1 - self.Density)), replace = False)] = 0.
         return s_w.reshape(w.shape[0], w.shape[1])
-    
-    def ReLU(x):
-        #return np.where(x > 0, x , 0.0 * x)
-        return x
 
     #順伝播
     def forward(self, u: np.ndarray) -> np.ndarray: 
-        #使用するハイパーパラメータ
-        a = 0.89
-        b = 0.6
-        c = 0.28
-        k0 = 0.04
-        k1 = 0.1
-        k2 = 0.2
-        Alph_Chialvo = 0.1
-        Beta_Chialvo = 0.2
-        
-        self.x = ReLU(self.x_old ** 2 * np.exp(self.y_old - self.x_old) + k0 \
-                        + self.k * self.x_old * (Alph_Chialvo + 3 * Beta_Chialvo * self.phi_old ** 2) \
-                                + np.dot(self.x_old, self.W_rec)) + np.dot(np.concatenate([self.Bias, u]), self.W_in)
-        self.y = a * self.y_old - b * self.x_old + c
-        self.phi = k1 * self.x_old - k2 * self.phi_old
+        self.x = pow(self.x_old, 2) * np.exp(self.y_old - self.x_old) + self.k0 \
+            + self.k * self.x_old * (self.alpha + 3 * self.beta * pow(self.phi_old, 2)) \
+                + np.dot(self.x_old, self.W_rec) + np.dot(np.concatenate([self.Bias, u]), self.W_in)
+        self.y = self.a * self.y_old - self.b * self.x_old + self.c
+        self.phi = self.k1 * self.x_old - self.k2 * self.phi_old
 
         return self.x
 

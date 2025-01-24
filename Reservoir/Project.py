@@ -613,13 +613,27 @@ def Project_SishuESN_NRMSE_MC_2024_06_23_00_12():
         "Model_SishuESN_D_x" : 100,                        #ニューロン数
         "Model_SishuESN_D_y" : 1,                          #出力信号次元
 
+        "Model_SishuESN_Ring" : False,
+        "Model_SishuESN_Star" : False,
+        
         "Model_SishuESN_InputScale" : 0.1,                 #入力スケーリング
         "Model_SishuESN_sigma" : "False",    #リング・ネットワークの有無（文字列のTrueは乱数結合。併用禁止、するなら0指定）
         "Model_SishuESN_mu" : "False",        #スター・ネットワークの有無（文字列のTrueは乱数結合。併用禁止、するなら0指定）
+
+        "Model_SishuESN_a" : 0.89,      #変数a
+        "Model_SishuESN_b" : 0.6,       #変数b
+        "Model_SishuESN_c" : 0.28,      #変数c
+        "Model_SishuESN_k0" : 0.04,     #変数k0
+
+        "Model_SishuESN_k1" : 0.1,      #変数k1
+        "Model_SishuESN_k2" : 0.2,      #変数k2
+        "Model_SishuESN_alpha" : 0.1,   #変数alpha
+        "Model_SishuESN_beta" : 0.2,    #変数beta
+
         "Model_SishuESN_k" : -3.2,           #Chialvoの変数：k
 
-        "SishuReservoir_Density" : 1,                         #結合密度
-        "Model_SishuESN_Rho" : 0.0032,                          #スペクトル半径
+        "SishuReservoir_Density" : 0.8,                         #結合密度
+        "Model_SishuESN_Rho" : 0.003,                          #スペクトル半径
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "LinerTransformer_Beta" : 0.2,                      #正規化係数
         }

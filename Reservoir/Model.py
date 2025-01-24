@@ -976,11 +976,25 @@ class Model_SishuESN(Model):
         self.D_x = self.Param["Model_SishuESN_D_x"]            #ニューロン数（リスト型）
         self.D_y = self.Param["Model_SishuESN_D_y"]            #出力信号次元
 
-        self.ImputScale = self.Param["Model_SishuESN_InputScale"]
-        self.Rho = self.Param["Model_SishuESN_Rho"]
+        self.Ring = self.Param["Model_SishuESN_Ring"]          #リングネットワーク
+        self.Star = self.Param["Model_SishuESN_Star"]          #スターネットワーク
+
+        self.ImputScale = self.Param["Model_SishuESN_InputScale"]   #入力スケーリング
+        self.Rho = self.Param["Model_SishuESN_Rho"]                 #スペクトル半径
 
         self.sigma = self.Param["Model_SishuESN_sigma"]         #リングネットワークの有無
         self.mu = self.Param["Model_SishuESN_mu"]               #スターネットワークの有無
+
+        self.a = self.Param["Model_SishuESN_a"]
+        self.b = self.Param["Model_SishuESN_b"]
+        self.c = self.Param["Model_SishuESN_c"]
+        self.k0 = self.Param["Model_SishuESN_k0"]
+
+        self.k1 = self.Param["Model_SishuESN_k1"]
+        self.k2 = self.Param["Model_SishuESN_k2"]
+        self.alpha = self.Param["Model_SishuESN_alpha"]
+        self.beta = self.Param["Model_SishuESN_beta"]
+
         self.k = self.Param["Model_SishuESN_k"]                #Chialvoの変数：k
         
         self.D_z = self.D_x + self.D_u                           #特徴ベクトル次元
@@ -991,11 +1005,25 @@ class Model_SishuESN(Model):
             "SishuReservoir_D_u" : self.D_u,
             "SishuReservoir_D_x" : self.D_x,
 
+            "SishuReservoir_Ring" : self.Ring,
+            "SishuReservoir_Star" : self.Star,
+
             "SishuReservoir_InputScale" : self.ImputScale,
             "SishuReservoir_Rho" : self.Rho,
 
             "SishuReservoir_sigma" : self.sigma,
             "SishuReservoir_mu" : self.mu,
+
+            "SishuReservoir_a" : self.a,
+            "SishuReservoir_b" : self.b,
+            "SishuReservoir_c" : self.c,
+            "SishuReservoir_k0" : self.k0,
+
+            "SishuReservoir_k1" : self.k1,
+            "SishuReservoir_k2" : self.k2,
+            "SishuReservoir_alpha" : self.alpha,
+            "SishuReservoir_beta" : self.beta,
+
             "SishuReservoir_k" : self.k
             })
         self.SishuReservoir = Reservoir.Module_SishuReservoir(param, self)

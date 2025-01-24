@@ -169,6 +169,7 @@ def Project_Chialvo_All_2024_09_24_14_17():
         })
         Output_Graph.Output_NewNullcline(param)()
 
+#====================================================================
 def Project_Chialvo_TimeLine_2024_09_24_17_25():
     """
     変数1つに対して、時間経過における変数の値を描写する関数。
@@ -183,17 +184,17 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #従来のChialvoパラメータ
-        "Chialvo_a"                 : 0.89,
-        "Chialvo_b"                 : 0.6,
-        "Chialvo_c"                 : 0.28,
-        "Chialvo_k0"                : 0.04,
+        "Chialvo_a"                 : 0.6,
+        "Chialvo_b"                 : 0.1,
+        "Chialvo_c"                 : 1.4,
+        "Chialvo_k0"                : 0.1,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -1.1,
+        "Chialvo_k"                 : -0.5,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
-        "Chialvo_beta"              : 0.2,
+        "Chialvo_beta"              : 0.1,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
         "RunTime" : 6000,
@@ -201,7 +202,7 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         "Plot_End" : 6000,
 
         #入力信号：uについて
-        "Input_Signal"  : 0,
+        "Input_Signal"  : 0.01,
 
         #恒等関数：None
         #sin関数：np.sin
@@ -371,6 +372,8 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
         #Nullclineの間隔
         "dt" : 0.0001,
 
+        #交点の算出
+
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #どこからどこまでプロット図の点を作成するか
         "Plot_x_Start" : -5,
@@ -392,6 +395,59 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
     })
     Output_Graph.Output_NewNullcline(param)()
 
+def Project_Chialvo_Intersection_2024_09_24_17_25():
+    """
+    変数1つに対して、時間経過における変数の値を描写する関数。
+    """
+    #共通パラメータ
+    Param = {
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #時系列の描写
+        "Project_Plot_TimeLine_X"               : True,
+        "Project_Plot_TimeLine_Y"               : True,
+        "Project_Plot_TimeLine_Phi"             : True,
+
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #従来のChialvoパラメータ
+        "Chialvo_a"                 : 0.89,
+        "Chialvo_b"                 : 0.6,
+        "Chialvo_c"                 : 0.28,
+        "Chialvo_k0"                : 0.04,
+
+        #電磁束下のChialvoパラメータ
+        "Chialvo_k"                 : -1.1,
+        "Chialvo_k1"                : 0.1,
+        "Chialvo_k2"                : 0.2,
+        "Chialvo_alpha"             : 0.1,
+        "Chialvo_beta"              : 0.2,
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #時系列描写の実行時間
+        "RunTime" : 6000,
+        "Plot_Start" : 1000,
+        "Plot_End" : 6000,
+
+        #入力信号：uについて
+        "Input_Signal"  : 0,
+
+        #恒等関数：None
+        #sin関数：np.sin
+        #離散信号：random.randint
+        "Input_Signal_def" : None,
+
+        #時系列描写の初期化指定
+        "Initial_Value_X" : None,
+        "Initial_Value_Y" : None,
+        "Initial_Value_Phi" : None,
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    }
+    
+    param = Param.copy()
+    param.update({
+        "Model" : Model_Graph.Model_Chialvo
+    })
+    Output_Graph.Output_TimeLine(param)()
+
+#====================================================================
 def Project_Chialvo_Neurons_Network_PhaseSpace_2025_01_07_16_00():
     """
     変数2つに対して、時間経過における変数の値の組み合わせを描写する関数。
@@ -457,3 +513,4 @@ def Project_Chialvo_Neurons_Network_PhaseSpace_2025_01_07_16_00():
     })
     Output_Graph.Output_PhaseSpace(param)()
 
+#====================================================================
