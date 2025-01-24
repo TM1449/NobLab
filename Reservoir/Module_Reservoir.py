@@ -491,9 +491,6 @@ class Module_SishuReservoir(Module_Reservoir):
         self.Ring = self.Param["SishuReservoir_Ring"]
         self.Star = self.Param["SishuReservoir_Star"]
 
-        self.sigma = self.Param["SishuReservoir_sigma"]                     #リング・ネットワークの有無
-        self.mu = self.Param["SishuReservoir_mu"]                           #スター・ネットワークの有無
-
         self.a = self.Param["SishuReservoir_a"]
         self.b = self.Param["SishuReservoir_b"]
         self.c = self.Param["SishuReservoir_c"]
@@ -536,6 +533,7 @@ class Module_SishuReservoir(Module_Reservoir):
         #一様分布
         #W = (np.random.rand(self.D_x,self.D_x) * 2 - 1)
         W = np.random.randn(self.D_x, self.D_x)
+        W = np.triu(W)
         W = self._makeWSparse(W)
         w , v = np.linalg.eig(W)
 

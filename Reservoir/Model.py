@@ -982,9 +982,6 @@ class Model_SishuESN(Model):
         self.ImputScale = self.Param["Model_SishuESN_InputScale"]   #入力スケーリング
         self.Rho = self.Param["Model_SishuESN_Rho"]                 #スペクトル半径
 
-        self.sigma = self.Param["Model_SishuESN_sigma"]         #リングネットワークの有無
-        self.mu = self.Param["Model_SishuESN_mu"]               #スターネットワークの有無
-
         self.a = self.Param["Model_SishuESN_a"]
         self.b = self.Param["Model_SishuESN_b"]
         self.c = self.Param["Model_SishuESN_c"]
@@ -1010,9 +1007,6 @@ class Model_SishuESN(Model):
 
             "SishuReservoir_InputScale" : self.ImputScale,
             "SishuReservoir_Rho" : self.Rho,
-
-            "SishuReservoir_sigma" : self.sigma,
-            "SishuReservoir_mu" : self.mu,
 
             "SishuReservoir_a" : self.a,
             "SishuReservoir_b" : self.b,

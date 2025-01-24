@@ -617,9 +617,7 @@ def Project_SishuESN_NRMSE_MC_2024_06_23_00_12():
         "Model_SishuESN_Star" : False,
         
         "Model_SishuESN_InputScale" : 0.1,                 #入力スケーリング
-        "Model_SishuESN_sigma" : "False",    #リング・ネットワークの有無（文字列のTrueは乱数結合。併用禁止、するなら0指定）
-        "Model_SishuESN_mu" : "False",        #スター・ネットワークの有無（文字列のTrueは乱数結合。併用禁止、するなら0指定）
-
+        
         "Model_SishuESN_a" : 0.89,      #変数a
         "Model_SishuESN_b" : 0.6,       #変数b
         "Model_SishuESN_c" : 0.28,      #変数c
