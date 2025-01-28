@@ -86,7 +86,7 @@ class Plot_TimeLine(Plot):
         ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
 
         ax.plot(self.PlotData, label = f"{self.PlotData_Label}", linestyle = '-',lw = LineWidth * 0.9)
-        ax.plot(self.PlotSignal, label = f"{self.PlotSignal_Label}", linestyle = '-',lw = LineWidth * 0.85)
+        #ax.plot(self.PlotSignal, label = f"{self.PlotSignal_Label}", linestyle = '-',lw = LineWidth * 0.85)
         ax.grid()
         ax.legend(fontsize = FontSize_legend)
         fig.tight_layout()

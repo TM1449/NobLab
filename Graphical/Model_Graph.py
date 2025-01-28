@@ -105,14 +105,19 @@ class Model_Chialvo(Model):
         #入力信号プロットの作成
         self.Input_Signal_In = np.zeros(self.RunTime)
 
+        #恒等関数の場合
         if self.Input_Signal_def == None:
             for n in range(self.RunTime - 1):
                 self.Input_Signal_In[n+1] = self.Input_Signal
+
+            self.Input_Signal_In[2000:2100] = 1
         
+        #sin波の場合
         elif self.Input_Signal_def == np.sin:
             for n in range(self.RunTime - 1):
                 self.Input_Signal_In[n+1] = 0.1 * self.Input_Signal * self.Input_Signal_def(4 * n * np.pi / 180)
         
+        #ランダムの場合
         elif self.Input_Signal_def == random.randint:
             self.Step_s = self.RunTime // 100
             self.Step = self.RunTime // self.Step_s
@@ -229,6 +234,7 @@ class Model_Chialvo_OldNullcline(Model):
         return self.X, self.Y, self.Vx, self.Vy, \
                 self.dx, self.dy, self.fx, self.fy, \
                         self.x[self.Plot_Start : self.Plot_End - 1], self.y[self.Plot_Start : self.Plot_End - 1]
+
 
 class Model_Chialvo_NewNullcline(Model):
 
@@ -348,6 +354,7 @@ class Model_Chialvo_NewNullcline(Model):
         return self.X, self.Y, self.Vx, self.Vy, \
                 self.dx, self.dy, self.fx, self.fy, \
                         self.x[self.Plot_Start : self.Plot_End - 1], self.y[self.Plot_Start : self.Plot_End - 1]
+
 
 class Model_Chialvo_Neurons_Network(Model):
 
@@ -483,3 +490,5 @@ class Model_Chialvo_Neurons_Network(Model):
             self.y[self.Plot_Start : self.Plot_End - 1], \
             self.phi[self.Plot_Start : self.Plot_End - 1], \
                 self.Input_Signal_In[self.Plot_Start : self.Plot_End - 1]
+    
+    

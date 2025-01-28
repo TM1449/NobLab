@@ -184,25 +184,27 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #従来のChialvoパラメータ
-        "Chialvo_a"                 : 0.6,
-        "Chialvo_b"                 : 0.1,
-        "Chialvo_c"                 : 1.4,
-        "Chialvo_k0"                : 0.1,
+        "Chialvo_a"                 : 0.89,
+        "Chialvo_b"                 : 0.6,
+        "Chialvo_c"                 : 0.28,
+        "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -0.5,
+        "Chialvo_k"                 : -3.2,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
-        "Chialvo_beta"              : 0.1,
+        "Chialvo_beta"              : 0.2,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の実行時間
         "RunTime" : 6000,
-        "Plot_Start" : 1000,
-        "Plot_End" : 6000,
+
+        #描写開始時間と描写終了時間
+        "Plot_Start" : 1800,
+        "Plot_End" : 2200,
 
         #入力信号：uについて
-        "Input_Signal"  : 0.01,
+        "Input_Signal"  : 0,
 
         #恒等関数：None
         #sin関数：np.sin
