@@ -152,6 +152,8 @@ class Model_EMChialvo(Model):
         self.D_x = self.Param["Model_EMChialvo_D_x"]            #ニューロン数（リスト型）
         self.D_y = self.Param["Model_EMChialvo_D_y"]            #出力信号次元
 
+        self.RS_neuron = self.Param["NRMSE_Reservoir_Neurons"]
+
         #リザバー層のニューロン形態に関するパラメータ
         self.Ring = self.Param["Model_EMChialvo_Ring"]          #リングネットワーク
         self.Star = self.Param["Model_EMChialvo_Star"]          #スターネットワーク
@@ -215,9 +217,11 @@ class Model_EMChialvo(Model):
         self.EMChialvo_Reservoir.update()
 
         #リザバー層のランダムなニューロンを抜粋
-        Random_Neuron = random.sample(range(len(s)), 11)
+        Random_Neuron = random.sample(range(len(s)), self.RS_neuron)
         RS_N = s[Random_Neuron]
-        return z , s[30:51]
+        #s[30:51]
+        
+        return z , s[1,6,91,22,42,51,21,87,65,10]
     
     #順伝播（リードアウトのみ）
     def forwardReadout(self, z: np.ndarray) -> np.ndarray:
@@ -240,9 +244,11 @@ class Model_EMChialvo(Model):
         self.EMChialvo_Reservoir.update()
 
         #リザバー層のランダムなニューロンを抜粋
-        Random_Neuron = random.sample(range(len(s)), 11)
+        Random_Neuron = random.sample(range(len(s)), self.RS_neuron)
         RS_N = s[Random_Neuron]
-        return y, e, s[30:51]
+        #s[30:51]
+
+        return y, e, s[1,6,91,22,42,51,21,87,65,10]
     
     #学習
     def fit(self, Z: np.ndarray, Y_d: np.ndarray):

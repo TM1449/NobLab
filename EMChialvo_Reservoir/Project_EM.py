@@ -204,6 +204,9 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
             "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
             "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
+
+            "NRMSE_Reservoir_Neurons" : 10,
+
             "NRMSE_T_Task" : Task_EM.Task_NDLorenz,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）

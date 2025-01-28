@@ -72,6 +72,7 @@ class Evaluation_NRMSE(Evaluation):
         self.Length_Train = self.Param["NRMSE_Length_Train"]    #学習用データ時間長
         self.Length_Test = self.Param["NRMSE_Length_Test"]      #評価用データ時間長
         self.Length_Total = self.Length_Burnin + self.Length_Train + self.Length_Test#全体データ時間長
+        self.RS_neuron = self.Param["NRMSE_Reservoir_Neurons"]  #リザバー層のニューロン数
 
         #評価用タスク（Type型）
         self.T_Task = self.Param["NRMSE_T_Task"]
@@ -115,7 +116,7 @@ class Evaluation_NRMSE(Evaluation):
         Y = [None for _ in range(self.Length_Total)]
         Y_d = [None for _ in range(self.Length_Total)]
         E = [None for _ in range(self.Length_Total)]
-        RS = np.array([None for _ in range(self.Length_Total * 21)]).reshape(-1,self.Length_Total)
+        RS = np.array([None for _ in range(self.Length_Total * self.RS_neuron)]).reshape(-1,self.Length_Total)
 
         #モデルリセット
         self.Model.reset()

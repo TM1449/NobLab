@@ -67,6 +67,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
         self.Length_Train = self.Param["NRMSE_Length_Train"]        #学習用データ時間長
         self.Length_Test = self.Param["NRMSE_Length_Test"]          #評価用データ時間長
         self.Length_Total = self.Length_Burnin + self.Length_Train + self.Length_Test#全体データ時間長
+        self.RS_neuron = self.Param["NRMSE_Reservoir_Neurons"]  #リザバー層のニューロン数
 
         #フォルダ構造
         self.DirPath_Project = self.Param["DirPath_Project"]        #プロジェクトのフォルダパス
@@ -151,7 +152,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.set_ylabel(r'$x_{R}$', fontsize = FontSize_Label)
                 ax.grid(True)
                 cmap = plt.get_cmap("tab10")
-                for i in range(20):
+                for i in range(self.RS_neuron):
                     ax.plot(T[:1000], RS[i,:1000], color = cmap(i), label = r'$x_{R}$', lw = LineWidth)
                 ax.legend()
                 plt.tight_layout()
