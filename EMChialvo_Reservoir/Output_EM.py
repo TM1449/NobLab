@@ -115,6 +115,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 Y_d = np.array(result_param["NRMSE_R_Y_d"][start : end])
                 E = np.array(result_param["NRMSE_R_E"][start : end])
                 RS = np.array(result_param["Reservoir_Move"][:,start : end])
+                RS_HeatMap = np.array(result_param["Reservoir_HeatMap"][:,start : end])
 
                 #各種波形
                 Title = "UYYdWaves" + self.AxisTag  #図題
@@ -153,10 +154,24 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.grid(True)
                 cmap = plt.get_cmap("tab10")
                 for i in range(self.RS_neuron):
-                    ax.plot(T[:1000], RS[i,:1000], color = cmap(i), label = r'$x_{R}$', lw = LineWidth)
+                    ax.plot(T, RS[i,:], color = cmap(i), label = r'$x_{R}$', lw = LineWidth)
                 ax.legend()
                 plt.tight_layout()
                 fig.savefig(self.Plt_Charts_MOVEWaves.Path + FileFormat)
+
+                #リザバー層のヒートマップ
+                Title = None
+                fig = plt.figure(figsize = FigSize)
+                ax = fig.add_subplot(111)
+                plt.tick_params(labelsize=18)
+                RS_HeatMap = RS_HeatMap.astype(float).T
+                sns.heatmap(RS_HeatMap, cmap='hsv', xticklabels=10, yticklabels=1000)
+                ax.set_title(Title, fontsize = FontSize_Title)
+                plt.xlabel("Reservoir Neurons", fontsize = FontSize_Label * 0.8)
+                plt.ylabel("Time Step", fontsize = FontSize_Label * 0.8)
+                ax.legend()
+                plt.tight_layout()
+                fig.savefig(self.Plt_Charts_ReservoirHeatMap.Path + FileFormat)
 
                 plt.close()
     
@@ -192,6 +207,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
         self.Plt_Charts_UYYdWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("UYYdWaves"))
         self.Plt_Charts_ErrorWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("ErrorWaves"))
         self.Plt_Charts_MOVEWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("MOVEWaves"))
+        self.Plt_Charts_ReservoirHeatMap = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("ReservoirHeatMap"))
         
 #--------------------------------------------------------------------
 class Output_Single_MC_2023_05_25_13_28(Output):

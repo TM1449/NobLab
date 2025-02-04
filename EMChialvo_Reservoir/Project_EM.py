@@ -121,7 +121,7 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
             "MemoryCapacity_T_Output" : Output_EM.Output_Single_MC_2023_05_25_13_28,       #作図出力（Type型）
         
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "DirPath_Project" : "./Results/Project_ESN_2024_04_16_13_58/MC",
+            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/Project_ESN_2024_04_16_13_58/MC",
         
             "MemoryCapacity_F_OutputCharts" : True,             #図の出力フラグ
             "MemoryCapacity_F_OutputCharts_MCGraph" : True,     #MC曲線の出力フラグ
@@ -182,12 +182,12 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
         "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
-        "Model_EMChialvo_k" : -3.2,                         #変数:k
+        "Model_EMChialvo_k" : 0,                         #変数:k
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # "Module_Reservoir" に直接渡す
         "EMChialvo_Reservoir_Density" : 1,                          #結合密度
-        "EMChialvo_Reservoir_Rho" : 0.0032,                      #スペクトル半径
+        "EMChialvo_Reservoir_Rho" : 0.003,                      #スペクトル半径
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "LinerTransformer_Beta" : 0.2,                      #正規化係数
@@ -205,7 +205,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
             "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
 
-            "NRMSE_Reservoir_Neurons" : 10,
+            "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
 
             "NRMSE_T_Task" : Task_EM.Task_NDLorenz,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）

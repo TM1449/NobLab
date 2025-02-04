@@ -33,11 +33,6 @@ k_list_result_M = np.zeros((len(k_list), 10))
 
 #print(k_list_result)
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#入力信号
-InputSingal = 0
-#バイアス
-#振幅の0.1倍
-Bias = 0
 #周期
 Period = 1000
 
@@ -130,73 +125,6 @@ if Lyapunov_expotent:
         phi[0] = np.random.random() * 0.2 - 0.1
     else:
         phi[0] = Initial_phi
-
-    #--------------------------------------------------------------------
-    #入力信号の作成
-    Input_Signal_In = np.zeros(Alltime) * InputSingal
-
-    if InputSingal_def == None:
-        #入力信号：定常信号
-        print("\n====================================================================")
-        print("入力信号: 定常信号")
-        pass
-
-    elif InputSingal_def == np.sin:
-        print("\n====================================================================")
-        print("入力信号: sin波")
-        for n in range(Alltime):
-            Input_Signal_In[n] = 0.1 * InputSingal * np.sin(2 * n * np.pi / Period) + Bias
-
-    elif InputSingal_def == np.cos:
-        print("\n====================================================================")
-        print("入力信号: ローレンツ方程式")
-
-        #微小時間
-        dt = 0.01
-        #信号の大きさ
-        scale = 1 / 1000 * InputSingal
-
-        #パラメータ
-        sigma = 10
-        rho = 28
-        beta = 8/3
-
-        np.random.seed(728)
-        #入力信号の長さ
-        rorentu_x = np.ones(Alltime)
-        rorentu_x[0] = np.random.random() * 0.02 - 0.01
-        
-        rorentu_y = np.ones(Alltime)
-        rorentu_y[0] = np.random.random() * 0.02 - 0.01
-        
-        rorentu_z = np.ones(Alltime)
-        rorentu_z[0] = np.random.random() * 0.02 - 0.01
-        np.random.seed(None)
-
-        Input_Signal_In[0] = rorentu_x[0]
-
-        for n in range(0, Alltime - 1):
-            rorentu_x[n+1] = dt * (sigma *(rorentu_y[n] - rorentu_x[n])) + rorentu_x[n]
-            rorentu_y[n+1] = dt * (rorentu_x[n] * (rho - rorentu_z[n]) - rorentu_y[n]) + rorentu_y[n]
-            rorentu_z[n+1] = dt * (rorentu_x[n] * rorentu_y[n] - beta * rorentu_z[n]) + rorentu_z[n]
-
-            Input_Signal_In[n+1] = scale * rorentu_x[n+1]
-
-    #入力信号のプロット
-    if Plot_InputSignal:
-        print("\n--------------------------------------------------------------------")
-        print("入力信号の描写")
-
-        fig = plt.figure(figsize = FigSize)
-        ax = fig.add_subplot(1,1,1)
-        ax.plot(Input_Signal_In[Burn_in_time:],'-', lw = LineWidth)
-        ax.set_xlabel("Time Step", fontsize = FontSize_Axis)
-        ax.set_ylabel("x", fontsize = FontSize_Axis)
-        ax.grid()
-        fig.tight_layout()
-
-        plt.savefig(f"./{TimeDate()}_Input_Signal.png")
-        plt.show()
     #--------------------------------------------------------------------
     #規準軌道の計算部
     print("\n--------------------------------------------------------------------")
@@ -205,8 +133,7 @@ if Lyapunov_expotent:
     for i in range(0, Alltime - 1):
         print("\r%d / %d"%(i, Alltime), end = "")
         x[i+1] = pow(x[i], 2) * np.exp(y[i] - x[i]) + k0\
-              + k * x[i] * (alpha + 3 * beta * pow(phi[i], 2))\
-                + Input_Signal_In[i]
+              + k * x[i] * (alpha + 3 * beta * pow(phi[i], 2))
         y[i+1] = a * y[i] - b * x[i] + c
         phi[i+1] = k1 * x[i] - k2 * phi[i]
 
@@ -261,8 +188,7 @@ if Lyapunov_expotent:
 
     #摂動軌道の算出
     x_D[1] = pow(x_D[0], 2) * np.exp(y_D[0] - x_D[0]) + k0 \
-            + k * x_D[0] * (alpha + 3 * beta * pow(phi_D[0], 2)) \
-                + Input_Signal_In[Burn_in_time]
+            + k * x_D[0] * (alpha + 3 * beta * pow(phi_D[0], 2))
     y_D[1] = a * y_D[0] - b * x_D[0] + c
     phi_D[1] = k1 * x_D[0] - k2 * phi_D[0]
 
@@ -311,8 +237,7 @@ if Lyapunov_expotent:
 
         #摂動軌道の算出
         x_D[i+1] = pow(x_D[i], 2) * np.exp(y_D[i] - x_D[i]) + k0 \
-                + k * x_D[i] * (alpha + 3 * beta * pow(phi_D[i], 2)) \
-                    + Input_Signal_In[Burn_in_time + i]
+                + k * x_D[i] * (alpha + 3 * beta * pow(phi_D[i], 2))
         y_D[i+1] = a * y_D[i] - b * x_D[i] + c
         phi_D[i+1] = k1 * x_D[i] - k2 * phi_D[i]
 
@@ -439,57 +364,12 @@ if Lyapunov_List_10:
             else:
                 phi[0] = Initial_phi
 
-            #--------------------------------------------------------------------
-            #入力信号の作成
-            Input_Signal_In = np.ones(Alltime) * InputSingal
-
-            if InputSingal_def == None:
-                #入力信号：定常信号
-                pass
-
-            elif InputSingal_def == np.sin:
-                for n in range(Alltime):
-                    Input_Signal_In[n] = 0.1 * InputSingal * np.sin(2 * n * np.pi / Period) + Bias
-
-            elif InputSingal_def == np.cos:
-                #微小時間
-                dt = 0.01
-                #信号の大きさ
-                scale = 1 / 500 * InputSingal
-
-                #パラメータ
-                sigma = 10
-                rho = 28
-                beta = 8/3
-
-                np.random.seed(728)
-                #入力信号の長さ
-                rorentu_x = np.ones(Alltime)
-                rorentu_x[0] = np.random.random() * 0.02 - 0.01
-                
-                rorentu_y = np.ones(Alltime)
-                rorentu_y[0] = np.random.random() * 0.02 - 0.01
-                
-                rorentu_z = np.ones(Alltime)
-                rorentu_z[0] = np.random.random() * 0.02 - 0.01
-
-                np.random.seed(None)
-                Input_Signal_In[0] = rorentu_x[0]
-
-                for n in range(0, Alltime - 1):
-                    rorentu_x[n+1] = dt * (sigma *(rorentu_y[n] - rorentu_x[n])) + rorentu_x[n]
-                    rorentu_y[n+1] = dt * (rorentu_x[n] * (rho - rorentu_z[n]) - rorentu_y[n]) + rorentu_y[n]
-                    rorentu_z[n+1] = dt * (rorentu_x[n] * rorentu_y[n] - beta * rorentu_z[n]) + rorentu_z[n]
-
-                    Input_Signal_In[n+1] = scale * rorentu_x[n+1]
-
-
+            
             #--------------------------------------------------------------------
             #規準軌道の計算部
             for i in range(0, Alltime - 1):
                 x[i+1] = pow(x[i], 2) * np.exp(y[i] - x[i]) + k0\
-                    + k * x[i] * (alpha + 3 * beta * pow(phi[i], 2))\
-                        + Input_Signal_In[i]
+                    + k * x[i] * (alpha + 3 * beta * pow(phi[i], 2))
                 y[i+1] = a * y[i] - b * x[i] + c
                 phi[i+1] = k1 * x[i] - k2 * phi[i]
             
@@ -520,8 +400,7 @@ if Lyapunov_List_10:
 
             #摂動軌道の算出
             x_D[1] = pow(x_D[0], 2) * np.exp(y_D[0] - x_D[0]) + k0 \
-                    + k * x_D[0] * (alpha + 3 * beta * pow(phi_D[0], 2)) \
-                        + Input_Signal_In[Burn_in_time]
+                    + k * x_D[0] * (alpha + 3 * beta * pow(phi_D[0], 2))
             y_D[1] = a * y_D[0] - b * x_D[0] + c
             phi_D[1] = k1 * x_D[0] - k2 * phi_D[0]
 
@@ -561,8 +440,7 @@ if Lyapunov_List_10:
 
                 #摂動軌道の算出
                 x_D[i+1] = pow(x_D[i], 2) * np.exp(y_D[i] - x_D[i]) + k0 \
-                        + k * x_D[i] * (alpha + 3 * beta * pow(phi_D[i], 2)) \
-                            + Input_Signal_In[Burn_in_time + i]
+                        + k * x_D[i] * (alpha + 3 * beta * pow(phi_D[i], 2))
                 y_D[i+1] = a * y_D[i] - b * x_D[i] + c
                 phi_D[i+1] = k1 * x_D[i] - k2 * phi_D[i]
 
@@ -625,7 +503,6 @@ if Lyapunov_List_10:
 
     fig = plt.figure(figsize = FigSize)
     ax = fig.add_subplot(1,1,1)
-    ax.plot(Input_Signal_In[Burn_in_time:],'-', lw = LineWidth)
     ax.set_xlabel("Time Step", fontsize = FontSize_Axis)
     ax.set_ylabel("x", fontsize = FontSize_Axis)
     ax.grid()

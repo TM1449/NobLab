@@ -41,9 +41,6 @@ print("###Program has started.###\n")
 print("###Main Program has started###\n")
 
 #---試行---
-#====================================================================
-#Project_Graph.Project_Chialvo_All_2024_09_24_14_17()
-
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 Project_Graph.Project_Chialvo_TimeLine_2024_09_24_17_25()
 #Project_Graph.Project_Chialvo_PhaseSpace_2024_09_26_12_34()

@@ -55,6 +55,7 @@ class Plot_TimeLine(Plot):
         self.PlotPath_Project = self.Param["PlotPath_Project"]
         self.PlotPath_Date = self.Param["PlotPath_Date"]
         self.PlotName = self.Param["PlotName"]
+        self.x_Log_scale = self.Param["x_Log_scale"] 
 
         #モデル
         self.T_Model = self.Param["Model"]
@@ -81,6 +82,8 @@ class Plot_TimeLine(Plot):
 
         Title = self.PlotTitle
         ax.tick_params(labelsize=FontSize_TickLabel)
+        if self.x_Log_scale == True:
+            ax.set_xscale('log')
         ax.set_title(Title, fontsize = FontSize_Title)
         ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
         ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)

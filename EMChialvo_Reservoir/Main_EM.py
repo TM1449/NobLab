@@ -17,11 +17,10 @@
 #====================================================================
 import ctypes
 import os
-
 import matplotlib
 
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 import Project_EM
-
 
 import Project_GS_Template_EM
 import Project_GS_Sishu_EM
@@ -30,6 +29,8 @@ import Project_RS_Template_EM
 import Project_RS_Sishu_EM
 
 import Evaluation_EM
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #====================================================================
 #並列処理数（コメントアウトでデフォルト，グリッドサーチで並列化するときは1にする．）

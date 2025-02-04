@@ -22,6 +22,7 @@ maru
 import numpy as np
 
 import Module_EM
+import random
 
 #====================================================================
 #モジュール
@@ -156,9 +157,9 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         self.alpha = self.Param["EMChialvo_Reservoir_alpha"]
         self.beta = self.Param["EMChialvo_Reservoir_beta"]
 
-        self.k = self.Param["EMChialvo_Reservoir_k"]                             #k
+        self.k = self.Param["EMChialvo_Reservoir_k"]                    #k
         
-        self.Rho = self.Param["EMChialvo_Reservoir_Rho"]                         #スペクトル半径
+        self.Rho = self.Param["EMChialvo_Reservoir_Rho"]                        #スペクトル半径
         self.Density = self.Param["EMChialvo_Reservoir_Density"]
         self.Bias = np.ones([1])                                        #バイアス
 
@@ -184,7 +185,6 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
             np.random.rand(self.D_u, self.D_x) * 2 - 1]         #入力信号に掛かる重み（正負）
                               ) * self.InputScale               #入力スケールをかける
     
-
     #疎行列化
     def _makeWSparse(self, w: np.ndarray) -> np.ndarray:
         s_w = w.reshape([-1])

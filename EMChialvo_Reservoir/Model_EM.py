@@ -174,7 +174,8 @@ class Model_EMChialvo(Model):
         self.k = self.Param["Model_EMChialvo_k"]                #Chialvoの変数：k
         
         self.D_z = self.D_x + self.D_u                           #特徴ベクトル次元
-        
+        #self.Rand = random.sample(range(len(self.D_x)), self.RS_neuron)
+
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         #リザバーインスタンス
@@ -219,9 +220,8 @@ class Model_EMChialvo(Model):
         #リザバー層のランダムなニューロンを抜粋
         Random_Neuron = random.sample(range(len(s)), self.RS_neuron)
         RS_N = s[Random_Neuron]
-        #s[30:51]
-        
-        return z , s[1,6,91,22,42,51,21,87,65,10]
+
+        return z , s[0:self.RS_neuron]
     
     #順伝播（リードアウトのみ）
     def forwardReadout(self, z: np.ndarray) -> np.ndarray:
@@ -243,12 +243,7 @@ class Model_EMChialvo(Model):
         e = self.Readout_LinerTransformer.RMSE(z, y_d)
         self.EMChialvo_Reservoir.update()
 
-        #リザバー層のランダムなニューロンを抜粋
-        Random_Neuron = random.sample(range(len(s)), self.RS_neuron)
-        RS_N = s[Random_Neuron]
-        #s[30:51]
-
-        return y, e, s[1,6,91,22,42,51,21,87,65,10]
+        return y, e, s[0:self.RS_neuron], s[:]
     
     #学習
     def fit(self, Z: np.ndarray, Y_d: np.ndarray):

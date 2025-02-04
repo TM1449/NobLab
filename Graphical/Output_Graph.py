@@ -53,10 +53,12 @@ class Output_TimeLine(Output):
         self.Plot_Y = self.Param["Project_Plot_TimeLine_Y"]
         self.Plot_Phi = self.Param["Project_Plot_TimeLine_Phi"]
 
-        #実行時間
-        self.RunTime = self.Param["RunTime"]
-        self.Plot_Start = self.Param["Plot_Start"]
-        self.Plot_End = self.Param["Plot_End"]
+        #空走時間
+        self.Length_Burnin = self.Param["Length_Burnin"]
+        #プロット時間
+        self.Length_Plot = self.Param["Length_Plot"]
+        #総合時間
+        self.Length_Total = self.Length_Burnin + self.Length_Plot
 
         #モデル
         self.T_Model = self.Param["Model"]
@@ -91,7 +93,7 @@ class Output_TimeLine(Output):
                 "PlotTitle" : "Chialvo Map : Timeline of x",
                 "PlotXLabel" : "Time Step",
                 "PlotYLabel" : "x",
-                "PlotPath_Project" : "./Results/Project_Chialvo_TimeLine",
+                "PlotPath_Project" : "./Graphical/Results/Project_Chialvo_TimeLine",
                 "PlotPath_Date" : f"/TimeLine_{Plot_Date}",
                 "PlotName" : f"/{TimeDate()}_TimeLine_X.png"
             })
@@ -109,7 +111,7 @@ class Output_TimeLine(Output):
                 "PlotTitle" : "Chialvo Map : Timeline of y",
                 "PlotXLabel" : "Time Step",
                 "PlotYLabel" : "y",
-                "PlotPath_Project" : "./Results/Project_Chialvo_TimeLine",
+                "PlotPath_Project" : "./Graphical/Results/Project_Chialvo_TimeLine",
                 "PlotPath_Date" : f"/TimeLine_{Plot_Date}",
                 "PlotName" : f"/{TimeDate()}_TimeLine_Y.png"
             })
@@ -128,7 +130,7 @@ class Output_TimeLine(Output):
                 "PlotTitle" : "Chialvo Map : Timeline of phi",
                 "PlotXLabel" : "Time Step",
                 "PlotYLabel" : "phi",
-                "PlotPath_Project" : "./Results/Project_Chialvo_TimeLine",
+                "PlotPath_Project" : "./Graphical/Results/Project_Chialvo_TimeLine",
                 "PlotPath_Date" : f"/TimeLine_{Plot_Date}",
                 "PlotName" : f"/{TimeDate()}_TimeLine_Phi.png"
                         })

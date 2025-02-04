@@ -68,6 +68,8 @@ class Evaluation_NRMSE(Evaluation):
 
         self.D_u = self.Param["NRMSE_D_u"]                      #入力信号次元
         self.D_y = self.Param["NRMSE_D_y"]                      #出力信号次元
+        self.D_x = self.Param["Model_EMChialvo_D_x"]
+
         self.Length_Burnin = self.Param["NRMSE_Length_Burnin"]  #空走用データ時間長
         self.Length_Train = self.Param["NRMSE_Length_Train"]    #学習用データ時間長
         self.Length_Test = self.Param["NRMSE_Length_Test"]      #評価用データ時間長
@@ -117,6 +119,7 @@ class Evaluation_NRMSE(Evaluation):
         Y_d = [None for _ in range(self.Length_Total)]
         E = [None for _ in range(self.Length_Total)]
         RS = np.array([None for _ in range(self.Length_Total * self.RS_neuron)]).reshape(-1,self.Length_Total)
+        RS_HeatMap = np.array([None for _ in range(self.Length_Total * self.D_x)]).reshape(-1,self.Length_Total)
 
         #モデルリセット
         self.Model.reset()
@@ -164,7 +167,7 @@ class Evaluation_NRMSE(Evaluation):
         for i, t in enumerate(T[self.Length_Burnin + self.Length_Train : self.Length_Burnin + self.Length_Train + self.Length_Test]):
             if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Test), end = "")
             U[t], Y_d[t] = self.Task.getData(t)
-            Y[t], E[t], RS[:, t] = self.Model.forwardWithRMSE(U[t], Y_d[t])
+            Y[t], E[t], RS[:, t], RS_HeatMap[:, t] = self.Model.forwardWithRMSE(U[t], Y_d[t])
         if self.F_OutputLog : print("\n", end = "")
         
         #評価時間計測終了(オーバーフローしてた場合はNaN)
@@ -197,7 +200,9 @@ class Evaluation_NRMSE(Evaluation):
             "NRMSE_R_Y_d" : Y_d,
             "NRMSE_R_E" : E,
             "Reservoir_Move" : RS,
+            "Reservoir_HeatMap" : RS_HeatMap,
             })
+        
         outputs = self.Param.copy()
         outputs.update({
             "NRMSE_R_NRMSE" : NRMSE,

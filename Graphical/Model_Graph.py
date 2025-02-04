@@ -63,20 +63,24 @@ class Model_Chialvo(Model):
         #入力信号
         self.Input_Signal = self.Param["Input_Signal"]
         self.Input_Signal_def = self.Param["Input_Signal_def"]
+        self.Input_Signal_Interval = self.Param["Input_Signal_Interval"]
+        self.Input_Signal_Line = self.Param["Input_Signal_Line"]
 
-        #実行時間
-        self.RunTime = self.Param["RunTime"]
-        self.Plot_Start = self.Param["Plot_Start"]
-        self.Plot_End = self.Param["Plot_End"]
+        #空走時間
+        self.Length_Burnin = self.Param["Length_Burnin"]
+        #プロット時間
+        self.Length_Plot = self.Param["Length_Plot"]
+        #総合時間
+        self.Length_Total = self.Length_Burnin + self.Length_Plot
 
         #--------------------------------------------------------------------
         #初期値Xについて
         self.Initial_Value_X = self.Param["Initial_Value_X"]
 
         if self.Initial_Value_X == None:
-            self.x = np.random.uniform(-0.1,0.1,self.RunTime)
+            self.x = np.random.uniform(-0.1,0.1,self.Length_Total)
         else:
-            self.x = np.zeros(self.RunTime)
+            self.x = np.zeros(self.Length_Total)
             self.x[0] = self.Initial_Value_X
 
         #--------------------------------------------------------------------
@@ -84,9 +88,9 @@ class Model_Chialvo(Model):
         self.Initial_Value_Y = self.Param["Initial_Value_Y"]
 
         if self.Initial_Value_Y == None:
-            self.y = np.random.uniform(-0.1,0.1,self.RunTime)
+            self.y = np.random.uniform(-0.1,0.1,self.Length_Total)
         else:
-            self.y = np.zeros(self.RunTime)
+            self.y = np.zeros(self.Length_Total)
             self.y[0] = self.Initial_Value_Y
         
         #--------------------------------------------------------------------
@@ -94,51 +98,61 @@ class Model_Chialvo(Model):
         self.Initial_Value_Phi = self.Param["Initial_Value_Phi"]
 
         if self.Initial_Value_Phi == None:
-            self.phi = np.random.uniform(-0.1,0.1,self.RunTime)
+            self.phi = np.random.uniform(-0.1,0.1,self.Length_Total)
         else:
-            self.phi = np.zeros(self.RunTime)
+            self.phi = np.zeros(self.Length_Total)
             self.phi[0] = self.Initial_Value_Phi
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     def __call__(self):
         
         #入力信号プロットの作成
-        self.Input_Signal_In = np.zeros(self.RunTime)
+        self.Input_Signal_In = np.zeros(self.Length_Total)
 
         #恒等関数の場合
         if self.Input_Signal_def == None:
-            for n in range(self.RunTime - 1):
-                self.Input_Signal_In[n+1] = self.Input_Signal
+            #通常の信号の場合
+            if self.Input_Signal_Interval == None:
+                for n in range(self.Length_Burnin, self.Length_Total - 1):
+                    self.Input_Signal_In[n+1] = self.Input_Signal
+                    
+            #インターバル有り信号
+            else:
+                if self.Input_Signal_Line == None:
+                    for n in range(self.Length_Total - 1):
+                        if (n % self.Input_Signal_Interval) == 0:
+                            self.Input_Signal_In[n+1] = self.Input_Signal
+                        else:
+                            self.Input_Signal_In[n+1] = 0
+                else:
+                    for n in range(self.Length_Burnin, self.Length_Total - 1, self.Input_Signal_Interval):
+                            self.Input_Signal_In[n+1: n+1+self.Input_Signal_Line] = self.Input_Signal
 
-            self.Input_Signal_In[2000:2100] = 1
-        
         #sin波の場合
         elif self.Input_Signal_def == np.sin:
-            for n in range(self.RunTime - 1):
+            for n in range(self.Length_Total - 1):
                 self.Input_Signal_In[n+1] = 0.1 * self.Input_Signal * self.Input_Signal_def(4 * n * np.pi / 180)
         
         #ランダムの場合
         elif self.Input_Signal_def == random.randint:
-            self.Step_s = self.RunTime // 100
-            self.Step = self.RunTime // self.Step_s
+            self.Step_s = self.Length_Total // 100
+            self.Step = self.Length_Total // self.Step_s
             for n in range(self.Step):
                 self.Input_Signal_In[n * 100 : (n+1) * 100] = self.Input_Signal_def(0,self.Input_Signal)
 
         #Chialvoニューロンの差分方程式の計算部
-        for i in range(self.RunTime - 1):
-
-            print("\r%d / %d"%(i, self.RunTime), end = "")
+        for i in range(self.Length_Total - 1):
+            print("\r%d / %d"%(i, self.Length_Total), end = "")
 
             self.x[i+1] = pow(self.x[i], 2) * np.exp(self.y[i] - self.x[i]) + self.k0 \
                 + self.k * self.x[i] * (self.alpha + 3 * self.beta * pow(self.phi[i], 2)) + self.Input_Signal_In[i]
             self.y[i+1] = self.a * self.y[i] - self.b * self.x[i] + self.c 
             self.phi[i+1] = self.k1 * self.x[i] - self.k2 * self.phi[i]
 
-        return self.x[self.Plot_Start : self.Plot_End - 1], \
-            self.y[self.Plot_Start : self.Plot_End - 1], \
-            self.phi[self.Plot_Start : self.Plot_End - 1], \
-                self.Input_Signal_In[self.Plot_Start : self.Plot_End - 1]
-
+        return self.x[self.Length_Burnin :], \
+            self.y[self.Length_Burnin :], \
+            self.phi[self.Length_Burnin :], \
+                self.Input_Signal_In[self.Length_Burnin :]
 
 class Model_Chialvo_OldNullcline(Model):
 
