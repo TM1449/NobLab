@@ -90,11 +90,8 @@ def LorenzSystem(s, sigma, rho, beta, dt):
     dy = x * (rho - z) - y
     dz = x * y - beta * z
 
-    x = x + (dx * dt)
-    y = y + (dy * dt)
-    z = z + (dz * dt)
-
-    new_s = np.stack([x, y, z])
+    ds = np.stack([x, y, z])
+    new_s = s + ds * dt
     
     return new_s
 
@@ -284,7 +281,7 @@ def k_loop():
 def Test():
     
     #初期状態の設定
-    s_old = (np.ones((3)) * (np.random.rand(3) * 2 - 1)) * 0.01
+    s_old = (np.ones((3)) * (np.random.rand(3) * 2 - 1)) * 0.1
 
     #リアプノフ指数の格納用配列
     lamdas_t_qr = np.zeros((time_steps, 3))
@@ -298,21 +295,18 @@ def Test():
     Q_old = np.eye(3)
 
     for j in range(time_steps):
+        #Chialvoの更新式
+        s_new = LorenzSystem(s_old, sigma, rhos, beta_Lo, dt)
+        #ヤコビ行列の更新
+        Lorenz_J = LorenzSystem_J(s_old, sigma, rhos, beta_Lo, dt)  @ Q_old
+        
+        #QR分解
+        Q_old, R_old = np.linalg.qr(Lorenz_J)
+        
+        #上三角行列の対角成分を取得
+        lyapunov_exponents_qr = lyapunov_exponents_qr + np.log(np.abs(np.diag(R_old)))
 
-        for z in range(10):
-
-            #Chialvoの更新式
-            s_new = LorenzSystem(s_old, sigma, rhos, beta_Lo, dt)
-            #ヤコビ行列の更新
-            Lorenz_J = LorenzSystem_J(s_old, sigma, rhos, beta_Lo, dt)  @ Q_old
-            
-            #QR分解
-            Q_old, R_old = np.linalg.qr(Lorenz_J)
-            
-            #上三角行列の対角成分を取得
-            lyapunov_exponents_qr = lyapunov_exponents_qr + np.log(np.abs(np.diag(R_old)))
-
-            s_old = s_new
+        s_old = s_new
 
     lamdas_math_qr = lyapunov_exponents_qr / time_steps
     l_x = round(lamdas_math_qr[0], 8)
@@ -323,7 +317,7 @@ def Test():
 
     print(lll)
 
-#Test()
+Test()
 
 def Test_H():
 
@@ -365,5 +359,5 @@ def Test_H():
     print(lll)
 
 
-Test_H()
+#Test_H()
 #====================================================================
