@@ -18,6 +18,7 @@ maru
 
 #====================================================================
 import numpy as np
+from scipy.integrate import odeint
 
 #====================================================================
 #タスク
@@ -214,9 +215,11 @@ class Task_NDRosslor(Task):
         np.random.seed(seed=728)
         
         s = (np.random.rand(self.Systems, 3) - 0.5) * 10
+        
         for t in range(self.InitTerm + self.Length + self.Tau):
             if self.InitTerm <= t:
-                self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
+                #self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
+                self.X[t - self.InitTerm] = s[0][2] * self.Scale
             s_old = s
             s = np.zeros([self.Systems, 3])
 
@@ -338,3 +341,102 @@ class Task_tcVDP(Task):
         self.X = np.concatenate([x1s, y1s, x2s, y2s],1)
         self.Y = np.concatenate([x1s, y1s, x2s, y2s],1)
 
+class Task_LogisticEquation(Task):
+    """
+    ロジスティック写像
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, evaluation: any):
+        super().__init__(param, evaluation)
+
+        #パラメータ取得
+        self.A = self.Param["Task_LogisticEquation_A"]       #ルンゲクッタ法刻み幅
+        self.Tau = param["Task_LogisticEquation_Tau"]        #どれくらい先を予測するか
+        
+        self.makeData()
+
+    #時刻tの入出力データ取得
+    def getData(self, t: int) -> tuple: 
+        return self.X[t], self.X[t + self.Tau]
+
+    #データ生成
+    def makeData(self):
+        
+        #ロジスティック写像の配列
+        self.X = np.zeros([self.Length + self.Tau, self.D_u])
+        
+        #シード値設定（無効にしても可）
+        np.random.seed(seed=999)
+        
+        #初期値生成
+        self.X[0] = np.random.rand(1)
+
+        for ts in range(self.Length + self.Tau - 1):
+            self.X[ts + 1] = self.Logistic(self.X[ts])
+
+    def Logistic(self, old_x):
+        #ロジスティック写像の更新式
+        self.next_x = self.A * old_x * (1 - old_x)
+
+        return self.next_x
+    
+
+class Task_Lorenz96(Task):
+    """
+    ローレンツ96
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, evaluation: any):
+        super().__init__(param, evaluation)
+
+        #パラメータ取得
+        self.Scale = param["Task_Lorenz96_Scale"]                 #信号のスケール
+        self.Dt = param["Task_Lorenz96_Dt"]                       #時間スケール
+        self.Tau = param["Task_Lorenz96_Tau"]                     #どれくらい先を予測するか
+        
+        self.makeData()
+    
+    #時刻tの入出力データ取得
+    def getData(self, t: int) -> tuple:
+        return self.X[t], self.X[t + self.Tau]
+    
+    #データ生成
+    def makeData(self):
+        def L96(x, t):
+            return (np.roll(x, -1) - np.roll(x, 2)) * np.roll(x, 1) - x + 8
+
+        self.X = np.zeros([self.Length + self.Tau, self.D_u])
+
+        x0 = 8 * np.ones(10)  # 初期状態 (平衡点)
+        x0[0] += 0.01        # 1番目の変数に小さな摂動を加える
+        t = np.arange(0.0, (self.Length + self.Tau) * self.Dt, self.Dt)
+
+        self.X96 = odeint(L96, x0, t)
+
+        # データ保存
+        if self.D_u == 1:
+            # 1次元データを2次元に変換して保存
+            self.X = (self.X96[:, 0].reshape(-1, 1)) * self.Scale
+        else:
+            # D_u次元分のデータを保存
+            self.X = self.X96[:, :self.D_u] * self.Scale
+
+class Task_Zeros(Task):
+    """
+    入力0
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, evaluation: any):
+        super().__init__(param, evaluation)
+
+        #パラメータ取得
+        
+        self.makeData()
+    
+    #時刻tの入出力データ取得
+    def getData(self, t: int) -> tuple:
+        return self.X[t], self.X[t + 1]
+    
+    #データ生成
+    def makeData(self):
+        self.X = np.zeros([self.Length + 1, self.D_u])

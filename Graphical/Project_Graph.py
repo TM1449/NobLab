@@ -42,7 +42,7 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -0.8,
+        "Chialvo_k"                 : 6.95,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
@@ -50,7 +50,7 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #空走時間
-        "Length_Burnin" : 100000,
+        "Length_Burnin" : 100,
         #描写時間
         "Length_Plot" : 10000,
 
@@ -108,7 +108,7 @@ def Project_Chialvo_PhaseSpace_2024_09_26_12_34():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -1.1,
+        "Chialvo_k"                 : 7,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,

@@ -68,7 +68,7 @@ class Evaluation_NRMSE(Evaluation):
 
         self.D_u = self.Param["NRMSE_D_u"]                      #入力信号次元
         self.D_y = self.Param["NRMSE_D_y"]                      #出力信号次元
-        self.D_x = self.Param["Model_EMChialvo_D_x"]
+        self.D_x = self.Param["NRMSE_D_x"]
 
         self.Length_Burnin = self.Param["NRMSE_Length_Burnin"]  #空走用データ時間長
         self.Length_Train = self.Param["NRMSE_Length_Train"]    #学習用データ時間長

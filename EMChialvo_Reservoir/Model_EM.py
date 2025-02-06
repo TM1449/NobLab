@@ -75,6 +75,9 @@ class Model_NormalESN(Model):
         self.D_u = self.Param["Model_NormalESN_D_u"]            #入力信号次元
         self.D_x = self.Param["Model_NormalESN_D_x"]            #ニューロン数（リスト型）
         self.D_y = self.Param["Model_NormalESN_D_y"]            #出力信号次元
+        
+        self.RS_neuron = self.Param["NRMSE_Reservoir_Neurons"]
+
         self.D_z = self.D_x + self.D_u                          #特徴ベクトル次元
         
         #リザバーインスタンス
@@ -98,7 +101,12 @@ class Model_NormalESN(Model):
         s = self.SubReservoir.forward(u)
         z = np.concatenate([s, u])
         self.SubReservoir.update()
-        return z, s[10:21]
+
+        #リザバー層のランダムなニューロンを抜粋
+        Random_Neuron = random.sample(range(len(s)), self.RS_neuron)
+        RS_N = s[Random_Neuron]
+
+        return z , s[0:self.RS_neuron]
     
     #順伝播（リードアウトのみ）
     def forwardReadout(self, z: np.ndarray) -> np.ndarray:
@@ -119,7 +127,8 @@ class Model_NormalESN(Model):
         y = self.Readout_LinerTransformer.forward(z)
         e = self.Readout_LinerTransformer.RMSE(z, y_d)
         self.SubReservoir.update()
-        return y, e, s[10:21]
+
+        return y, e, s[0:self.RS_neuron], s[:]
     
     #学習
     def fit(self, Z: np.ndarray, Y_d: np.ndarray):

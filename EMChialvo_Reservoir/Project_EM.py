@@ -38,7 +38,7 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
     Param = {
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Project_F_NRMSE" : True,                           #NRMSEを調査するか
-        "Project_F_MemoryCapacity" : True,                  #MCを調査するか
+        "Project_F_MemoryCapacity" : False,                  #MCを調査するか
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Task_SinCurve_RK_h" : 0.01,                        #ルンゲクッタ法刻み幅
@@ -65,6 +65,13 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         "Task_Lorenz_Tau" : 5,                              #どれくらい先を予測するか
         "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
 
+
+        "Task_LogisticEquation_A" : 4,
+        "Task_LogisticEquation_Tau" : 1,
+
+        "Task_Lorenz96_Scale" : 1/50,
+        "Task_Lorenz96_Dt" : 0.01,
+        "Task_Lorenz96_Tau" : 5,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Model_NormalESN_D_u" : 1,                          #入力信号次元
         "Model_NormalESN_D_x" : 100,                        #ニューロン数
@@ -87,16 +94,20 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "NRMSE_F_OutputLog" : True,                         #経過の出力を行うか
             "NRMSE_D_u" : 1,                                    #入力信号次元
+            "NRMSE_D_x" : 100,
             "NRMSE_D_y" : 1,                                    #出力信号次元
             "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
             "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-            "NRMSE_T_Task" : Task_EM.Task_NDRosslor,                                #評価用タスク（Type型）
+            
+            "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
+            
+            "NRMSE_T_Task" : Task_EM.Task_Lorenz96,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_NormalESN,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "DirPath_Project" : "./Results/Project_ESN_2024_04_16_13_58/NRMSE",
+            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/Project_ESN_2024_04_16_13_58/NRMSE",
         
             "NRMSE_F_OutputCharts" : True,                      #図の出力フラグ
             "NRMSE_F_OutputCharts_UYYdEWaves" : True,           #入出力＆誤差波形図の出力フラグ
@@ -148,7 +159,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
 
         "Task_Rosslor_Scale" : 1 / 30,                      #信号のスケール
         "Task_Rosslor_Mu" : 5.7,                            #レスラー方程式パラメータ
-        "Task_Rosslor_Dt" : 0.01,                           #時間スケール
+        "Task_Rosslor_Dt" : 0.02,                           #時間スケール
         "Task_Rosslor_A" : 0.005,                            #ギャップジャンクションパラメータ
         "Task_Rosslor_Tau" : 5,                             #どれくらい先を予測するか
         "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
@@ -162,6 +173,12 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Task_Lorenz_Tau" : 5,                              #どれくらい先を予測するか
         "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
 
+        "Task_LogisticEquation_A" : 4,
+        "Task_LogisticEquation_Tau" : 1,
+
+        "Task_Lorenz96_Scale" : 1/50,
+        "Task_Lorenz96_Dt" : 0.01,
+        "Task_Lorenz96_Tau" : 5,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Model_EMChialvo_D_u" : 1,                          #入力信号次元
         "Model_EMChialvo_D_x" : 100,                        #ニューロン数
@@ -200,6 +217,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "NRMSE_F_OutputLog" : True,                         #経過の出力を行うか
             "NRMSE_D_u" : 1,                                    #入力信号次元
+            "NRMSE_D_x" : 100,
             "NRMSE_D_y" : 1,                                    #出力信号次元
             "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
             "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
@@ -207,7 +225,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
 
             "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
 
-            "NRMSE_T_Task" : Task_EM.Task_NDLorenz,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_Zeros,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
