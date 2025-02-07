@@ -38,9 +38,8 @@ rhos = 28
 beta_Lo = 8/3
 dt = 0.001
 
-
 #時間ステップの指定
-time_steps = 10000
+time_steps = 50000
 
 #====================================================================
 
@@ -88,13 +87,10 @@ def LorenzSystem(s, sigma, rho, beta, dt):
     y = s[1]
     z = s[2]
 
-    dx = (sigma * (y - x))
-    dy = (x * (rho - z) - y)
-    dz = (x * y - beta * z)
-
-    nx = x + (dx * dt)
-    ny = y + (dy * dt)
-    nz = z + (dz * dt)
+    for i in range(2):
+        nx = x + ((sigma * (y - x)) * dt)
+        ny = y + ((x * (rho - z) - y) * dt)
+        nz = z + ((x * y - beta * z) * dt)
 
     new_s = np.stack([nx, ny, nz])
     
@@ -170,11 +166,11 @@ def Main_Lorenz():
     for x in range(20000):
         Lorenz = LorenzSystem(Lorenz, sigma, rhos, beta_Lo, dt)
 
-    for i in range(time_steps):
+#    for i in range(time_steps):
         #ローレンツ方程式の更新
-        Lorenz = LorenzSystem(Lorenz, sigma, rhos, beta_Lo, dt)
+#        Lorenz = LorenzSystem(Lorenz, sigma, rhos, beta_Lo, dt)
         #ローレンツ方程式の結果収納
-        Lorenz_List[i, :] = Lorenz
+#        Lorenz_List[i, :] = Lorenz
 
     
     #単位行列
@@ -184,6 +180,13 @@ def Main_Lorenz():
     lyapu_list_time = np.zeros((time_steps, 3))
 
     for j in range(time_steps):
+        print("\r%d / %d" % (j, time_steps), end="")
+
+        #ローレンツ方程式の更新
+        Lorenz = LorenzSystem(Lorenz, sigma, rhos, beta_Lo, dt)
+        #ローレンツ方程式の結果収納
+        Lorenz_List[j, :] = Lorenz
+        
         #各時刻のヤコビ行列をQR分解
         Q, R = np.linalg.qr(LorenzSystem_J(Lorenz_List[j,:], sigma, rhos, beta_Lo, dt) @ Q)
         #上三角行列の対角成分取得

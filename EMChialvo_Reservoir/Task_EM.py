@@ -212,14 +212,15 @@ class Task_NDRosslor(Task):
     def makeData(self):
         self.X = np.zeros([self.Length + self.Tau, self.D_u])
 
-        np.random.seed(seed=728)
+        np.random.seed(seed=99)
         
         s = (np.random.rand(self.Systems, 3) - 0.5) * 10
         
         for t in range(self.InitTerm + self.Length + self.Tau):
             if self.InitTerm <= t:
                 #self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
-                self.X[t - self.InitTerm] = s[0][2] * self.Scale
+                self.X[t - self.InitTerm] = s[0][2] * self.Scale        #1次元の信号に限り、列要素を変えることで、成分を変更できる。
+
             s_old = s
             s = np.zeros([self.Systems, 3])
 
@@ -273,7 +274,8 @@ class Task_NDLorenz(Task):
         
         for t in range(self.InitTerm + self.Length + self.Tau):
             if self.InitTerm <= t:
-                self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
+                #self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
+                self.X[t - self.InitTerm] = s[0][2] * self.Scale        #1次元の信号に限り、列要素を変えることで、成分を変更できる。
             
             s_old = s
             s = np.zeros([self.Systems, 3])
@@ -393,33 +395,41 @@ class Task_Lorenz96(Task):
         self.Scale = param["Task_Lorenz96_Scale"]                 #信号のスケール
         self.Dt = param["Task_Lorenz96_Dt"]                       #時間スケール
         self.Tau = param["Task_Lorenz96_Tau"]                     #どれくらい先を予測するか
-        
+        self.InitTerm = param["Task_Lorenz96_InitTerm"]          #初期状態排除期間
+
+        self.N = param["Task_Lorenz96_N"]                       #次元数
+        self.F = param["Task_Lorenz96_F"]                       #外部強制力
+
         self.makeData()
     
     #時刻tの入出力データ取得
     def getData(self, t: int) -> tuple:
         return self.X[t], self.X[t + self.Tau]
     
+    def Lorenz96(self, x):
+        dx = np.zeros(self.N)
+        for i in range((self.N)):
+            dx[i] =  x[i] +  (((x[(i + 1) % self.N] - x[(i - 2)]) * x[i - 1]) - x[i] + self.F) * self.Dt
+
+        return dx
+
     #データ生成
     def makeData(self):
-        def L96(x, t):
-            return (np.roll(x, -1) - np.roll(x, 2)) * np.roll(x, 1) - x + 8
+        # 乱数シードの設定
+        np.random.seed(seed=999)
+        self.X = np.zeros((self.Length + self.Tau, self.D_u))
 
-        self.X = np.zeros([self.Length + self.Tau, self.D_u])
+        self.s = (np.random.rand(self.N) - 0.5) * 10
 
-        x0 = 8 * np.ones(10)  # 初期状態 (平衡点)
-        x0[0] += 0.01        # 1番目の変数に小さな摂動を加える
-        t = np.arange(0.0, (self.Length + self.Tau) * self.Dt, self.Dt)
+        for i in range(self.InitTerm + self.Length + self.Tau):
+            if self.InitTerm <= i:
+                self.X[i - self.InitTerm] = self.s[-1] * self.Scale
 
-        self.X96 = odeint(L96, x0, t)
+            self.s = self.Lorenz96(self.s)
 
-        # データ保存
-        if self.D_u == 1:
-            # 1次元データを2次元に変換して保存
-            self.X = (self.X96[:, 0].reshape(-1, 1)) * self.Scale
-        else:
-            # D_u次元分のデータを保存
-            self.X = self.X96[:, :self.D_u] * self.Scale
+
+
+
 
 class Task_Zeros(Task):
     """

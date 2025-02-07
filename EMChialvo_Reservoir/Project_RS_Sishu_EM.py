@@ -27,10 +27,10 @@ import Random_Search_EM
 
 #********************************************************************
 #Sishu提案モデル（結合形態のみ指定、結合強度は乱数）
-def Project_RandomSearch_NRMSE_SishuESN():
+def Project_RandomSearch_NRMSE_EMSishu():
     
     RS_Param = {
-            "Model_SishuESN_k__01" : [-5.0,-2.0],
+            "Model_SishuESN_k__01" : [-5.0,5.0],
             "Model_SishuESN_Rho__01" : [0.001,0.05]
     }
     

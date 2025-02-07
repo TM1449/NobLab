@@ -38,14 +38,14 @@ import GridSearch_EM
 #********************************************************************
 #GSパラメータ
 #====================================================================
-def Project_GridSearch_SishuESN_NRMSEAndMC():
+def Project_GridSearch_EMChialvo_NRMSE():
     """ 
     Sishu提案モデル（結合形態のみ指定、強度は乱数）のNRMSEやMC測定
     """
     GridSearch_EM.Normal({
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Project_F_NRMSE" : True,                                   #NRMSEを調査するか
-        "Project_F_MemoryCapacity" : True,                          #MCを調査するか
+        "Project_F_MemoryCapacity" : False,                          #MCを調査するか
 
         "Project_F_OutputResults" : True,                           #各評価地点でパラメータを出力するか
 
@@ -55,20 +55,20 @@ def Project_GridSearch_SishuESN_NRMSEAndMC():
         #[0.1, 0.099, 0.098, 0.097, 0.096, 0.095, 0.094, 0.093, 0.092, 0.091, 0.09, 0.089, 0.088, 0.087, 0.086, 0.085, 0.084, 0.083, 0.082, 0.081, 0.08, 0.079, 0.078, 0.077, 0.076, 0.075, 0.074, 0.073, 0.072, 0.071, 0.07, 0.069, 0.068, 0.067, 0.066, 0.065, 0.064, 0.063, 0.062, 0.061, 0.06, 0.059, 0.058, 0.057, 0.056, 0.055, 0.054, 0.053, 0.052, 0.051, 0.05, 0.049, 0.048, 0.047, 0.046, 0.045, 0.044, 0.043, 0.042, 0.041, 0.04, 0.039, 0.038, 0.037, 0.036, 0.035, 0.034, 0.033, 0.032, 0.031, 0.03, 0.029, 0.028, 0.027, 0.026, 0.025, 0.024, 0.023, 0.022, 0.021, 0.02, 0.019, 0.018, 0.017, 0.016, 0.015, 0.014, 0.013, 0.012, 0.011, 0.01, 0.009, 0.008, 0.007, 0.006, 0.005, 0.004, 0.003, 0.002, 0.001]
         
         "_Param_Rho" : [0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.009, 0.008, 0.007, 0.006, 0.005, 0.004, 0.003, 0.002, 0.001, 0.0009, 0.0008, 0.0007, 0.0006, 0.0005, 0.0004, 0.0003, 0.0002, 0.0001],
-        "_Param_k" : [-10.0, -9.5, -9.0, -8.5, -8.0, -7.5, -7.0, -6.5, -6.0, -5.5, -5.0, -4.5, -4.0, -3.5, -3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5, 10.0],
-        "_Param_Model" : ["SishuESN"],
+        "_Param_k" : [-5.0, -4.75, -4.5, -4.25, -4.0, -3.75, -3.5, -3.25, -3.0, -2.75, -2.5, -2.25, -2.0, -1.75, -1.5, -1.25, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5, 4.75, 5.0],
+        "_Param_Model" : ["EMChialvo"],
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        "GridSearch_MachineName" : "SishuESN",                            #計算機名
+        "GridSearch_MachineName" : "EMChialvo",                            #計算機名
         "GridSearch_StartPoint" : 0,                                #担当開始ポイントインデックス
-        "GridSearch_EndPoint" : 11480,                                #担当終了ポイントインデックス(MAX:4410(21*21*10))
+        "GridSearch_EndPoint" : 3444,                                #担当終了ポイントインデックス(MAX:4410(21*21*10))
         
         "GridSearch_MultiThread" : 12,                               #スレッド数（0で逐次処理）初期値:2
         "GridSearch_MaxNumberInOneFile" : 100,                        #１ファイルの最大のポイント数 初期値:5
         "GridSearch_MaxNumberInOnePool" : 1000,                       #１プール（並列する）最大のポイント数（この分メモリを消費） 初期値:50
-        "GridSearch_NumberOfSamples" : 10,                           #サンプル数
-        "GridSearch_ProjectName" : "NRMSEAndMC_SishuESN",                    #プロジェクト名
-        "GridSearch_ProjectDate" : "2024_06_01_10_30",              #プロジェクト日時
+        "GridSearch_NumberOfSamples" : 3,                           #サンプル数
+        "GridSearch_ProjectName" : "NRMSE_EMChialvo",                    #プロジェクト名
+        "GridSearch_ProjectDate" : "2025_02_07_10_08",              #プロジェクト日時
         "GridSearch_T_Process" : Process_SishuESN_GridSearch,     #GS処理指定
         "GridSearch_T_Output" : OutputLog_SishuESN_2024_06_01_10_30             #GS出力処理指定
         })()
@@ -141,7 +141,8 @@ class Process_SishuESN_GridSearch:
         #各軸パラメータ
         Param_Rho = chank_i["Rho"]
         Param_k = chank_i["k"]
-        if chank_i["Model"] == "SishuESN":
+
+        if chank_i["Model"] == "EMChialvo":
             Param_Model = Model_EM.Model_EMChialvo
             
         #共通パラメータ
@@ -170,19 +171,40 @@ class Process_SishuESN_GridSearch:
             "Task_Lorenz_A" : 0.001,                             #ギャップジャンクションパラメータ
             "Task_Lorenz_Tau" : 5,                              #どれくらい先を予測するか
             "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
+        
+            "Task_LogisticEquation_A" : 4,
+            "Task_LogisticEquation_Tau" : 1,
 
+            "Task_Lorenz96_Scale" : 1/50,
+            "Task_Lorenz96_Dt" : 0.01,
+            "Task_Lorenz96_Tau" : 5,
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "Model_SishuESN_D_u" : 1,                  #入力信号次元
-            "Model_SishuESN_D_x" : 100,                #ニューロン数
-            "Model_SishuESN_D_y" : 1,                  #出力信号次元
-            
-            "Model_SishuESN_InputScale" : 0.1,                 #入力スケーリング
-            "Model_SishuESN_sigma" : "False",                   #リング・ネットワークの結合強度
-            "Model_SishuESN_mu" : "False",                     #スター・ネットワークの結合強度
-            "Model_SishuESN_k" : Param_k,
+            "Model_EMChialvo_D_u" : 1,                          #入力信号次元
+            "Model_EMChialvo_D_x" : 100,                        #ニューロン数
+            "Model_EMChialvo_D_y" : 1,                          #出力信号次元
 
-            "Model_SishuESN_Rho" : Param_Rho,                             #スペクトル半径
-            "SishuReservoir_Density" : 1,                         #結合密度
+            "Model_EMChialvo_Ring" : False,                     #結合の形態を指定するか（値は乱数）
+            "Model_EMChialvo_Star" : False,                     #結合の形態を指定するか（値は乱数）
+            
+            "Model_EMChialvo_InputScale" : 0.1,                 #入力スケーリング
+            
+            "Model_EMChialvo_a" : 0.89,                         #変数:a
+            "Model_EMChialvo_b" : 0.6,                          #変数:b
+            "Model_EMChialvo_c" : 0.28,                         #変数:c
+            "Model_EMChialvo_k0" : 0.04,                        #変数:k0
+
+            "Model_EMChialvo_k1" : 0.1,                         #変数:k1
+            "Model_EMChialvo_k2" : 0.2,                         #変数:k2
+            "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
+            "Model_EMChialvo_beta" : 0.2,                       #変数:beta
+
+            "Model_EMChialvo_k" : Param_k,                         #変数:k
+            "Model_EMChialvo_Rho" : Param_Rho,
+        
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            # "Module_Reservoir" に直接渡す
+            "EMChialvo_Reservoir_Density" : 1,                          #結合密度
+            
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "LinerTransformer_Beta" : 0.2,                      #正規化係数
             }
@@ -195,11 +217,15 @@ class Process_SishuESN_GridSearch:
                 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 "NRMSE_F_OutputLog" : False,                        #経過の出力を行うか
                 "NRMSE_D_u" : 1,                            #入力信号次元
+                "NRMSE_D_x" : 100,
                 "NRMSE_D_y" : 1,                            #出力信号次元
+
+                "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
+
                 "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
                 "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
                 "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-                "NRMSE_T_Task" : Task_EM.Task_NDRosslor,                                #評価用タスク（Type型）
+                "NRMSE_T_Task" : Task_EM.Task_Lorenz96,                                #評価用タスク（Type型）
                 "NRMSE_T_Model" : Param_Model,                                      #モデル（Type型）
                 "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         

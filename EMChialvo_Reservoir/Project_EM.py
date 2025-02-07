@@ -72,14 +72,18 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         "Task_Lorenz96_Scale" : 1/50,
         "Task_Lorenz96_Dt" : 0.01,
         "Task_Lorenz96_Tau" : 5,
+        "Task_Lorenz96_InitTerm" : 1000,
+
+        "Task_Lorenz96_N" : 10,
+        "Task_Lorenz96_F" : 8,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Model_NormalESN_D_u" : 1,                          #入力信号次元
         "Model_NormalESN_D_x" : 100,                        #ニューロン数
         "Model_NormalESN_D_y" : 1,                          #出力信号次元
 
-        "SubReservoir_LeakingRate" : 1,                     #リーク率
+        "SubReservoir_LeakingRate" : 0.98,                     #リーク率
         "SubReservoir_InputScale" : 0.1,                    #入力スケーリング
-        "SubReservoir_Rho" : 0.9,                             #スペクトル半径
+        "SubReservoir_Rho" : 0.8,                             #スペクトル半径
         "SubReservoir_Density" : 0.95,                         #結合密度
         "SubReservoir_ActivationFunc" : np.tanh,            #活性化関数
 
@@ -179,6 +183,10 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Task_Lorenz96_Scale" : 1/50,
         "Task_Lorenz96_Dt" : 0.01,
         "Task_Lorenz96_Tau" : 5,
+        "Task_Lorenz96_InitTerm" : 1000,
+
+        "Task_Lorenz96_N" : 10,
+        "Task_Lorenz96_F" : 8,
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Model_EMChialvo_D_u" : 1,                          #入力信号次元
         "Model_EMChialvo_D_x" : 100,                        #ニューロン数
@@ -199,12 +207,13 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
         "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
-        "Model_EMChialvo_k" : 0,                         #変数:k
+        "Model_EMChialvo_k" : -3.2,                         #変数:k
         
+        "Model_EMChialvo_Rho" : 0.003,                      #スペクトル半径
+
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # "Module_Reservoir" に直接渡す
         "EMChialvo_Reservoir_Density" : 1,                          #結合密度
-        "EMChialvo_Reservoir_Rho" : 0.003,                      #スペクトル半径
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "LinerTransformer_Beta" : 0.2,                      #正規化係数
@@ -225,7 +234,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
 
             "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
 
-            "NRMSE_T_Task" : Task_EM.Task_Zeros,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_Lorenz96,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         

@@ -159,7 +159,8 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
 
         self.k = self.Param["EMChialvo_Reservoir_k"]                    #k
         
-        self.Rho = self.Param["EMChialvo_Reservoir_Rho"]                        #スペクトル半径
+        self.Rho = self.Param["Model_EMChialvo_Rho"]                        #スペクトル半径
+        
         self.Density = self.Param["EMChialvo_Reservoir_Density"]
         self.Bias = np.ones([1])                                        #バイアス
 

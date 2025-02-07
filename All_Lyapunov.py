@@ -31,7 +31,7 @@ beta_Lorentz = 8/3
 #時間刻み幅
 dt = 1/1000
 #何ステップ先まで実行するか
-T = 10
+T = 2
 
 #====================================================================
 #データ保存用パラメータ
@@ -49,11 +49,17 @@ Burnin_Time = 2000
 #時間ステップ数
 Run_Time = 10000
 
+#空走時間
+Burnin_Time_Lorenz = 25000
+#時間ステップ数
+Run_Time_Lorenz = 50000
+
 #====================================================================
 #Chialvoにおける1回のリアプノフスペクトル
-Lyapunov_Chialvo = True
+Lyapunov_Chialvo = False
 
-#
+#Lorenzにおけるリアプノフスペクトラム
+Lyapunov_Lorenz = True
 #====================================================================
 """共通関数"""
 
@@ -118,16 +124,17 @@ def ChialvoSystem_J(old_c, a, b, c, k, k0, k1, k2, alpha, beta):
 
 #--------------------------------------------------------------------
 #ローレンツ方程式の更新式
-def LorenzSystem(old_l, sigma, rho, beta, dt):
+def LorenzSystem(old_l, sigma, rho, beta, dt, T):
     x = old_l[0]
     y = old_l[1]
     z = old_l[2]
 
-    nx = x + ((sigma * (y - x)) * dt)
-    ny = y + ((x * (rho - z) - y) * dt)
-    nz = z + ((x * y - beta * z) * dt)
+    for i in range(T):
+        x = x + ((sigma * (y - x)) * dt)
+        y = y + ((x * (rho - z) - y) * dt)
+        z = z + ((x * y - beta * z) * dt)
 
-    new_s = np.stack([nx, ny, nz])
+    new_s = np.stack([x, y, z])
     
     return new_s
 
@@ -160,7 +167,7 @@ def LorenzSystem_J(old_l, sigma, rho, beta, dt):
 #====================================================================
 
 if Lyapunov_Chialvo:
-    Print_Info("Chialvio", Burnin_Time, Run_Time)
+    Print_Info("Chialvio System", Burnin_Time, Run_Time)
 
     #初期値生成
     chialvo = ((np.random.rand(3) * 2 - 1) * 0.1)
@@ -216,6 +223,79 @@ if Lyapunov_Chialvo:
     print("\n\n====================================================================")
     print("====================================================================")
     print(f"\nChialvoのリアプノフスペクトル: {Lyapunov_XYPhi}")
+
+    fig = plt.figure(figsize = FigSize)
+    ax = fig.add_subplot(1,1,1)
+    ax.plot(Lyapunov_Result_Time[:,0],'-', label = "x")
+    ax.plot(Lyapunov_Result_Time[:,1],'-', label = "y")
+    ax.plot(Lyapunov_Result_Time[:,2],'-', label = "phi")
+    ax.set_xlabel("Time", fontsize = FontSize_Axis)
+    ax.set_ylabel("Lyapunov", fontsize = FontSize_Axis)
+    ax.grid()
+    ax.legend()
+    fig.tight_layout()
+
+    plt.show()
+
+
+
+if Lyapunov_Lorenz:
+    Print_Info("Lorenz System", Burnin_Time_Lorenz, Run_Time_Lorenz)
+
+    #初期値生成
+    Lorenz = ((np.random.rand(3) * 2 - 1) * 0.1)
+
+    #Chialvoの更新式の配列
+    Lorenz_Result_List = np.zeros((Run_Time_Lorenz, 3))
+
+    #空走時間
+    print(f"\n空走時間")
+    for n in range(Burnin_Time_Lorenz):
+        print("\r%d / %d"%(n+1, Burnin_Time_Lorenz), end = "")
+
+        #Chialvoの更新式
+        Lorenz = LorenzSystem(Lorenz, sigma, rho, beta_Lorentz, dt, T)
+
+    #時刻0における単位行列
+    Q = np.eye(3)
+
+    #リアプノフスペクトルの総和
+    Lyapunov_Result = np.zeros(3)
+    #各時刻のリアプノフスペクトル
+    Lyapunov_Result_Time = np.zeros((Run_Time_Lorenz, 3))
+
+    #実行時間
+    print(f"\n実行時間")
+    for i in range(Run_Time_Lorenz):
+        print("\r%d / %d"%(i+1, Run_Time_Lorenz), end = "")
+
+        #Chialvoの更新式
+        Lorenz = LorenzSystem(Lorenz, sigma, rho, beta_Lorentz, dt, T)
+        #各時刻のChialvoの更新式
+        Lorenz_Result_List[i, :] = Lorenz
+
+        #各時刻のヤコビ行列をQR分解
+        Q, R = np.linalg.qr(LorenzSystem_J(Lorenz_Result_List[i,:], sigma, rho, beta_Lorentz, dt) @ Q)
+        #上三角行列の対角成分取得
+        R_diag = np.diag(R)
+        #それぞれの対角要素の絶対値のlogを総和
+        Lyapunov_Result = Lyapunov_Result + np.log(np.abs(R_diag))
+        #各時刻のリアプノフスペクトルを取得
+        Lyapunov_Result_Time[i, :] = np.log(np.abs(R_diag))
+
+    #総時間のリアプノフスペクトル
+    Lyapunov = Lyapunov_Result / Run_Time_Lorenz
+
+    #各成分におけるリアプノフスペクトル
+    Lyapunov_X = round(Lyapunov[0], 5)
+    Lyapunov_Y = round(Lyapunov[1], 5)
+    Lyapunov_Phi = round(Lyapunov[2], 5)
+
+    Lyapunov_XYPhi = np.stack([Lyapunov_X, Lyapunov_Y, Lyapunov_Phi])
+    
+    print("\n\n====================================================================")
+    print("====================================================================")
+    print(f"\nLorenzのリアプノフスペクトル: {Lyapunov_XYPhi}")
 
     fig = plt.figure(figsize = FigSize)
     ax = fig.add_subplot(1,1,1)
