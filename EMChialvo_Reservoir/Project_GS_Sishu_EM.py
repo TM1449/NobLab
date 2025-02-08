@@ -61,14 +61,14 @@ def Project_GridSearch_EMChialvo_NRMSE():
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "GridSearch_MachineName" : "EMChialvo",                            #計算機名
         "GridSearch_StartPoint" : 0,                                #担当開始ポイントインデックス
-        "GridSearch_EndPoint" : 3444,                                #担当終了ポイントインデックス(MAX:4410(21*21*10))
+        "GridSearch_EndPoint" : 11480,                                #担当終了ポイントインデックス(MAX:4410(21*21*10))
         
         "GridSearch_MultiThread" : 12,                               #スレッド数（0で逐次処理）初期値:2
         "GridSearch_MaxNumberInOneFile" : 100,                        #１ファイルの最大のポイント数 初期値:5
         "GridSearch_MaxNumberInOnePool" : 1000,                       #１プール（並列する）最大のポイント数（この分メモリを消費） 初期値:50
-        "GridSearch_NumberOfSamples" : 3,                           #サンプル数
+        "GridSearch_NumberOfSamples" : 10,                           #サンプル数
         "GridSearch_ProjectName" : "NRMSE_EMChialvo",                    #プロジェクト名
-        "GridSearch_ProjectDate" : "2025_02_07_10_08",              #プロジェクト日時
+        "GridSearch_ProjectDate" : "2025_02_08_00_00",              #プロジェクト日時
         "GridSearch_T_Process" : Process_SishuESN_GridSearch,     #GS処理指定
         "GridSearch_T_Output" : OutputLog_SishuESN_2024_06_01_10_30             #GS出力処理指定
         })()
@@ -178,6 +178,10 @@ class Process_SishuESN_GridSearch:
             "Task_Lorenz96_Scale" : 1/50,
             "Task_Lorenz96_Dt" : 0.01,
             "Task_Lorenz96_Tau" : 5,
+            "Task_Lorenz96_InitTerm" : 1000,
+
+            "Task_Lorenz96_N" : 10,
+            "Task_Lorenz96_F" : 8,
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "Model_EMChialvo_D_u" : 1,                          #入力信号次元
             "Model_EMChialvo_D_x" : 100,                        #ニューロン数
