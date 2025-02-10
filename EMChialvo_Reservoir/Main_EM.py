@@ -66,8 +66,8 @@ if __name__ == '__main__':
 
 #====================================================================
     """Sishu提案モデル（結合形態のみ指定、結合強度は乱数）に関連するプロジェクト"""
-    #Project_EM.Project_EMChialvo_NRMSE_MC_2025_01_28_12_34()
-    Project_RS_Sishu_EM.Project_RandomSearch_NRMSE_SishuESN()
+    Project_EM.Project_EMChialvo_NRMSE_MC_2025_01_28_12_34()
+    #Project_RS_Sishu_EM.Project_RandomSearch_NRMSE_EMChialvo()
 
     #Project_GS_Sishu_EM.Project_GridSearch_EMChialvo_NRMSE()
     #Project_GS_Sishu.Project_GridSearch_SishuESN_NRMSEAndMC_Tau()

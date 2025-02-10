@@ -42,12 +42,17 @@ print("###Main Program has started###\n")
 
 #---試行---
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Project_Graph.Project_Chialvo_TimeLine_2024_09_24_17_25()
+#Project_Graph.Project_Chialvo_TimeLine_2024_09_24_17_25()
 #Project_Graph.Project_Chialvo_PhaseSpace_2024_09_26_12_34()
 
+"""
 #Project_Graph.Project_Chialvo_OldNullcline_2024_09_27_15_07()
 #Project_Graph.Project_Chialvo_NewNullcline_2024_10_14_18_17()
+"""
+
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Project_Graph.Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32()
+#Project_Graph.Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32()
 
 
 

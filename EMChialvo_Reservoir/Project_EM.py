@@ -45,10 +45,12 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         
         "Task_MC_Tau" : 5,                                  #遅延量，MCのτ
 
+        #******************************************************************************************
         "Task_Parity_Tau" : 5,                              #遅延量
         "Task_Parity_MinTerm" : 100,                         #同じ状態を維持する最小期間
         "Task_Parity_MaxTerm" : 200,                        #同じ状態を維持する最大期間
         
+        #******************************************************************************************
         "Task_Rosslor_Scale" : 1 / 30,                      #信号のスケール
         "Task_Rosslor_Mu" : 5.7,                            #レスラー方程式パラメータ
         "Task_Rosslor_Dt" : 0.01,                           #時間スケール
@@ -56,6 +58,7 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         "Task_Rosslor_Tau" : 5,                             #どれくらい先を予測するか
         "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
         
+        #******************************************************************************************
         "Task_Lorenz_Scale" : 1 / 50,                       #信号のスケール
         "Task_Lorenz_Sigma" : 10,                           #ローレンツ方程式パラメータ
         "Task_Lorenz_Gamma" : 28,                           #ローレンツ方程式パラメータ
@@ -63,12 +66,13 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         "Task_Lorenz_Dt" : 0.01,                            #時間スケール
         "Task_Lorenz_A" : 0.001,                             #ギャップジャンクションパラメータ
         "Task_Lorenz_Tau" : 5,                              #どれくらい先を予測するか
-        "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
+        "Task_Lorenz_InitTerm" : 1000,                     #初期状態排除期間
 
-
+        #******************************************************************************************
         "Task_LogisticEquation_A" : 4,
         "Task_LogisticEquation_Tau" : 1,
 
+        #******************************************************************************************
         "Task_Lorenz96_Scale" : 1/50,
         "Task_Lorenz96_Dt" : 0.01,
         "Task_Lorenz96_Tau" : 5,
@@ -76,12 +80,24 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
 
         "Task_Lorenz96_N" : 10,
         "Task_Lorenz96_F" : 8,
+
+        #******************************************************************************************
+        "Task_MackeyGlass_Scale" : 1 / 50,
+        "Task_MackeyGlass_Dt" : 0.01,
+        "Task_MackeyGlass_InitTerm" : 1000,
+        "Task_MackeyGlass_Tau" : 5,
+
+        "Task_MackeyGlass_Beta" : 0.2,
+        "Task_MackeyGlass_Gamma" : 0.1,
+        "Task_MackeyGlass_N" : 10,
+        "Task_MackeyGlass_Tau" : 17,
+
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Model_NormalESN_D_u" : 1,                          #入力信号次元
         "Model_NormalESN_D_x" : 100,                        #ニューロン数
         "Model_NormalESN_D_y" : 1,                          #出力信号次元
 
-        "SubReservoir_LeakingRate" : 0.98,                     #リーク率
+        "SubReservoir_LeakingRate" : 0.99,                     #リーク率
         "SubReservoir_InputScale" : 0.1,                    #入力スケーリング
         "SubReservoir_Rho" : 0.8,                             #スペクトル半径
         "SubReservoir_Density" : 0.95,                         #結合密度
@@ -106,7 +122,7 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
             
             "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
             
-            "NRMSE_T_Task" : Task_EM.Task_Lorenz96,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_NDLorenz,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_NormalESN,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
@@ -175,7 +191,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Task_Lorenz_Dt" : 0.01,                            #時間スケール
         "Task_Lorenz_A" : 0.001,                            #ギャップジャンクションパラメータ
         "Task_Lorenz_Tau" : 5,                              #どれくらい先を予測するか
-        "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
+        "Task_Lorenz_InitTerm" : 1000,                     #初期状態排除期間
 
         "Task_LogisticEquation_A" : 4,
         "Task_LogisticEquation_Tau" : 1,
@@ -209,7 +225,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
 
         "Model_EMChialvo_k" : -3.2,                         #変数:k
         
-        "Model_EMChialvo_Rho" : 0.003,                      #スペクトル半径
+        "Model_EMChialvo_Rho" : 0.001,                      #スペクトル半径
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # "Module_Reservoir" に直接渡す
@@ -234,7 +250,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
 
             "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
 
-            "NRMSE_T_Task" : Task_EM.Task_Lorenz96,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_NDRosslor,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         

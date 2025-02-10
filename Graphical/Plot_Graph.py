@@ -14,6 +14,7 @@
 #====================================================================
 #外部ライブラリ
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os
@@ -43,6 +44,12 @@ class Plot_TimeLine(Plot):
     #コンストラクタ
     def __init__(self, param: dict, parent: any = None):
         super().__init__(param, parent)
+
+        #データ指定
+        #評価時間
+        self.Length_Eva = self.Param["Length_Eva"]
+        #プロット時間
+        self.Length_Plot = self.Param["Length_Plot"]
 
         #プロット要素
         self.PlotData = self.Param["PlotData"]
@@ -88,8 +95,8 @@ class Plot_TimeLine(Plot):
         ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
         ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
 
-        ax.plot(self.PlotData, label = f"{self.PlotData_Label}", linestyle = '-',lw = LineWidth * 0.9)
-        #ax.plot(self.PlotSignal, label = f"{self.PlotSignal_Label}", linestyle = '-',lw = LineWidth * 0.85)
+        ax.plot(self.PlotData[self.Length_Eva:], label = f"{self.PlotData_Label}", linestyle = '-',lw = LineWidth * 0.9)
+        ax.plot(self.PlotSignal[self.Length_Eva:], label = f"{self.PlotSignal_Label}", linestyle = '-',lw = LineWidth * 0.85)
         ax.grid()
         ax.legend(fontsize = FontSize_legend)
         fig.tight_layout()
@@ -104,6 +111,12 @@ class Plot_PhaseSpace(Plot):
     #コンストラクタ
     def __init__(self, param: dict, parent: any = None):
         super().__init__(param, parent)
+
+        #データ指定
+        #評価時間
+        self.Length_Eva = self.Param["Length_Eva"]
+        #プロット時間
+        self.Length_Plot = self.Param["Length_Plot"]
 
         #プロット要素
         self.PlotData_Xaxis = self.Param["PlotData_x-axis"]
@@ -144,12 +157,12 @@ class Plot_PhaseSpace(Plot):
         ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
         ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
 
-        ax.plot(self.PlotData_Xaxis, self.PlotData_Yaxis,'-',lw = LineWidth)
+        ax.plot(self.PlotData_Xaxis[self.Length_Eva:], self.PlotData_Yaxis[self.Length_Eva:],'-',lw = LineWidth)
         ax.grid()
         fig.tight_layout()
         New_DirPath()
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
-        plt.show()
+        plt.close()
 
 class Plot_PhaseSpace_3D(Plot):
     """
@@ -158,6 +171,12 @@ class Plot_PhaseSpace_3D(Plot):
     #コンストラクタ
     def __init__(self, param: dict, parent: any = None):
         super().__init__(param, parent)
+
+        #データ指定
+        #評価時間
+        self.Length_Eva = self.Param["Length_Eva"]
+        #プロット時間
+        self.Length_Plot = self.Param["Length_Plot"]
 
         #プロット要素
         self.PlotData_Xaxis = self.Param["PlotData_x-axis"]
@@ -202,12 +221,14 @@ class Plot_PhaseSpace_3D(Plot):
         ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
         ax.set_zlabel(self.PlotZLabel, fontsize = FontSize_Axis)
 
-        ax.plot(self.PlotData_Xaxis, self.PlotData_Yaxis, self.PlotData_Zaxis,'-',lw = LineWidth)
+        ax.plot(self.PlotData_Xaxis[self.Length_Eva:], self.PlotData_Yaxis[self.Length_Eva:], self.PlotData_Zaxis[self.Length_Eva:],'-',lw = LineWidth)
         ax.grid()
         fig.tight_layout()
         New_DirPath()
+        ax.view_init(azim=150)
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
-        plt.show()
+        #plt.show()
+        plt.close()
 
 class Plot_Nullcline(Plot):
     """
@@ -293,6 +314,73 @@ class Plot_Nullcline(Plot):
 
         ax.set_xlim([self.Plot_x_Start, self.Plot_x_End])
         ax.set_ylim([self.Plot_y_Start, self.Plot_y_End])
+        fig.tight_layout()
+        New_DirPath()
+        plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
+        plt.show()
+
+class Plot_TimeLine_NeuronMap(Plot):
+    """
+    時系列描写
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, parent: any = None):
+        super().__init__(param, parent)
+
+        #データ指定
+        #評価時間
+        self.Length_Eva = self.Param["Length_Eva"]
+        #プロット時間
+        self.Length_Plot = self.Param["Length_Plot"]
+
+        #プロット要素
+        self.PlotData = self.Param["PlotData"]
+        self.PlotData_Label = None#self.Param["PlotData_Label"]
+        self.PlotSignal = self.Param["PlotSignal"]
+        self.PlotSignal_Label = self.Param["PlotSignal_Label"]
+        self.PlotTitle = self.Param["PlotTitle"]
+        self.PlotXLabel = self.Param["PlotXLabel"]
+        self.PlotYLabel = self.Param["PlotYLabel"]
+        self.PlotPath_Project = self.Param["PlotPath_Project"]
+        self.PlotPath_Date = self.Param["PlotPath_Date"]
+        self.PlotName = self.Param["PlotName"]
+        self.x_Log_scale = self.Param["x_Log_scale"] 
+
+        #モデル
+        self.T_Model = self.Param["Model"]
+        param = self.Param.copy()
+        self.Model = self.T_Model(param, self)
+
+    def __call__(self):
+
+        def New_DirPath():
+            Dir_Path = f"{self.PlotPath_Project}{self.PlotPath_Date}"
+            os.makedirs(Dir_Path, exist_ok=True)
+
+        #プロット図全体のフォントサイズ
+        FigSize = (16,9)
+        FontSize_Axis = 32                #「各軸ラベル（Time Stepなど）」のフォントサイズ
+        FontSize_Title = 28               #「タイトル（一番上）」のフォントサイズ
+        FontSize_TickLabel = 14           #「各ラベルの単位（-2.0,-1.9など）」のフォントサイズ
+        FontSize_legend = 10              #「各凡例」のフォントサイズ
+        LineWidth = 2                     #線の太さ
+        FileFormat = ".png"          #ファイルフォーマット
+
+        fig = plt.figure(figsize = FigSize)
+        ax = fig.add_subplot(1,1,1)
+
+        Title = self.PlotTitle
+        ax.tick_params(labelsize=FontSize_TickLabel)
+        if self.x_Log_scale == True:
+            ax.set_xscale('log')
+        ax.set_title(Title, fontsize = FontSize_Title)
+        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
+        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
+
+        ax.plot(self.PlotData[self.Length_Eva:], label = f"{self.PlotData_Label}", linestyle = '-',lw = LineWidth * 0.9)
+        ax.plot(self.PlotSignal[self.Length_Eva:], label = f"{self.PlotSignal_Label}", linestyle = '-',lw = LineWidth * 0.85)
+        ax.grid()
+        ax.legend(fontsize = FontSize_legend)
         fig.tight_layout()
         New_DirPath()
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)

@@ -27,16 +27,16 @@ import Random_Search_EM
 
 #********************************************************************
 #Sishu提案モデル（結合形態のみ指定、結合強度は乱数）
-def Project_RandomSearch_NRMSE_EMSishu():
+def Project_RandomSearch_NRMSE_EMChialvo():
     
     RS_Param = {
-            "Model_SishuESN_k__01" : [-5.0,5.0],
-            "Model_SishuESN_Rho__01" : [0.001,0.05]
+            "Model_EMChialvo_k__01" : [-5.0,5.0],
+            "Model_EMChialvo_Rho__01" : [0.001,0.01]
     }
     
     Param = {
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "Use_model" : "SishuESN",                         #モデル
+            "Use_model" : "EMChialvo",                         #モデル
             "Evaluation" : "NRMSE",                             #評価方法(現在NRMSEのみ対応)
             
             "RandomSearch_target_num_sample" : 300,           #おおよそのサンプル数
@@ -72,25 +72,51 @@ def Project_RandomSearch_NRMSE_EMSishu():
             "Task_vandelPol_Init" : [0., 0., 0., 0.001],        #初期状態
             "Task_vandelPol_Tau" : 5,                           #どれくらい先を予測するか
             "Task_vandelPol_InitTerm" : 1000,                   #初期状態排除期間
+            
+            "Task_LogisticEquation_A" : 4,
+            "Task_LogisticEquation_Tau" : 1,
+
+            "Task_Lorenz96_Scale" : 1/50,
+            "Task_Lorenz96_Dt" : 0.01,
+            "Task_Lorenz96_Tau" : 5,
+            "Task_Lorenz96_InitTerm" : 1000,
+
+            "Task_Lorenz96_N" : 10,
+            "Task_Lorenz96_F" : 8,
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            "Model_EMChialvo_D_u" : 1,                          #入力信号次元
+            "Model_EMChialvo_D_x" : 100,                        #ニューロン数
+            "Model_EMChialvo_D_y" : 1,                          #出力信号次元
+
+            "Model_EMChialvo_Ring" : False,                     #結合の形態を指定するか（値は乱数）
+            "Model_EMChialvo_Star" : False,                     #結合の形態を指定するか（値は乱数）
+            
+            "Model_EMChialvo_InputScale" : 0.1,                 #入力スケーリング
+            
+            "Model_EMChialvo_a" : 0.89,                         #変数:a
+            "Model_EMChialvo_b" : 0.6,                          #変数:b
+            "Model_EMChialvo_c" : 0.28,                         #変数:c
+            "Model_EMChialvo_k0" : 0.04,                        #変数:k0
+
+            "Model_EMChialvo_k1" : 0.1,                         #変数:k1
+            "Model_EMChialvo_k2" : 0.2,                         #変数:k2
+            "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
+            "Model_EMChialvo_beta" : 0.2,                       #変数:beta
+
+            "Model_EMChialvo_k" : -3.2,                         #変数:k
+            
+            "Model_EMChialvo_Rho" : 0.003,                      #スペクトル半径
 
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "Model_SishuESN_D_u" : 1,                          #入力信号次元
-            "Model_SishuESN_D_x" : 100,                        #ニューロン数
-            "Model_SishuESN_D_y" : 1,                          #出力信号次元
-
-            "Model_SishuESN_InputScale" : 0.1,                 #入力スケーリング
-            "Model_SishuESN_sigma" : False,    #リング・ネットワークの有無
-            "Model_SishuESN_mu" : False,        #スター・ネットワークの有無
-            "Model_SishuESN_k" : -3,           #Chialvoの変数：k
-
-            "Model_SishuESN_Rho" : 0.03,                             #スペクトル半径
-            "SishuReservoir_Density" : 1,                         #結合密度
+            # "Module_Reservoir" に直接渡す
+            "EMChialvo_Reservoir_Density" : 1,                          #結合密度
+            
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "LinerTransformer_Beta" : 0.2,                      #正規化係数
     }
     
-    if Param["Use_model"] == "SishuESN":
-        Param_Model = Model_EM.Model_SishuESN
+    if Param["Use_model"] == "EMChialvo":
+        Param_Model = Model_EM.Model_EMChialvo
     
     #NRMSE評価
     if Param["Evaluation"] == "NRMSE":
@@ -99,11 +125,15 @@ def Project_RandomSearch_NRMSE_EMSishu():
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "NRMSE_F_OutputLog" : True,                        #経過の出力を行うか
             "NRMSE_D_u" : 1,                            #入力信号次元
+            "NRMSE_D_x" : 100,
             "NRMSE_D_y" : 1,                            #出力信号次元
+
             "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
             "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-            "NRMSE_T_Task" : Task_EM.Task_NDLorenz,                                #評価用タスク（Type型）
+            "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数            
+            
+            "NRMSE_T_Task" : Task_EM.Task_Lorenz96,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Param_Model,                                      #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
     

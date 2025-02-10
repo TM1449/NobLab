@@ -61,17 +61,18 @@ class Model_Chialvo(Model):
         self.beta = self.Param["Chialvo_beta"]
 
         #入力信号
-        self.Input_Signal = self.Param["Input_Signal"]
-        self.Input_Signal_def = self.Param["Input_Signal_def"]
-        self.Input_Signal_Interval = self.Param["Input_Signal_Interval"]
-        self.Input_Signal_Line = self.Param["Input_Signal_Line"]
+        self.Input_Signal_Amp = self.Param["Input_Signal_Amp"]
+        self.Input_Signal_Def = self.Param["Input_Signal_Def"]
 
         #空走時間
         self.Length_Burnin = self.Param["Length_Burnin"]
+        #評価時間
+        self.Length_Eva = self.Param["Length_Eva"]
         #プロット時間
         self.Length_Plot = self.Param["Length_Plot"]
+        
         #総合時間
-        self.Length_Total = self.Length_Burnin + self.Length_Plot
+        self.Length_Total = self.Length_Burnin + self.Length_Eva +self.Length_Plot
 
         #--------------------------------------------------------------------
         #初期値Xについて
@@ -105,54 +106,32 @@ class Model_Chialvo(Model):
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
     def __call__(self):
-        
         #入力信号プロットの作成
-        self.Input_Signal_In = np.zeros(self.Length_Total)
+        self.Input_Signal = np.zeros(self.Length_Total)
 
         #恒等関数の場合
-        if self.Input_Signal_def == None:
-            #通常の信号の場合
-            if self.Input_Signal_Interval == None:
-                for n in range(self.Length_Burnin, self.Length_Total - 1):
-                    self.Input_Signal_In[n+1] = self.Input_Signal
-                    
-            #インターバル有り信号
-            else:
-                if self.Input_Signal_Line == None:
-                    for n in range(self.Length_Total - 1):
-                        if (n % self.Input_Signal_Interval) == 0:
-                            self.Input_Signal_In[n+1] = self.Input_Signal
-                        else:
-                            self.Input_Signal_In[n+1] = 0
-                else:
-                    for n in range(self.Length_Burnin, self.Length_Total - 1, self.Input_Signal_Interval):
-                            self.Input_Signal_In[n+1: n+1+self.Input_Signal_Line] = self.Input_Signal
-
-        #sin波の場合
-        elif self.Input_Signal_def == np.sin:
-            for n in range(self.Length_Total - 1):
-                self.Input_Signal_In[n+1] = 0.1 * self.Input_Signal * self.Input_Signal_def(4 * n * np.pi / 180)
+        if self.Input_Signal_Def == None:
+            for n in range(self.Length_Burnin, self.Length_Total - 1):
+                self.Input_Signal[n+1] = self.Input_Signal_Amp
         
-        #ランダムの場合
-        elif self.Input_Signal_def == random.randint:
-            self.Step_s = self.Length_Total // 100
-            self.Step = self.Length_Total // self.Step_s
-            for n in range(self.Step):
-                self.Input_Signal_In[n * 100 : (n+1) * 100] = self.Input_Signal_def(0,self.Input_Signal)
+        #sin波の場合
+        elif self.Input_Signal_Def == np.sin:
+            for n in range(self.Length_Burnin, self.Length_Total - 1):
+                self.Input_Signal[n+1] = 0.1 * self.Input_Signal_Amp * self.Input_Signal_Def(4 * n * np.pi / 180)
 
         #Chialvoニューロンの差分方程式の計算部
         for i in range(self.Length_Total - 1):
             print("\r%d / %d"%(i, self.Length_Total), end = "")
 
             self.x[i+1] = pow(self.x[i], 2) * np.exp(self.y[i] - self.x[i]) + self.k0 \
-                + self.k * self.x[i] * (self.alpha + 3 * self.beta * pow(self.phi[i], 2)) + self.Input_Signal_In[i]
+                + self.k * self.x[i] * (self.alpha + 3 * self.beta * pow(self.phi[i], 2)) + self.Input_Signal[i]
             self.y[i+1] = self.a * self.y[i] - self.b * self.x[i] + self.c 
             self.phi[i+1] = self.k1 * self.x[i] - self.k2 * self.phi[i]
 
         return self.x[self.Length_Burnin :], \
             self.y[self.Length_Burnin :], \
             self.phi[self.Length_Burnin :], \
-                self.Input_Signal_In[self.Length_Burnin :]
+                self.Input_Signal[self.Length_Burnin :]
 
 class Model_Chialvo_OldNullcline(Model):
 
@@ -370,7 +349,7 @@ class Model_Chialvo_NewNullcline(Model):
                         self.x[self.Plot_Start : self.Plot_End - 1], self.y[self.Plot_Start : self.Plot_End - 1]
 
 
-class Model_Chialvo_Neurons_Network(Model):
+class Model_ChialvoNeuronMap(Model):
 
     #コンストラクタ
     def __init__(self, param: dict, parent: any = None):
@@ -395,35 +374,37 @@ class Model_Chialvo_Neurons_Network(Model):
         self.Sigma = self.Param["Chialvo_Sigma"]
         self.R = self.Param["Chialvo_R"]
 
-        #電磁束下Chialvoニューロンネットワークの追加パラメータ
-        self.Xi_mu = self.Param["Chialvo_Xi_mu"]
-        self.Xi_sigma = self.Param["Chialvo_Xi_sigma"]
-        self.D_mu = self.Param["Chialvo_D_mu"]
-        self.D_sigma = self.Param["Chialvo_D_sigma"]
+        self.Random = self.Param["Chialvo_Neurons_Random"]
+        self.Rho = self.Param["Chialvo_Rho"]
 
         #入力信号
-        self.Input_Signal = self.Param["Input_Signal"]
-        self.Input_Signal_def = self.Param["Input_Signal_def"]
+        self.Input_Signal_Amp = self.Param["Input_Signal_Amp"]
+        self.Input_Signal_Def = self.Param["Input_Signal_Def"]
 
-        #実行時間
-        self.RunTime = self.Param["RunTime"]
-        self.Plot_Start = self.Param["Plot_Start"]
-        self.Plot_End = self.Param["Plot_End"]
+        #空走時間
+        self.Length_Burnin = self.Param["Length_Burnin"]
+        #評価時間
+        self.Length_Eva = self.Param["Length_Eva"]
+        #プロット時間
+        self.Length_Plot = self.Param["Length_Plot"]
+        
+        #総合時間
+        self.Length_Total = self.Length_Burnin + self.Length_Eva +self.Length_Plot
 
         #--------------------------------------------------------------------
         #初期値Xについて
-        self.x = np.zeros((self.N, self.RunTime))
-        self.x[:, 0] = np.random.uniform(-1,1)
+        self.x = np.zeros((self.Length_Total, self.N))
+        self.x[0, :] = np.random.uniform(-1,1)
 
         #--------------------------------------------------------------------
         #初期値Yについて
-        self.y = np.zeros((self.N, self.RunTime))
-        self.y[:, 0] = np.random.uniform(-1,1)
+        self.y = np.zeros((self.Length_Total, self.N))
+        self.y[0, :] = np.random.uniform(-1,1)
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #初期値Phiについて
-        self.phi = np.zeros((self.N, self.RunTime))
-        self.phi[:, 0] = np.random.uniform(-1,1)
+        self.phi = np.zeros((self.Length_Total, self.N))
+        self.phi[0, :] = np.random.uniform(-1,1)
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -431,78 +412,76 @@ class Model_Chialvo_Neurons_Network(Model):
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
         #入力信号プロットの作成
-        self.Input_Signal_In = np.zeros(self.RunTime)
+        self.Input_Signal = np.zeros(self.Length_Total)
 
-        if self.Input_Signal_def == None:
-            for n in range(self.RunTime - 1):
-                self.Input_Signal_In[n+1] = self.Input_Signal
+        #恒等関数の場合
+        if self.Input_Signal_Def == None:
+            for n in range(self.Length_Burnin, self.Length_Total - 1):
+                self.Input_Signal[n+1] = self.Input_Signal_Amp
         
-        elif self.Input_Signal_def == np.sin:
-            for n in range(self.RunTime - 1):
-                self.Input_Signal_In[n+1] = 0.1 * self.Input_Signal * self.Input_Signal_def(4 * n * np.pi / 180)
-        
-        elif self.Input_Signal_def == random.randint:
-            self.Step_s = self.RunTime // 100
-            self.Step = self.RunTime // self.Step_s
-            for n in range(self.Step):
-                self.Input_Signal_In[n * 100 : (n+1) * 100] = self.Input_Signal_def(0,self.Input_Signal)
-        
+        #sin波の場合
+        elif self.Input_Signal_Def == np.sin:
+            for n in range(self.Length_Burnin, self.Length_Total - 1):
+                self.Input_Signal[n+1] = 0.1 * self.Input_Signal_Amp * self.Input_Signal_Def(4 * n * np.pi / 180)
+
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
         #Chialvoニューロンの差分方程式の計算部
-
         #--------------------------------------------------------------------
-        #sigmaの不均質性
-        self.sigma_matrix = (np.ones(self.N, self.N) * self.Sigma) + self.D_sigma * self.Xi_sigma
+        if self.Random == True:
+            self.LW = np.random.randn(self.N, self.N)
+            self.sw, _ = np.linalg.eig(self.LW)
 
-        #self.ring_matrixは、リングネットワークの隣接行列を生成する
-        self.ring_matrix = np.identity(self.N)
-        self.ring_matrix[0,0] = 0
+            self.Matrix = self.Rho * (self.LW / np.max(np.abs(self.sw)))
 
-        for i in range(1,self.N):
-            #これが対角成分周辺の1を生成する
-            self.ring_matrix[i :i+self.R+1 ,i :i+self.R+1] = 1
-            #これらが範囲外でも対応させる部分（左下や右上の1を生成する）
-            self.ring_matrix[self.N-self.R+i-1 :, i] = 1
-            self.ring_matrix[i,self.N-self.R+i-1:] = 1
-        for i in range(1,self.N):
-            self.ring_matrix[i,i] = -2 * self.R
+        else:
+            #--------------------------------------------------------------------
+            #self.ring_matrixは、リングネットワークの隣接行列を生成する
+            self.ring_matrix = np.identity(self.N)
+            self.ring_matrix[0,0] = 0
 
-        self.ring_matrix *= (self.sigma_matrix / (2 * self.R))
+            for i in range(1,self.N):
+                #これが対角成分周辺の1を生成する
+                self.ring_matrix[i:i+self.R+1 , i:i+self.R+1] = 1
 
-        #--------------------------------------------------------------------
-        #muの不均質性
-        self.Test_star = (np.ones(self.N, self.N) * self.Mu) + self.D_mu * self.Xi_mu
-        
-        #self.star_matrixは、スターネットワークの隣接行列を生成する
-        self.star_matrix = np.zeros((self.N, self.N))
+                #これらが範囲外でも対応させる部分（左下や右上の1を生成する）
+                self.ring_matrix[self.N-self.R+i-1: , i] = 1
+                self.ring_matrix[i , self.N-self.R+i-1:] = 1
+            for i in range(1,self.N):
+                self.ring_matrix[i,i] = -2 * self.R
 
-        self.star_matrix[0,0] = -self.Test_star[0,0] * (self.N-1)
-        self.star_matrix[0,1:] = self.Test_star[0,1:]
-        self.star_matrix[1:,0] = -self.Test_star[1:,0]
+            self.ring_matrix *= (self.Sigma / (2 * self.R))
 
-        for i in range(1,self.N):
-            self.star_matrix[i,i] += self.Test_star[i,i]
-        
-        #--------------------------------------------------------------------
-        
-        #self.Ring_Star_matrixは、リングスターネットワークの隣接行列を生成する（ただ足し合わせた）
-        self.Ring_Star_matrix = (self.ring_matrix + self.star_matrix)
+            #--------------------------------------------------------------------
+            #self.star_matrixは、スターネットワークの隣接行列を生成する
+            self.star_matrix = np.zeros((self.N, self.N))
 
-        #--------------------------------------------------------------------
-        
-        for i in range(self.RunTime - 1):
+            self.star_matrix[0,0] = -self.Mu * (self.N-1)
+            self.star_matrix[0,1:] = self.Mu
+            self.star_matrix[1:,0] = -self.Mu
 
-            print("\r%d / %d"%(i, self.RunTime), end = "")
+            for i in range(1,self.N):
+                self.star_matrix[i,i] += self.Mu
+            
+            #--------------------------------------------------------------------
+            #self.Ring_Star_matrixは、リングスターネットワークの隣接行列を生成する（ただ足し合わせた）
+            self.Ring_Star_matrix = (self.ring_matrix + self.star_matrix)
 
-            self.x[i+1] = pow(self.x[i], 2) * np.exp(self.y[i] - self.x[i]) + self.k0 \
-                + self.k * self.x[i] * (self.alpha + 3 * self.beta * pow(self.phi[i], 2)) + self.Input_Signal_In[i]
-            self.y[i+1] = self.a * self.y[i] - self.b * self.x[i] + self.c 
-            self.phi[i+1] = self.k1 * self.x[i] - self.k2 * self.phi[i]
+            self.Matrix = self.Ring_Star_matrix
 
-        return self.x[self.Plot_Start : self.Plot_End - 1], \
-            self.y[self.Plot_Start : self.Plot_End - 1], \
-            self.phi[self.Plot_Start : self.Plot_End - 1], \
-                self.Input_Signal_In[self.Plot_Start : self.Plot_End - 1]
-    
-    
+    #--------------------------------------------------------------------
+
+        def M(phi):
+            return self.alpha + 3 * self.beta * pow(phi, 2)
+
+        for n in range(self.Length_Total - 1):
+
+            print("\r%d / %d"%(n, self.Length_Total), end = "")
+
+            self.x[n+1, :] = pow(self.x[n, :], 2) * np.exp(self.y[n, :] - self.x[n, :]) + self.k0 \
+                + self.k * self.x[n, :] * M(self.phi[n, :]) + self.x[n,:] @ self.Matrix
+            self.y[n+1, :] = self.a * self.y[n, :] - self.b * self.x[n, :] + self.c
+            self.phi[n+1, :] = self.k1 * self.x[n, :] - self.k2 * self.phi[n, :]
+
+        return self.x[self.Length_Burnin: ,:], \
+            self.y[self.Length_Burnin: ,:], \
+            self.phi[self.Length_Burnin: ,:], _

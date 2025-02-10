@@ -254,7 +254,7 @@ class Task_NDLorenz(Task):
         self.Dt = param["Task_Lorenz_Dt"]                       #時間スケール
         self.A = param["Task_Lorenz_A"]                         #ギャップジャンクションパラメータ
         self.Tau = param["Task_Lorenz_Tau"]                     #どれくらい先を予測するか
-        self.InitTerm = param["Task_Rosslor_InitTerm"]          #初期状態排除期間
+        self.InitTerm = param["Task_Lorenz_InitTerm"]          #初期状態排除期間
 
         self.Systems = self.D_u // 3 + (0 if self.D_u % 3 == 0 else 1)#ローレンツ系の数
 
@@ -267,8 +267,9 @@ class Task_NDLorenz(Task):
     #データ生成
     def makeData(self):
         self.X = np.zeros([self.Length + self.Tau, self.D_u])
+        self.Z = np.zeros([self.Length + self.Tau, self.D_u])
 
-        np.random.seed(seed=728)
+        np.random.seed(seed=999)
 
         s = (np.random.rand(self.Systems, 3) - 0.5) * 10
         
@@ -276,6 +277,8 @@ class Task_NDLorenz(Task):
             if self.InitTerm <= t:
                 #self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
                 self.X[t - self.InitTerm] = s[0][2] * self.Scale        #1次元の信号に限り、列要素を変えることで、成分を変更できる。
+                #self.Z[t - self.InitTerm] = s[0][2] * self.Scale
+
             
             s_old = s
             s = np.zeros([self.Systems, 3])
@@ -428,9 +431,6 @@ class Task_Lorenz96(Task):
             self.s = self.Lorenz96(self.s)
 
 
-
-
-
 class Task_Zeros(Task):
     """
     入力0
@@ -450,3 +450,61 @@ class Task_Zeros(Task):
     #データ生成
     def makeData(self):
         self.X = np.zeros([self.Length + 1, self.D_u])
+
+
+class Task_MackeyGlass(Task):
+    """
+    マッキー・グラス方程式
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, evaluation: any):
+        super().__init__(param, evaluation)
+
+        #パラメータ取得
+        self.Scale = param["Task_MackeyGlass_Scale"]                 #信号のスケール
+        self.Dt = param["Task_MackeyGlass_Dt"]                       #時間スケール
+        self.InitTerm = param["Task_MackeyGlass_InitTerm"]          #初期状態排除期間
+        self.Tau = param["Task_MackeyGlass_Tau"]             
+
+        self.MackeyBeta = param["Task_MackeyGlass_Beta"]
+        self.MackeyGamma = param["Task_MackeyGlass_Gamma"]
+        self.MackeyN = param["Task_MackeyGlass_N"]
+        self.MackeyTau = param["Task_MackeyGlass_Tau"]
+
+        self.makeData()
+    
+    #時刻tの入出力データ取得
+    def getData(self, t: int) -> tuple:
+        return self.X[t], self.X[t + self.Tau]
+    
+    def MackeyGlass(self, x, x_tau):
+        dx = (self.MackeyBeta * x_tau) /(1 + pow(x_tau, 2)) - self.MackeyGamma * x
+
+        return x + (dx * self.Dt)
+
+    #データ生成
+    def makeData(self):
+        # 乱数シードの設定
+        np.random.seed(seed=999)
+        self.X = np.zeros((self.Length + self.Tau, self.D_u))
+
+        # 遅延項のためのバッファを初期化
+        buffer_size = int(self.MackeyTau / self.Dt) + 1
+        history = np.zeros(buffer_size)
+        history[0] = 1.2  # 初期値
+
+        for i in range(self.Length + self.Tau + self.InitTerm):
+            t_idx = i % buffer_size
+            t_tau_idx = (i - int(self.MackeyTau / self.Dt)) % buffer_size
+
+            # 遅延項が初期化期間内の場合はゼロとして扱う
+            x_t_tau = history[t_tau_idx] if i >= self.MackeyTau / self.Dt else 0.0
+            x_t = history[t_idx]
+
+            # マッキー・グラス方程式で次の値を計算
+            next_value = self.MackeyGlass(x_t, x_t_tau)
+            history[(i + 1) % buffer_size] = next_value
+
+            # 初期期間を過ぎたらデータを保存
+            if i >= self.InitTerm:
+                self.X[i - self.InitTerm] = next_value * self.Scale
