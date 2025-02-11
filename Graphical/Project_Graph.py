@@ -42,7 +42,7 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : 3.2,
+        "Chialvo_k"                 : -3.2,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
@@ -54,7 +54,7 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         #評価時間
         "Length_Eva" : 10000,
         #プロット時間
-        "Length_Plot" : 1000,
+        "Length_Plot" : 2000,
 
         #x軸のスケールをlogにするかいなか
         "x_Log_scale" : False,
@@ -115,7 +115,7 @@ def Project_Chialvo_PhaseSpace_2024_09_26_12_34():
         #評価時間
         "Length_Eva" : 10000,
         #プロット時間
-        "Length_Plot" : 1000,
+        "Length_Plot" : 2000,
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #入力信号の振幅について
@@ -256,6 +256,7 @@ def Project_Chialvo_NewNullcline_2024_10_14_18_17():
     })
     Output_Graph.Output_NewNullcline(param)()
 
+
 #====================================================================
 def Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32():
     """
@@ -277,7 +278,7 @@ def Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -1.2,
+        "Chialvo_k"                 : -3.2,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
@@ -292,7 +293,10 @@ def Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32():
         "Chialvo_Sigma"             : 0.1, #隣接ニューロン間
         "Chialvo_R"                 : 10,  #ニューロン結合数
         
+        #Chialvo Neuron Map内の結合
         "Chialvo_Rho" : 0.001,
+        #入力信号の結合形態
+        "W_in_Scale" : 0.1,
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #空走時間
@@ -300,17 +304,17 @@ def Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32():
         #評価時間
         "Length_Eva" : 10000,
         #プロット時間
-        "Length_Plot" : 1000,
+        "Length_Plot" : 2000,
 
         #x軸のスケールをlogにするかいなか
         "x_Log_scale" : False,
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #入力信号の振幅について
-        "Input_Signal_Amp" : 0,
+        "Input_Signal_Amp" : 1,
 
         #恒等関数：None, sin関数：np.sin, 離散信号：random.randint
-        "Input_Signal_Def" : None,
+        "Input_Signal_Def" : np.sin,
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の初期化指定
@@ -354,12 +358,13 @@ def Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32():
         "Chialvo_k0"                : 0.04,
 
         #電磁束下のChialvoパラメータ
-        "Chialvo_k"                 : -1.2,
+        "Chialvo_k"                 : -3.2,
         "Chialvo_k1"                : 0.1,
         "Chialvo_k2"                : 0.2,
         "Chialvo_alpha"             : 0.1,
         "Chialvo_beta"              : 0.2,
 
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #電磁束下Chialvoニューロンのネットワークパラメータ
         "Chialvo_Neurons_Random"    : True,
 
@@ -368,27 +373,25 @@ def Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32():
         "Chialvo_Sigma"             : 0.1, #隣接ニューロン間
         "Chialvo_R"                 : 10,  #ニューロン結合数
         
+        #Chialvo Neuron Map内の結合
         "Chialvo_Rho" : 0.001,
+        #入力信号の結合形態
+        "W_in_Scale" : 0.1,
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #空走時間
-        "Length_Burnin" : 100,
-        #描写時間
-        "Length_Plot" : 10000,
+        "Length_Burnin" : 1000,
+        #評価時間
+        "Length_Eva" : 10000,
+        #プロット時間
+        "Length_Plot" : 2000,
+        
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #入力信号の振幅について
-        "Input_Signal" : 0,
-
-        #入力信号の間隔
-        #（ None は通常の信号。数値を指定するとその間隔で信号が生成）
-        "Input_Signal_Interval" : None,
-
-        #入力信号の長さ
-        #( None は通常の信号。Interval の数値を指定するとその長さで信号が生成)
-        "Input_Signal_Line" : None,
+        "Input_Signal_Amp" : 0.1,
 
         #恒等関数：None, sin関数：np.sin, 離散信号：random.randint
-        "Input_Signal_def" : None,
+        "Input_Signal_Def" : np.sin,
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #時系列描写の初期化指定
@@ -400,8 +403,8 @@ def Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32():
     
     param = Param.copy()
     param.update({
-        "Model" : Model_Graph.Model_ChialvoNeuronsMap
+        "Model" : Model_Graph.Model_ChialvoNeuronMap
     })
-    Output_Graph.Output_PhaseSpace(param)()
+    Output_Graph.Output_PhaseSpace_NeuronMap(param)()
 
 #====================================================================

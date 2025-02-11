@@ -197,7 +197,7 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
     def _makeRecurrentWeight(self) -> np.ndarray:
 
         #乱数で重み調整
-        np.random.seed(seed=999)
+        #np.random.seed(seed=999)
         
         #一様分布
         #W = (np.random.rand(self.D_x,self.D_x) * 2 - 1)

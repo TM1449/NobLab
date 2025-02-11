@@ -51,8 +51,8 @@ print("###Main Program has started###\n")
 """
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Project_Graph.Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32()
-#Project_Graph.Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32()
+#Project_Graph.Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32()
+Project_Graph.Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32()
 
 
 

@@ -72,7 +72,7 @@ class Model_Chialvo(Model):
         self.Length_Plot = self.Param["Length_Plot"]
         
         #総合時間
-        self.Length_Total = self.Length_Burnin + self.Length_Eva +self.Length_Plot
+        self.Length_Total = self.Length_Burnin + self.Length_Eva + self.Length_Plot
 
         #--------------------------------------------------------------------
         #初期値Xについて
@@ -380,6 +380,7 @@ class Model_ChialvoNeuronMap(Model):
         #入力信号
         self.Input_Signal_Amp = self.Param["Input_Signal_Amp"]
         self.Input_Signal_Def = self.Param["Input_Signal_Def"]
+        self.W_in_Scale = self.Param["W_in_Scale"]
 
         #空走時間
         self.Length_Burnin = self.Param["Length_Burnin"]
@@ -389,7 +390,7 @@ class Model_ChialvoNeuronMap(Model):
         self.Length_Plot = self.Param["Length_Plot"]
         
         #総合時間
-        self.Length_Total = self.Length_Burnin + self.Length_Eva +self.Length_Plot
+        self.Length_Total = self.Length_Burnin + self.Length_Eva + self.Length_Plot
 
         #--------------------------------------------------------------------
         #初期値Xについて
@@ -424,6 +425,7 @@ class Model_ChialvoNeuronMap(Model):
             for n in range(self.Length_Burnin, self.Length_Total - 1):
                 self.Input_Signal[n+1] = 0.1 * self.Input_Signal_Amp * self.Input_Signal_Def(4 * n * np.pi / 180)
 
+        self.W_in = ((np.random.randn(self.N) * 2) - 1) * self.W_in_Scale
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #Chialvoニューロンの差分方程式の計算部
         #--------------------------------------------------------------------
@@ -468,7 +470,7 @@ class Model_ChialvoNeuronMap(Model):
 
             self.Matrix = self.Ring_Star_matrix
 
-    #--------------------------------------------------------------------
+        #--------------------------------------------------------------------
 
         def M(phi):
             return self.alpha + 3 * self.beta * pow(phi, 2)
@@ -478,10 +480,10 @@ class Model_ChialvoNeuronMap(Model):
             print("\r%d / %d"%(n, self.Length_Total), end = "")
 
             self.x[n+1, :] = pow(self.x[n, :], 2) * np.exp(self.y[n, :] - self.x[n, :]) + self.k0 \
-                + self.k * self.x[n, :] * M(self.phi[n, :]) + self.x[n,:] @ self.Matrix
+                + self.k * self.x[n, :] * M(self.phi[n, :]) + np.dot(self.x[n,:], self.Matrix) + np.dot(self.Input_Signal[n], self.W_in) 
             self.y[n+1, :] = self.a * self.y[n, :] - self.b * self.x[n, :] + self.c
             self.phi[n+1, :] = self.k1 * self.x[n, :] - self.k2 * self.phi[n, :]
 
         return self.x[self.Length_Burnin: ,:], \
             self.y[self.Length_Burnin: ,:], \
-            self.phi[self.Length_Burnin: ,:], _
+            self.phi[self.Length_Burnin: ,:], self.Input_Signal[self.Length_Burnin:]

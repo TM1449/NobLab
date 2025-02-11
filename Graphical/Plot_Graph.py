@@ -102,7 +102,7 @@ class Plot_TimeLine(Plot):
         fig.tight_layout()
         New_DirPath()
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
-        plt.show()
+        plt.close()
 
 class Plot_PhaseSpace(Plot):
     """
@@ -163,6 +163,7 @@ class Plot_PhaseSpace(Plot):
         New_DirPath()
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
         plt.close()
+
 
 class Plot_PhaseSpace_3D(Plot):
     """
@@ -227,8 +228,8 @@ class Plot_PhaseSpace_3D(Plot):
         New_DirPath()
         ax.view_init(azim=150)
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
-        #plt.show()
         plt.close()
+
 
 class Plot_Nullcline(Plot):
     """
@@ -319,6 +320,8 @@ class Plot_Nullcline(Plot):
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
         plt.show()
 
+
+#++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class Plot_TimeLine_NeuronMap(Plot):
     """
     時系列描写
@@ -333,9 +336,11 @@ class Plot_TimeLine_NeuronMap(Plot):
         #プロット時間
         self.Length_Plot = self.Param["Length_Plot"]
 
+        self.N = self.Param["Chialvo_Neurons"]
+
         #プロット要素
         self.PlotData = self.Param["PlotData"]
-        self.PlotData_Label = None#self.Param["PlotData_Label"]
+        self.PlotData_Label = self.Param["PlotData_Label"]
         self.PlotSignal = self.Param["PlotSignal"]
         self.PlotSignal_Label = self.Param["PlotSignal_Label"]
         self.PlotTitle = self.Param["PlotTitle"]
@@ -377,12 +382,150 @@ class Plot_TimeLine_NeuronMap(Plot):
         ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
         ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
 
-        ax.plot(self.PlotData[self.Length_Eva:], label = f"{self.PlotData_Label}", linestyle = '-',lw = LineWidth * 0.9)
+        for ix in range(self.N):
+            if ix == 0:
+                ax.plot(self.PlotData[self.Length_Eva:, ix], label = f"{self.PlotData_Label}", linestyle = '-',lw = LineWidth * 0.9)
+            else:
+                ax.plot(self.PlotData[self.Length_Eva:, ix], linestyle = '-',lw = LineWidth * 0.9)
+
         ax.plot(self.PlotSignal[self.Length_Eva:], label = f"{self.PlotSignal_Label}", linestyle = '-',lw = LineWidth * 0.85)
         ax.grid()
         ax.legend(fontsize = FontSize_legend)
         fig.tight_layout()
         New_DirPath()
         plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
-        plt.show()
+        plt.close()
+
+    
+class Plot_PhaseSpace_NeuronMap(Plot):
+    """
+    相平面描写
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, parent: any = None):
+        super().__init__(param, parent)
+
+        #データ指定
+        #評価時間
+        self.Length_Eva = self.Param["Length_Eva"]
+        #プロット時間
+        self.Length_Plot = self.Param["Length_Plot"]
+
+        #プロット要素
+        self.PlotData_Xaxis = self.Param["PlotData_x-axis"]
+        self.PlotData_Yaxis = self.Param["PlotData_y-axis"]
+        
+        self.PlotTitle = self.Param["PlotTitle"]
+        self.PlotXLabel = self.Param["PlotXLabel"]
+        self.PlotYLabel = self.Param["PlotYLabel"]
+        self.PlotPath_Project = self.Param["PlotPath_Project"]
+        self.PlotPath_Date = self.Param["PlotPath_Date"]
+        self.PlotName = self.Param["PlotName"]
+
+        #モデル
+        self.T_Model = self.Param["Model"]
+        param = self.Param.copy()
+        self.Model = self.T_Model(param, self)
+
+    def __call__(self):
+
+        def New_DirPath():
+            Dir_Path = f"{self.PlotPath_Project}{self.PlotPath_Date}"
+            os.makedirs(Dir_Path, exist_ok=True)
+
+        #プロット図全体のフォントサイズ
+        FigSize = (16,9)
+        FontSize_Axis = 32                #「各軸ラベル（Time Stepなど）」のフォントサイズ
+        FontSize_Title = 28               #「タイトル（一番上）」のフォントサイズ
+        FontSize_TickLabel = 14           #「各ラベルの単位（-2.0,-1.9など）」のフォントサイズ
+        LineWidth = 2                     #線の太さ
+        FileFormat = ".png"          #ファイルフォーマット
+
+        fig = plt.figure(figsize = FigSize)
+        ax = fig.add_subplot(1,1,1)
+
+        Title = self.PlotTitle
+        plt.tick_params(labelsize=FontSize_TickLabel)
+        ax.set_title(Title, fontsize = FontSize_Title)
+        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
+        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
+
+        ax.plot(self.PlotData_Xaxis[self.Length_Eva:], self.PlotData_Yaxis[self.Length_Eva:],'-',lw = LineWidth)
+        ax.grid()
+        fig.tight_layout()
+        New_DirPath()
+        plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
+        plt.close()
+
+class Plot_PhaseSpace_3D_NeuronMap(Plot):
+    """
+    3Dの相平面描写
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, parent: any = None):
+        super().__init__(param, parent)
+
+        #データ指定
+        #評価時間
+        self.Length_Eva = self.Param["Length_Eva"]
+        #プロット時間
+        self.Length_Plot = self.Param["Length_Plot"]
+        self.N = self.Param["Chialvo_Neurons"]
+
+
+        #プロット要素
+        self.PlotData_Xaxis = self.Param["PlotData_x-axis"]
+        self.PlotData_Yaxis = self.Param["PlotData_y-axis"]
+        self.PlotData_Zaxis = self.Param["PlotData_z-axis"]
+        
+        self.PlotTitle = self.Param["PlotTitle"]
+        self.PlotXLabel = self.Param["PlotXLabel"]
+        self.PlotYLabel = self.Param["PlotYLabel"]
+        self.PlotZLabel = self.Param["PlotZLabel"]
+
+        self.PlotPath_Project = self.Param["PlotPath_Project"]
+        self.PlotPath_Date = self.Param["PlotPath_Date"]
+        self.PlotName = self.Param["PlotName"]
+
+        #モデル
+        self.T_Model = self.Param["Model"]
+        param = self.Param.copy()
+        self.Model = self.T_Model(param, self)
+
+    def __call__(self):
+        def New_DirPath():
+            Dir_Path = f"{self.PlotPath_Project}{self.PlotPath_Date}"
+            os.makedirs(Dir_Path, exist_ok=True)
+
+        #プロット図全体のフォントサイズ
+        FigSize = (16,9)
+        FontSize_Axis = 22                #「各軸ラベル（Time Stepなど）」のフォントサイズ
+        FontSize_Title = 18               #「タイトル（一番上）」のフォントサイズ
+        FontSize_TickLabel = 9           #「各ラベルの単位（-2.0,-1.9など）」のフォントサイズ
+        FontSize_legend = 10              #「各凡例」のフォントサイズ
+        LineWidth = 2                     #線の太さ
+        FileFormat = ".png"          #ファイルフォーマット
+
+        fig = plt.figure(figsize = FigSize)
+        ax = fig.add_subplot(1,1,1, projection = '3d')
+
+        Title = self.PlotTitle
+        plt.tick_params(labelsize=FontSize_TickLabel)
+        ax.set_title(Title, fontsize = FontSize_Title)
+        ax.set_xlabel(self.PlotXLabel, fontsize = FontSize_Axis)
+        ax.set_ylabel(self.PlotYLabel, fontsize = FontSize_Axis)
+        ax.set_zlabel(self.PlotZLabel, fontsize = FontSize_Axis)
+
+        for i in range(self.N):
+            ax.plot(self.PlotData_Xaxis[self.Length_Eva:, i], 
+                    self.PlotData_Yaxis[self.Length_Eva:, i], 
+                    self.PlotData_Zaxis[self.Length_Eva:, i], '-', lw=LineWidth)
+        ax.grid()
+        fig.tight_layout()
+        New_DirPath()
+        ax.view_init(azim=150)
+        plt.savefig(self.PlotPath_Project + self.PlotPath_Date + self.PlotName)
+        plt.close()
+
+
 

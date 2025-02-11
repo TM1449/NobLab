@@ -60,7 +60,7 @@ class Output_TimeLine(Output):
         #プロット時間
         self.Length_Plot = self.Param["Length_Plot"]
         #総合時間
-        self.Length_Total = self.Length_Burnin + self.Length_Eva +self.Length_Plot
+        self.Length_Total = self.Length_Burnin + self.Length_Eva + self.Length_Plot
 
         #モデル
         self.T_Model = self.Param["Model"]
@@ -156,10 +156,12 @@ class Output_PhaseSpace(Output):
 
         #空走時間
         self.Length_Burnin = self.Param["Length_Burnin"]
+        #評価時間
+        self.Length_Eva = self.Param["Length_Eva"]
         #プロット時間
         self.Length_Plot = self.Param["Length_Plot"]
         #総合時間
-        self.Length_Total = self.Length_Burnin + self.Length_Plot
+        self.Length_Total = self.Length_Burnin + self.Length_Eva + self.Length_Plot
 
 
         #モデル
@@ -459,6 +461,7 @@ class Output_TimeLine_NeuronMap(Output):
             param = self.Param.copy()
             param.update({
                 "PlotData" : self.X,
+                "PlotData_Label" : "Chialvo : X",
                 "PlotSignal" : self.Signal,
                 "PlotSignal_Label" : "Input Signal",
                 "PlotTitle" : "Chialvo Map : Timeline of x",
@@ -476,6 +479,7 @@ class Output_TimeLine_NeuronMap(Output):
             param = self.Param.copy()
             param.update({
                 "PlotData" : self.Y,
+                "PlotData_Label" : "Chialvo : Y",
                 "PlotSignal" : self.Signal,
                 "PlotSignal_Label" : "Input Signal",
                 "PlotTitle" : "Chialvo Map : Timeline of y",
@@ -494,6 +498,7 @@ class Output_TimeLine_NeuronMap(Output):
             param = self.Param.copy()
             param.update({
                 "PlotData" : self.Phi,
+                "PlotData_Label" : "Chialvo : Phi",
                 "PlotSignal" : self.Signal,
                 "PlotSignal_Label" : "Input Signal",
                 "PlotTitle" : "Chialvo Map : Timeline of phi",
@@ -522,10 +527,12 @@ class Output_PhaseSpace_NeuronMap(Output):
 
         #空走時間
         self.Length_Burnin = self.Param["Length_Burnin"]
+        #評価時間
+        self.Length_Eva = self.Param["Length_Eva"]
         #プロット時間
         self.Length_Plot = self.Param["Length_Plot"]
         #総合時間
-        self.Length_Total = self.Length_Burnin + self.Length_Plot
+        self.Length_Total = self.Length_Burnin + self.Length_Eva + self.Length_Plot
 
 
         #モデル
@@ -537,7 +544,7 @@ class Output_PhaseSpace_NeuronMap(Output):
     def __call__(self):
 
         print("--- Chialvo Neuron Map RunStart---\n")
-        self.X, self.Y, self.Phi ,_ = self.Model()
+        self.X, self.Y, self.Phi, _ = self.Model()
 
         def TimeDate():
             Time_Delta = datetime.timedelta(hours=9)
@@ -564,7 +571,7 @@ class Output_PhaseSpace_NeuronMap(Output):
                 "PlotPath_Date" : f"/PhaseSpace_{Plot_Date}",
                 "PlotName" : f"/{TimeDate()}_PhaseSpace_XandY.png"
                 })
-            Plot_Graph.Plot_PhaseSpace(param)()
+            Plot_Graph.Plot_PhaseSpace_NeuronMap(param)()
 
         if self.Plot_XP:
             print("\n--- Display of PhaseSpace Chialvo Neuron Map of X and Phi ---")
@@ -581,7 +588,7 @@ class Output_PhaseSpace_NeuronMap(Output):
                 "PlotPath_Date" : f"/PhaseSpace_{Plot_Date}",
                 "PlotName" : f"/{TimeDate()}_PhaseSpace_XandPhi.png"
             })
-            Plot_Graph.Plot_PhaseSpace(param)()
+            Plot_Graph.Plot_PhaseSpace_NeuronMap(param)()
 
         if self.Plot_YP:
             print("\n--- Display of PhaseSpace Chialvo Neuron Map of Y and Phi ---")
@@ -599,7 +606,7 @@ class Output_PhaseSpace_NeuronMap(Output):
                 "PlotPath_Date" : f"/PhaseSpace_{Plot_Date}",
                 "PlotName" : f"/{TimeDate()}_PhaseSpace_YandPhi.png"    
                 })
-            Plot_Graph.Plot_PhaseSpace(param)()
+            Plot_Graph.Plot_PhaseSpace_NeuronMap(param)()
 
         if self.Plot_3D:
             print("\n--- Display of PhaseSpace Chialvo Neuron Map of 3D ---")
@@ -619,5 +626,5 @@ class Output_PhaseSpace_NeuronMap(Output):
                 "PlotPath_Date" : f"/PhaseSpace_{Plot_Date}",
                 "PlotName" : f"/{TimeDate()}_PhaseSpace_3D.png"    
                 })
-            Plot_Graph.Plot_PhaseSpace_3D(param)()
+            Plot_Graph.Plot_PhaseSpace_3D_NeuronMap(param)()
 
