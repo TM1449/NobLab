@@ -37,7 +37,7 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #従来のChialvoパラメータ
         "Chialvo_a"                 : 0.89,
-        "Chialvo_b"                 : 0.6,
+        "Chialvo_b"                 : 0.16,
         "Chialvo_c"                 : 0.28,
         "Chialvo_k0"                : 0.04,
 
@@ -61,7 +61,7 @@ def Project_Chialvo_TimeLine_2024_09_24_17_25():
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #入力信号の振幅について
-        "Input_Signal_Amp" : 1,
+        "Input_Signal_Amp" : 0,
 
         #恒等関数：None, sin関数：np.sin, 離散信号：random.randint
         "Input_Signal_Def" : np.sin,
@@ -99,7 +99,7 @@ def Project_Chialvo_PhaseSpace_2024_09_26_12_34():
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #従来のChialvoパラメータ
         "Chialvo_a"                 : 0.89,
-        "Chialvo_b"                 : 0.6,
+        "Chialvo_b"                 : 0.16,
         "Chialvo_c"                 : 0.28,
         "Chialvo_k0"                : 0.04,
 
@@ -119,7 +119,7 @@ def Project_Chialvo_PhaseSpace_2024_09_26_12_34():
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #入力信号の振幅について
-        "Input_Signal_Amp" : 1,
+        "Input_Signal_Amp" : 0,
 
         #恒等関数：None, sin関数：np.sin, 離散信号：random.randint
         "Input_Signal_Def" : np.sin,
@@ -286,12 +286,7 @@ def Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32():
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #電磁束下Chialvoニューロンのネットワークパラメータ
-        "Chialvo_Neurons_Random"    : True,
-
-        "Chialvo_Neurons"           : 100,
-        "Chialvo_Mu"                : 0.1, #中心ニューロン間
-        "Chialvo_Sigma"             : 0.1, #隣接ニューロン間
-        "Chialvo_R"                 : 10,  #ニューロン結合数
+        "Chialvo_Neurons"           : 200,
         
         #Chialvo Neuron Map内の結合
         "Chialvo_Rho" : 0.001,
@@ -311,7 +306,7 @@ def Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32():
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #入力信号の振幅について
-        "Input_Signal_Amp" : 1,
+        "Input_Signal_Amp" : 0.1,
 
         #恒等関数：None, sin関数：np.sin, 離散信号：random.randint
         "Input_Signal_Def" : np.sin,
@@ -330,7 +325,6 @@ def Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32():
         "Model" : Model_Graph.Model_ChialvoNeuronMap
     })
     Output_Graph.Output_TimeLine_NeuronMap(param)()
-
 
 
 def Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32():
@@ -366,13 +360,8 @@ def Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32():
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #電磁束下Chialvoニューロンのネットワークパラメータ
-        "Chialvo_Neurons_Random"    : True,
-
         "Chialvo_Neurons"           : 100,
-        "Chialvo_Mu"                : 0.1, #中心ニューロン間
-        "Chialvo_Sigma"             : 0.1, #隣接ニューロン間
-        "Chialvo_R"                 : 10,  #ニューロン結合数
-        
+
         #Chialvo Neuron Map内の結合
         "Chialvo_Rho" : 0.001,
         #入力信号の結合形態
@@ -388,7 +377,7 @@ def Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32():
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #入力信号の振幅について
-        "Input_Signal_Amp" : 0.1,
+        "Input_Signal_Amp" : 0.2,
 
         #恒等関数：None, sin関数：np.sin, 離散信号：random.randint
         "Input_Signal_Def" : np.sin,
@@ -406,5 +395,67 @@ def Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32():
         "Model" : Model_Graph.Model_ChialvoNeuronMap
     })
     Output_Graph.Output_PhaseSpace_NeuronMap(param)()
+
+
+def Project_ChialvoNeuronMap_MaximumLyapunov_2025_02_09_01_32():
+    """
+
+    """
+
+    #共通パラメータ
+    Param = {
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #従来のChialvoパラメータ
+        "Chialvo_a"                 : 0.89,
+        "Chialvo_b"                 : 0.6,
+        "Chialvo_c"                 : 0.28,
+        "Chialvo_k0"                : 0.04,
+
+        #電磁束下のChialvoパラメータ
+        "Chialvo_k"                 : -3.2,
+        "Chialvo_k1"                : 0.1,
+        "Chialvo_k2"                : 0.2,
+        "Chialvo_alpha"             : 0.1,
+        "Chialvo_beta"              : 0.2,
+
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #電磁束下Chialvoニューロンのネットワークパラメータ
+        "Chialvo_Neurons"           : 100,        
+        #Chialvo Neuron Map内の結合
+        "Chialvo_Rho" : 0.001,
+        #入力信号の結合形態
+        "W_in_Scale" : 0.1,
+
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #空走時間
+        "Length_Burnin" : 1000,
+        #評価時間
+        "Length_Eva" : 10000,
+        #プロット時間
+        "Length_Plot" : 2000,
+        
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #入力信号の振幅について
+        "Input_Signal_Amp" : 0.2,
+
+        #恒等関数：None, sin関数：np.sin, 離散信号：random.randint
+        "Input_Signal_Def" : np.sin,
+
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #時系列描写の初期化指定
+        "Initial_Value_X" : None,
+        "Initial_Value_Y" : None,
+        "Initial_Value_Phi" : None,
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    }
+    
+    param = Param.copy()
+    param.update({
+        "Model" : Model_Graph.Model_ChialvoNeuronMap_MaximumLyapunov
+    })
+    Output_Graph.OutputA(param)()
+
+
+
 
 #====================================================================

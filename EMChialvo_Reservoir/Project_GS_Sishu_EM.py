@@ -61,14 +61,14 @@ def Project_GridSearch_EMChialvo_NRMSE():
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "GridSearch_MachineName" : "EMChialvo",                            #計算機名
         "GridSearch_StartPoint" : 0,                                #担当開始ポイントインデックス
-        "GridSearch_EndPoint" : 11480,                                #担当終了ポイントインデックス(MAX:4410(21*21*10))
+        "GridSearch_EndPoint" : 2296,                                #担当終了ポイントインデックス(MAX:4410(21*21*10))
         
         "GridSearch_MultiThread" : 12,                               #スレッド数（0で逐次処理）初期値:2, 自宅PC:4, 研究室PC, 12
         "GridSearch_MaxNumberInOneFile" : 100,                        #１ファイルの最大のポイント数 初期値:5
         "GridSearch_MaxNumberInOnePool" : 1000,                       #１プール（並列する）最大のポイント数（この分メモリを消費） 初期値:50
-        "GridSearch_NumberOfSamples" : 10,                           #サンプル数
+        "GridSearch_NumberOfSamples" : 2,                           #サンプル数
         "GridSearch_ProjectName" : "NRMSE_EMChialvo",                    #プロジェクト名
-        "GridSearch_ProjectDate" : "2025_02_11_22_57",              #プロジェクト日時
+        "GridSearch_ProjectDate" : "2025_02_12_15_09",              #プロジェクト日時
         "GridSearch_T_Process" : Process_SishuESN_GridSearch,     #GS処理指定
         "GridSearch_T_Output" : OutputLog_SishuESN_2024_06_01_10_30             #GS出力処理指定
         })()
@@ -184,7 +184,7 @@ class Process_SishuESN_GridSearch:
             "Task_Lorenz96_F" : 8,
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "Model_EMChialvo_D_u" : 1,                          #入力信号次元
-            "Model_EMChialvo_D_x" : 100,                        #ニューロン数
+            "Model_EMChialvo_D_x" : 200,                        #ニューロン数
             "Model_EMChialvo_D_y" : 1,                          #出力信号次元
 
             "Model_EMChialvo_Ring" : False,                     #結合の形態を指定するか（値は乱数）
@@ -221,7 +221,7 @@ class Process_SishuESN_GridSearch:
                 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 "NRMSE_F_OutputLog" : False,                        #経過の出力を行うか
                 "NRMSE_D_u" : 1,                            #入力信号次元
-                "NRMSE_D_x" : 100,
+                "NRMSE_D_x" : 200,
                 "NRMSE_D_y" : 1,                            #出力信号次元
 
                 "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
@@ -229,7 +229,7 @@ class Process_SishuESN_GridSearch:
                 "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
                 "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
                 "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-                "NRMSE_T_Task" : Task_EM.Task_NDRosslor,                                #評価用タスク（Type型）
+                "NRMSE_T_Task" : Task_EM.Task_NDLorenz,                                #評価用タスク（Type型）
                 "NRMSE_T_Model" : Param_Model,                                      #モデル（Type型）
                 "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         

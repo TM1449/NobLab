@@ -23,13 +23,13 @@ beta = 0.1 #0.2 0.1
 k = -0.5 #-3.2 -0.5
 
 #パラメータkのリスト
-k_lista = np.arange(-1.0, 7.01, 0.1)
-k_list = np.round(k_lista, 4)
+b_lista = np.arange(0.1, 1.01, 0.01)
+b_list = np.round(b_lista, 4)
 
 #各パラメータの平均の結果を格納する
-k_list_result = np.zeros(len(k_list))
+b_list_result = np.zeros(len(b_list))
 #各パラメータのリアプノフ指数
-k_list_result_M = np.zeros((len(k_list), 10))
+b_list_result_M = np.zeros((len(b_list), 10))
 
 #print(k_list_result)
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -64,10 +64,10 @@ FileFormat = ".png"          #ファイルフォーマット
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 #リアプノフ指数を1回求める
-Lyapunov_expotent = True
+Lyapunov_expotent = False
 
 #リアプノフ指数のリスト
-Lyapunov_List_10 = False
+Lyapunov_List_10 = True
 
 #print("--------------------------------------------------------------------")
 def TimeDate():
@@ -317,11 +317,11 @@ if Lyapunov_List_10:
     print("\n電磁束下Chialvoニューロン: パラメータ変化時の最大リアプノフ指数の導出")
     
     #kのカウンター
-    k_count = 0
+    b_count = 0
     
-    for k in k_list:
-        print(f"\n{k_count + 1} / {len(k_list_result)} 回")
-        print(f"パラメータのkの値: {k}")
+    for b in b_list:
+        print(f"\n{b_count + 1} / {len(b_list_result)} 回")
+        print(f"パラメータのkの値: {b}")
 
         #10回カウンターのl
         l = 0
@@ -480,7 +480,7 @@ if Lyapunov_List_10:
                 #計算不可が10回以上
                 else:
                     print(f"計測失敗")
-                    k_list_result[k_count] = None
+                    b_list_result[b_count] = None
                     break
             
             #通常通り算出できた場合
@@ -490,13 +490,13 @@ if Lyapunov_List_10:
                 l = l + 1
 
         if break_count == 10:
-            k_list_result[k_count] = None
+            b_list_result[b_count] = None
 
         else:
-            k_list_result[k_count] = Lyapunov_Ave / 10
-            print(f"リアプノフ指数: {k_list_result[k_count]}")
+            b_list_result[b_count] = Lyapunov_Ave / 10
+            print(f"リアプノフ指数: {b_list_result[b_count]}")
         
-        k_count = k_count + 1
+        b_count = b_count + 1
     
 
     print("入力信号の描写")
@@ -516,9 +516,9 @@ if Lyapunov_List_10:
     fig = plt.figure(figsize = FigSize)
     ax = fig.add_subplot(1,1,1)
 
-    ax.plot(k_list, k_list_result, '-', lw = LineWidth)
-    ax.set_xticks(np.arange(-1.0, 7.01, 0.5))
-    ax.set_xlabel("k", fontsize = FontSize_Axis)
+    ax.plot(b_list, b_list_result, '-', lw = LineWidth)
+    ax.set_xticks(np.arange(0.1, 1.01, 0.5))
+    ax.set_xlabel("b", fontsize = FontSize_Axis)
     ax.set_ylabel("Maximum Lyapunov", fontsize = FontSize_Axis)
     
     ax.grid()

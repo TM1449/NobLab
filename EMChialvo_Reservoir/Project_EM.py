@@ -213,6 +213,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         
         "Model_EMChialvo_InputScale" : 0.1,                 #入力スケーリング
         
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Model_EMChialvo_a" : 0.89,                         #変数:a
         "Model_EMChialvo_b" : 0.6,                          #変数:b
         "Model_EMChialvo_c" : 0.28,                         #変数:c
@@ -225,7 +226,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
 
         "Model_EMChialvo_k" : -3.2,                         #変数:k
         
-        "Model_EMChialvo_Rho" : 0.001,                      #スペクトル半径
+        "Model_EMChialvo_Rho" : 0.0032,                      #スペクトル半径
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # "Module_Reservoir" に直接渡す
