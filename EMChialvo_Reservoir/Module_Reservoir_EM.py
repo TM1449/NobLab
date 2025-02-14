@@ -198,22 +198,53 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
 
         #乱数で重み調整
         #np.random.seed(seed=999)
+
+        N = 100
+        R = 10
+        self.sigma = 0.001
+        self.mu = 0.00
+
+        #self.ring_matrixは、リングネットワークの隣接行列を生成する
+        self.ring_matrix = np.identity(N)
+        self.ring_matrix[0,0] = 0
         
+        for i in range(1,N):
+            #これが対角成分周辺の1を生成する
+            self.ring_matrix[i:i+R+1,i:i+R+1] = 1
+            #これらが範囲外でも対応させる部分（左下や右上の1を生成する）
+            self.ring_matrix[N-R+i-1:, i] = 1
+            self.ring_matrix[i,N-R+i-1:] = 1
+        for i in range(1,N):
+            self.ring_matrix[i,i] = -2 * R
+
+        self.ring_matrix *= (self.sigma / (2 * R))
+        
+        self.star_matrix = np.zeros((N,N))
+
+        self.star_matrix[0,0] = -self.mu * (N-1)
+        self.star_matrix[0,1:] = self.mu
+        self.star_matrix[1:,0] = -self.mu
+
+        for i in range(1,N):
+            self.star_matrix[i,i] += self.mu
+
+        self.RSMat = self.ring_matrix + self.star_matrix
+
         #一様分布
         #W = (np.random.rand(self.D_x,self.D_x) * 2 - 1)
-        W = np.random.randn(self.D_x, self.D_x)
+        W = self.RSMat
         W = self._makeWSparse(W)
         w , v = np.linalg.eig(W)
 
         Matrix = self.Rho * (W / np.max(np.abs(w)))
 
-        return Matrix
+        return W
     
     #順伝播
     def forward(self, u: np.ndarray) -> np.ndarray: 
         self.x = pow(self.x_old, 2) * np.exp(self.y_old - self.x_old) + self.k0 \
             + self.k * self.x_old * (self.alpha + 3 * self.beta * pow(self.phi_old, 2)) \
-                + np.dot(self.x_old, self.W_rec) + np.dot(np.concatenate([self.Bias, u]), self.W_in)
+                + np.dot( self.W_rec, self.x_old) + np.dot(np.concatenate([self.Bias, u]), self.W_in)
         self.y = self.a * self.y_old - self.b * self.x_old + self.c
         self.phi = self.k1 * self.x_old - self.k2 * self.phi_old
 

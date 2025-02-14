@@ -224,9 +224,9 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
         "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
-        "Model_EMChialvo_k" : -3.2,                         #変数:k
+        "Model_EMChialvo_k" : 3.5,                         #変数:k
         
-        "Model_EMChialvo_Rho" : 0.0032,                      #スペクトル半径
+        "Model_EMChialvo_Rho" : 1,                      #スペクトル半径
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # "Module_Reservoir" に直接渡す
@@ -251,7 +251,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
 
             "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
 
-            "NRMSE_T_Task" : Task_EM.Task_NDLorenz,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_Zeros,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         

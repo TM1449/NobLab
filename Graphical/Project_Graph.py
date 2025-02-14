@@ -286,7 +286,7 @@ def Project_ChialvoNeuronMap_TimeLine_2025_02_09_01_32():
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #電磁束下Chialvoニューロンのネットワークパラメータ
-        "Chialvo_Neurons"           : 200,
+        "Chialvo_Neurons"           : 100,
         
         #Chialvo Neuron Map内の結合
         "Chialvo_Rho" : 0.001,
@@ -377,7 +377,7 @@ def Project_ChialvoNeuronMap_PhaseSpace_2025_02_09_01_32():
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #入力信号の振幅について
-        "Input_Signal_Amp" : 0.2,
+        "Input_Signal_Amp" : 0.1,
 
         #恒等関数：None, sin関数：np.sin, 離散信号：random.randint
         "Input_Signal_Def" : np.sin,

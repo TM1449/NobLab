@@ -169,6 +169,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.set_title(Title, fontsize = FontSize_Title)
                 plt.xlabel("Reservoir Neurons", fontsize = FontSize_Label * 0.8)
                 plt.ylabel("Time Step", fontsize = FontSize_Label * 0.8)
+                ax.invert_yaxis()
                 ax.legend()
                 plt.tight_layout()
                 fig.savefig(self.Plt_Charts_ReservoirHeatMap.Path + FileFormat)
