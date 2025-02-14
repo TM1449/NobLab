@@ -67,7 +67,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
         self.Length_Train = self.Param["NRMSE_Length_Train"]        #学習用データ時間長
         self.Length_Test = self.Param["NRMSE_Length_Test"]          #評価用データ時間長
         self.Length_Total = self.Length_Burnin + self.Length_Train + self.Length_Test#全体データ時間長
-        self.RS_neuron = self.Param["NRMSE_Reservoir_Neurons"]  #リザバー層のニューロン数
+        self.RS_neuron = self.Param["Model_Reservoir_Neurons"]  #リザバー層のニューロン数
 
         #フォルダ構造
         self.DirPath_Project = self.Param["DirPath_Project"]        #プロジェクトのフォルダパス

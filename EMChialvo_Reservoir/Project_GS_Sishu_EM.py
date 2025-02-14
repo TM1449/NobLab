@@ -184,12 +184,13 @@ class Process_SishuESN_GridSearch:
             "Task_Lorenz96_F" : 8,
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "Model_EMChialvo_D_u" : 1,                          #入力信号次元
-            "Model_EMChialvo_D_x" : 200,                        #ニューロン数
+            "Model_EMChialvo_D_x" : 100,                        #ニューロン数
             "Model_EMChialvo_D_y" : 1,                          #出力信号次元
 
             "Model_EMChialvo_Ring" : False,                     #結合の形態を指定するか（値は乱数）
             "Model_EMChialvo_Star" : False,                     #結合の形態を指定するか（値は乱数）
             
+            "Model_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
             "Model_EMChialvo_InputScale" : 0.1,                 #入力スケーリング
             
             "Model_EMChialvo_a" : 0.89,                         #変数:a
@@ -221,7 +222,7 @@ class Process_SishuESN_GridSearch:
                 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 "NRMSE_F_OutputLog" : False,                        #経過の出力を行うか
                 "NRMSE_D_u" : 1,                            #入力信号次元
-                "NRMSE_D_x" : 200,
+                "NRMSE_D_x" : 100,
                 "NRMSE_D_y" : 1,                            #出力信号次元
 
                 "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数

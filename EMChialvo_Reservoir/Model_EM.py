@@ -76,7 +76,7 @@ class Model_NormalESN(Model):
         self.D_x = self.Param["Model_NormalESN_D_x"]            #ニューロン数（リスト型）
         self.D_y = self.Param["Model_NormalESN_D_y"]            #出力信号次元
         
-        self.RS_neuron = self.Param["NRMSE_Reservoir_Neurons"]
+        self.RS_neuron = self.Param["Model_Reservoir_Neurons"]
 
         self.D_z = self.D_x + self.D_u                          #特徴ベクトル次元
         
@@ -161,11 +161,7 @@ class Model_EMChialvo(Model):
         self.D_x = self.Param["Model_EMChialvo_D_x"]            #ニューロン数（リスト型）
         self.D_y = self.Param["Model_EMChialvo_D_y"]            #出力信号次元
 
-        self.RS_neuron = self.Param["NRMSE_Reservoir_Neurons"]
-
-        #リザバー層のニューロン形態に関するパラメータ
-        self.Ring = self.Param["Model_EMChialvo_Ring"]          #リングネットワーク
-        self.Star = self.Param["Model_EMChialvo_Star"]          #スターネットワーク
+        self.RS_neuron = self.Param["Model_Reservoir_Neurons"]  #リザバー層の抜き出すニューロン数
 
         self.ImputScale = self.Param["Model_EMChialvo_InputScale"]   #入力スケーリング
         
@@ -192,9 +188,6 @@ class Model_EMChialvo(Model):
         param.update({
             "EMChialvo_Reservoir_D_u" : self.D_u,
             "EMChialvo_Reservoir_D_x" : self.D_x,
-
-            "EMChialvo_Reservoir_Ring" : self.Ring,
-            "EMChialvo_Reservoir_Star" : self.Star,
 
             "EMChialvo_Reservoir_InputScale" : self.ImputScale,
             
@@ -230,7 +223,7 @@ class Model_EMChialvo(Model):
         Random_Neuron = random.sample(range(len(s)), self.RS_neuron)
         RS_N = s[Random_Neuron]
 
-        return z , s[0:self.RS_neuron]
+        return z , s[10:self.RS_neuron + 10]
     
     #順伝播（リードアウトのみ）
     def forwardReadout(self, z: np.ndarray) -> np.ndarray:
@@ -252,7 +245,7 @@ class Model_EMChialvo(Model):
         e = self.Readout_LinerTransformer.RMSE(z, y_d)
         self.EMChialvo_Reservoir.update()
 
-        return y, e, s[0:self.RS_neuron], s[:]
+        return y, e, s[10:self.RS_neuron + 10], s[:]
     
     #学習
     def fit(self, Z: np.ndarray, Y_d: np.ndarray):

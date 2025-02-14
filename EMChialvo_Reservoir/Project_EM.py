@@ -20,6 +20,7 @@ maru
 import numpy as np
 
 import Evaluation_EM
+import Evaluation_Lyapunov
 import Task_EM
 import Model_EM
 import Output_EM
@@ -36,7 +37,7 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
     """
     #共通パラメータ
     Param = {
-        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #==========================================================================================
         "Project_F_NRMSE" : True,                           #NRMSEを調査するか
         "Project_F_MemoryCapacity" : False,                  #MCを調査するか
 
@@ -45,12 +46,12 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         
         "Task_MC_Tau" : 5,                                  #遅延量，MCのτ
 
-        #******************************************************************************************
+        #------------------------------------------------------------------------------------------
         "Task_Parity_Tau" : 5,                              #遅延量
         "Task_Parity_MinTerm" : 100,                         #同じ状態を維持する最小期間
         "Task_Parity_MaxTerm" : 200,                        #同じ状態を維持する最大期間
         
-        #******************************************************************************************
+        #------------------------------------------------------------------------------------------
         "Task_Rosslor_Scale" : 1 / 30,                      #信号のスケール
         "Task_Rosslor_Mu" : 5.7,                            #レスラー方程式パラメータ
         "Task_Rosslor_Dt" : 0.01,                           #時間スケール
@@ -58,7 +59,7 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         "Task_Rosslor_Tau" : 5,                             #どれくらい先を予測するか
         "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
         
-        #******************************************************************************************
+        #------------------------------------------------------------------------------------------
         "Task_Lorenz_Scale" : 1 / 50,                       #信号のスケール
         "Task_Lorenz_Sigma" : 10,                           #ローレンツ方程式パラメータ
         "Task_Lorenz_Gamma" : 28,                           #ローレンツ方程式パラメータ
@@ -68,11 +69,11 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         "Task_Lorenz_Tau" : 5,                              #どれくらい先を予測するか
         "Task_Lorenz_InitTerm" : 1000,                     #初期状態排除期間
 
-        #******************************************************************************************
+        #------------------------------------------------------------------------------------------
         "Task_LogisticEquation_A" : 4,
         "Task_LogisticEquation_Tau" : 1,
 
-        #******************************************************************************************
+        #------------------------------------------------------------------------------------------
         "Task_Lorenz96_Scale" : 1/50,
         "Task_Lorenz96_Dt" : 0.01,
         "Task_Lorenz96_Tau" : 5,
@@ -81,7 +82,7 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         "Task_Lorenz96_N" : 10,
         "Task_Lorenz96_F" : 8,
 
-        #******************************************************************************************
+        #------------------------------------------------------------------------------------------
         "Task_MackeyGlass_Scale" : 1 / 50,
         "Task_MackeyGlass_Dt" : 0.01,
         "Task_MackeyGlass_InitTerm" : 1000,
@@ -92,10 +93,12 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         "Task_MackeyGlass_N" : 10,
         "Task_MackeyGlass_Tau" : 17,
 
-        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        #------------------------------------------------------------------------------------------
         "Model_NormalESN_D_u" : 1,                          #入力信号次元
         "Model_NormalESN_D_x" : 100,                        #ニューロン数
         "Model_NormalESN_D_y" : 1,                          #出力信号次元
+
+        "Model_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
 
         "SubReservoir_LeakingRate" : 0.99,                     #リーク率
         "SubReservoir_InputScale" : 0.1,                    #入力スケーリング
@@ -113,21 +116,20 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
         param.update({
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "NRMSE_F_OutputLog" : True,                         #経過の出力を行うか
+
             "NRMSE_D_u" : 1,                                    #入力信号次元
             "NRMSE_D_x" : 100,
             "NRMSE_D_y" : 1,                                    #出力信号次元
             "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
             "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-            
-            "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
-            
+
             "NRMSE_T_Task" : Task_EM.Task_NDLorenz,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_NormalESN,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/Project_ESN_2024_04_16_13_58/NRMSE",
+            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/ESN/NRMSE",
         
             "NRMSE_F_OutputCharts" : True,                      #図の出力フラグ
             "NRMSE_F_OutputCharts_UYYdEWaves" : True,           #入出力＆誤差波形図の出力フラグ
@@ -152,13 +154,16 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
             "MemoryCapacity_T_Output" : Output_EM.Output_Single_MC_2023_05_25_13_28,       #作図出力（Type型）
         
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/Project_ESN_2024_04_16_13_58/MC",
+            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/ESN/MC",
         
             "MemoryCapacity_F_OutputCharts" : True,             #図の出力フラグ
             "MemoryCapacity_F_OutputCharts_MCGraph" : True,     #MC曲線の出力フラグ
 
             })
         Evaluation_EM.Evaluation_MC(param)()
+
+
+
 
 #********************************************************************
 #Sishu提案モデル
@@ -168,22 +173,25 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
     """
     #共通パラメータ
     Param = {
-        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        "Project_F_NRMSE" : True,                           #NRMSEを調査するか
+        #==========================================================================================
+        "Project_F_NRMSE" : True,                            #NRMSEを調査するか
         "Project_F_MemoryCapacity" : False,                  #MCを調査するか
+        "Project_F_MLE" : False,                             #MLE（最大リアプノフ指数）を調査するか
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        "Task_SinCurve_RK_h" : 0.01,                        #ルンゲクッタ法刻み幅
+        "Task_SinCurve_RK_h" : 0.01,                         #ルンゲクッタ法刻み幅
         
         "Task_MC_Tau" : 10,                                  #遅延量，MCのτ
-
+        
+        #------------------------------------------------------------------------------------------
         "Task_Rosslor_Scale" : 1 / 30,                      #信号のスケール
         "Task_Rosslor_Mu" : 5.7,                            #レスラー方程式パラメータ
         "Task_Rosslor_Dt" : 0.02,                           #時間スケール
         "Task_Rosslor_A" : 0.005,                            #ギャップジャンクションパラメータ
         "Task_Rosslor_Tau" : 5,                             #どれくらい先を予測するか
         "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
-        
+
+        #------------------------------------------------------------------------------------------
         "Task_Lorenz_Scale" : 1 / 50,                       #信号のスケール
         "Task_Lorenz_Sigma" : 10,                           #ローレンツ方程式パラメータ
         "Task_Lorenz_Gamma" : 28,                           #ローレンツ方程式パラメータ
@@ -193,24 +201,27 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Task_Lorenz_Tau" : 5,                              #どれくらい先を予測するか
         "Task_Lorenz_InitTerm" : 1000,                     #初期状態排除期間
 
+        #------------------------------------------------------------------------------------------
         "Task_LogisticEquation_A" : 4,
         "Task_LogisticEquation_Tau" : 1,
 
+        #------------------------------------------------------------------------------------------
         "Task_Lorenz96_Scale" : 1/50,
         "Task_Lorenz96_Dt" : 0.01,
         "Task_Lorenz96_Tau" : 5,
         "Task_Lorenz96_InitTerm" : 1000,
-
         "Task_Lorenz96_N" : 10,
         "Task_Lorenz96_F" : 8,
+
+        #------------------------------------------------------------------------------------------
+        
+        
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Model_EMChialvo_D_u" : 1,                          #入力信号次元
         "Model_EMChialvo_D_x" : 100,                        #ニューロン数
         "Model_EMChialvo_D_y" : 1,                          #出力信号次元
 
-        "Model_EMChialvo_Ring" : False,                     #結合の形態を指定するか（値は乱数）
-        "Model_EMChialvo_Star" : False,                     #結合の形態を指定するか（値は乱数）
-        
+        "Model_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
         "Model_EMChialvo_InputScale" : 0.1,                 #入力スケーリング
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -224,13 +235,13 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
         "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
-        "Model_EMChialvo_k" : 3.5,                         #変数:k
+        "Model_EMChialvo_k" : -3.2,                         #変数:k
         
-        "Model_EMChialvo_Rho" : 1,                      #スペクトル半径
+        "Model_EMChialvo_Rho" : 0.001,                      #スペクトル半径
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # "Module_Reservoir" に直接渡す
-        "EMChialvo_Reservoir_Density" : 1,                          #結合密度
+        "EMChialvo_Reservoir_Density" : 0.5,                          #結合密度
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "LinerTransformer_Beta" : 0.2,                      #正規化係数
@@ -240,23 +251,25 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
     if Param["Project_F_NRMSE"]:
         param = Param.copy()
         param.update({
-            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #==========================================================================================
             "NRMSE_F_OutputLog" : True,                         #経過の出力を行うか
+
             "NRMSE_D_u" : 1,                                    #入力信号次元
-            "NRMSE_D_x" : 100,
+            "NRMSE_D_x" : 100,                                  #リザバー層次元
             "NRMSE_D_y" : 1,                                    #出力信号次元
+
+            #------------------------------------------------------------------------------------------
             "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
             "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
 
-            "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
-
-            "NRMSE_T_Task" : Task_EM.Task_Zeros,                                #評価用タスク（Type型）
+            #------------------------------------------------------------------------------------------
+            "NRMSE_T_Task" : Task_EM.Task_SinCurve,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/Project_EMChialvo_NRMSE_MC_2025_01_28_14_17/NRMSE",
+            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/EMChialvo/NRMSE",
         
             "NRMSE_F_OutputCharts" : True,                      #図の出力フラグ
             "NRMSE_F_OutputCharts_UYYdEWaves" : True,           #入出力＆誤差波形図の出力フラグ
@@ -268,7 +281,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
     if Param["Project_F_MemoryCapacity"]:
         param = Param.copy()
         param.update({
-            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #==========================================================================================
             "MemoryCapacity_F_OutputLog" : True,                #経過の出力を行うか
             "MemoryCapacity_D_u" : 1,                           #入力信号次元
             "MemoryCapacity_D_y" : 1,                           #出力信号次元
@@ -281,12 +294,46 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
             "MemoryCapacity_T_Output" : Output_EM.Output_Single_MC_2023_05_25_13_28,       #作図出力（Type型）
         
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/Project_EMChialvo_NRMSE_MC_2025_01_28_14_17/MC",
+            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/EMChialvo/MC",
         
             "MemoryCapacity_F_OutputCharts" : True,             #図の出力フラグ
             "MemoryCapacity_F_OutputCharts_MCGraph" : True,     #MC曲線の出力フラグ
 
             })
         Evaluation_EM.Evaluation_MC(param)()
+
+    #MLE評価
+    if Param["Project_F_MLE"]:
+        param = Param.copy()
+        param.update({
+            #==========================================================================================
+            "Project_F_UsePytorch" : False,
+            "Project_DeviceCode" : False,
+            "Project_DataType" : False,
+            
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            "MLE_F_OutputLog" : True,                        #経過の出力を行うか
+
+            "MLE_D_u" : 1,                                   #入力信号次元
+            "MLE_D_x" : 100,                                 #リザバー層次元
+            "MLE_D_y" : 1,                                   #出力信号次元
+            "MLE_Length_Burnin" : 1000,                      #空走用データ時間長
+            "MLE_Length_Test" : 5000,                        #評価用データ時間長
+
+            "MLE_Epsilon" : 1e-06,                            #摂動の大きさ
+
+            "MLE_T_Task" : Task_EM.Task_SinCurve,
+            "MLE_T_Model" : Model_EM.Model_EMChialvo,
+            "MLE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,
+
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            "DirPath_Project" : "./EMChialvo_Reservoir/Results_EM/Project_EMChialvo_2025_02_14_16_21/MLE",
+        
+            "MemoryCapacity_F_OutputCharts" : True,             #図の出力フラグ
+            "MemoryCapacity_F_OutputCharts_MCGraph" : True,     #MC曲線の出力フラグ
+        })
+        Evaluation_Lyapunov.Evaluation_MLE(param)()
+
+
 
 #********************************************************************
