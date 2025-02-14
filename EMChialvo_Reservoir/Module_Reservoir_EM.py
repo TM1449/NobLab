@@ -214,7 +214,7 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         self.y = self.a * self.y_old - self.b * self.x_old + self.c
         self.phi = self.k1 * self.x_old - self.k2 * self.phi_old
 
-        return self.x
+        return self.x, self.y, self.phi
 
     #時間発展
     def update(self):

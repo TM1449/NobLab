@@ -215,15 +215,11 @@ class Model_EMChialvo(Model):
 
     #順伝播（リザバーのみ）
     def forwardReservoir(self, u: np.ndarray) -> np.ndarray:
-        s = self.EMChialvo_Reservoir.forward(u)
-        z = np.concatenate([s, u])
+        xr, yr, phir = self.EMChialvo_Reservoir.forward(u)
+        z = np.concatenate([xr, u])
         self.EMChialvo_Reservoir.update()
 
-        #リザバー層のランダムなニューロンを抜粋
-        Random_Neuron = random.sample(range(len(s)), self.RS_neuron)
-        RS_N = s[Random_Neuron]
-
-        return z , s[10:self.RS_neuron + 10]
+        return z, xr[0:self.RS_neuron], yr[0:self.RS_neuron], phir[0:self.RS_neuron]
     
     #順伝播（リードアウトのみ）
     def forwardReadout(self, z: np.ndarray) -> np.ndarray:
@@ -231,21 +227,21 @@ class Model_EMChialvo(Model):
     
     #順伝播
     def forward(self, u: np.ndarray) -> np.ndarray: 
-        s = self.EMChialvo_Reservoir.forward(u)
-        z = np.concatenate([s, u])
+        xr, yr, phir = self.EMChialvo_Reservoir.forward(u)
+        z = np.concatenate([xr, u])
         y = self.Readout_LinerTransformer.forward(z)
         self.EMChialvo_Reservoir.update()
         return y
     
     #順伝播（エラー出力付き）
     def forwardWithRMSE(self, u: np.ndarray, y_d: np.ndarray) -> tuple: 
-        s = self.EMChialvo_Reservoir.forward(u)
-        z = np.concatenate([s, u])
+        xr, yr, phir = self.EMChialvo_Reservoir.forward(u)
+        z = np.concatenate([xr, u])
         y = self.Readout_LinerTransformer.forward(z)
         e = self.Readout_LinerTransformer.RMSE(z, y_d)
         self.EMChialvo_Reservoir.update()
 
-        return y, e, s[10:self.RS_neuron + 10], s[:]
+        return y, e, xr, xr[0:self.RS_neuron], yr[0:self.RS_neuron], phir[0:self.RS_neuron]
     
     #学習
     def fit(self, Z: np.ndarray, Y_d: np.ndarray):

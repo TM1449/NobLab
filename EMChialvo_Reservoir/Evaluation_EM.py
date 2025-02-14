@@ -112,14 +112,19 @@ class Evaluation_NRMSE(Evaluation):
         if self.F_OutputLog : print("+++ Collecting Echo +++")
         
         #バッチ
-        T = list(range(self.Length_Total))
-        U = [None for _ in range(self.Length_Total)]
-        Z = [None for _ in range(self.Length_Total)]
-        Y = [None for _ in range(self.Length_Total)]
-        Y_d = [None for _ in range(self.Length_Total)]
-        E = [None for _ in range(self.Length_Total)]
-        RS = np.array([None for _ in range(self.Length_Total * self.RS_neuron)]).reshape(-1,self.Length_Total)
-        RS_HeatMap = np.array([None for _ in range(self.Length_Total * self.D_x)]).reshape(-1,self.Length_Total)
+        T = list(range(self.Length_Total))                      #全体時間
+        U = [None for _ in range(self.Length_Total)]            #入力信号
+        Z = [None for _ in range(self.Length_Total)]            #リザバー層からの信号
+        Y = [None for _ in range(self.Length_Total)]            #出力層の信号
+        Y_d = [None for _ in range(self.Length_Total)]          #教師信号（のはず？）
+        E = [None for _ in range(self.Length_Total)]            #誤差
+
+
+        RS_X = np.array([None for _ in range(self.Length_Total * self.RS_neuron)]).reshape(-1,self.Length_Total)      #リザバー層のX
+        RS_Y = np.array([None for _ in range(self.Length_Total * self.RS_neuron)]).reshape(-1,self.Length_Total)      #リザバー層のY
+        RS_Phi = np.array([None for _ in range(self.Length_Total * self.RS_neuron)]).reshape(-1,self.Length_Total)      #リザバー層のPhi
+
+        RS_HeatMap = np.array([None for _ in range(self.Length_Total * self.D_x)]).reshape(-1,self.Length_Total)    #リザバー層のXのヒートマップ
 
         #モデルリセット
         self.Model.reset()
@@ -140,7 +145,7 @@ class Evaluation_NRMSE(Evaluation):
         for i, t in enumerate(T[self.Length_Burnin : self.Length_Burnin + self.Length_Train]):
             if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Train), end = "")
             U[t], Y_d[t] = self.Task.getData(t)
-            Z[t], RS[:, t] = self.Model.forwardReservoir(U[t])
+            Z[t], RS_X[:, t], RS_Y[:, t], RS_Phi[:, t] = self.Model.forwardReservoir(U[t])
         if self.F_OutputLog : print("\n", end = "")
     
         #学習
@@ -167,7 +172,7 @@ class Evaluation_NRMSE(Evaluation):
         for i, t in enumerate(T[self.Length_Burnin + self.Length_Train : self.Length_Burnin + self.Length_Train + self.Length_Test]):
             if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Test), end = "")
             U[t], Y_d[t] = self.Task.getData(t)
-            Y[t], E[t], RS[:, t], RS_HeatMap[:, t] = self.Model.forwardWithRMSE(U[t], Y_d[t])
+            Y[t], E[t], RS_HeatMap[:, t], RS_X[:, t], RS_Y[:, t], RS_Phi[:, t] = self.Model.forwardWithRMSE(U[t], Y_d[t])
         if self.F_OutputLog : print("\n", end = "")
         
         #評価時間計測終了(オーバーフローしてた場合はNaN)
@@ -199,7 +204,7 @@ class Evaluation_NRMSE(Evaluation):
             "NRMSE_R_Y" : Y,
             "NRMSE_R_Y_d" : Y_d,
             "NRMSE_R_E" : E,
-            "Reservoir_Move" : RS,
+            "Reservoir_Move" : RS_X,
             "Reservoir_HeatMap" : RS_HeatMap,
             })
         
