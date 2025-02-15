@@ -219,7 +219,7 @@ class Model_EMChialvo(Model):
         z = np.concatenate([xr, u])
         self.EMChialvo_Reservoir.update()
 
-        return z, xr[0:self.RS_neuron], yr[0:self.RS_neuron], phir[0:self.RS_neuron]
+        return z, xr[0:self.RS_neuron], yr[0:self.RS_neuron], phir[0:self.RS_neuron], xr, yr, phir
     
     #順伝播（リードアウトのみ）
     def forwardReadout(self, z: np.ndarray) -> np.ndarray:
@@ -241,7 +241,7 @@ class Model_EMChialvo(Model):
         e = self.Readout_LinerTransformer.RMSE(z, y_d)
         self.EMChialvo_Reservoir.update()
 
-        return y, e, xr, xr[0:self.RS_neuron], yr[0:self.RS_neuron], phir[0:self.RS_neuron]
+        return y, e, xr, xr[0:self.RS_neuron], yr[0:self.RS_neuron], phir[0:self.RS_neuron], xr, yr, phir
     
     #学習
     def fit(self, Z: np.ndarray, Y_d: np.ndarray):

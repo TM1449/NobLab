@@ -61,14 +61,14 @@ def Project_GridSearch_EMChialvo_NRMSE():
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "GridSearch_MachineName" : "EMChialvo",                            #計算機名
         "GridSearch_StartPoint" : 0,                                #担当開始ポイントインデックス
-        "GridSearch_EndPoint" : 2296,                                #担当終了ポイントインデックス(MAX:4410(21*21*10))
+        "GridSearch_EndPoint" : 11480,                                #担当終了ポイントインデックス(MAX:4410(21*21*10)) new:1148
         
         "GridSearch_MultiThread" : 12,                               #スレッド数（0で逐次処理）初期値:2, 自宅PC:4, 研究室PC, 12
         "GridSearch_MaxNumberInOneFile" : 100,                        #１ファイルの最大のポイント数 初期値:5
         "GridSearch_MaxNumberInOnePool" : 1000,                       #１プール（並列する）最大のポイント数（この分メモリを消費） 初期値:50
-        "GridSearch_NumberOfSamples" : 2,                           #サンプル数
+        "GridSearch_NumberOfSamples" : 10,                           #サンプル数
         "GridSearch_ProjectName" : "NRMSE_EMChialvo",                    #プロジェクト名
-        "GridSearch_ProjectDate" : "2025_02_12_15_09",              #プロジェクト日時
+        "GridSearch_ProjectDate" : "2025_02_15_23_25",              #プロジェクト日時
         "GridSearch_T_Process" : Process_SishuESN_GridSearch,     #GS処理指定
         "GridSearch_T_Output" : OutputLog_SishuESN_2024_06_01_10_30             #GS出力処理指定
         })()
@@ -148,51 +148,56 @@ class Process_SishuESN_GridSearch:
         #共通パラメータ
         Param = {
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "Task_SinCurve_RK_h" : 0.01,                        #ルンゲクッタ法刻み幅
-        
-            "Task_MC_Tau" : 5,                                  #遅延量，MCのτ
-
-            "Task_Parity_Tau" : 5,                              #遅延量
-            "Task_Parity_MinTerm" : 100,                         #同じ状態を維持する最小期間
-            "Task_Parity_MaxTerm" : 200,                        #同じ状態を維持する最大期間
-        
+            "Task_SinCurve_RK_h" : 0.01,                         #ルンゲクッタ法刻み幅
+            
+            "Task_MC_Tau" : 10,                                  #遅延量，MCのτ
+            
+            #------------------------------------------------------------------------------------------
             "Task_Rosslor_Scale" : 1 / 30,                      #信号のスケール
             "Task_Rosslor_Mu" : 5.7,                            #レスラー方程式パラメータ
-            "Task_Rosslor_Dt" : 0.01,                           #時間スケール
+            "Task_Rosslor_Dt" : 0.02,                           #時間スケール
             "Task_Rosslor_A" : 0.005,                            #ギャップジャンクションパラメータ
             "Task_Rosslor_Tau" : 5,                             #どれくらい先を予測するか
             "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
-        
+
+            #------------------------------------------------------------------------------------------
             "Task_Lorenz_Scale" : 1 / 50,                       #信号のスケール
             "Task_Lorenz_Sigma" : 10,                           #ローレンツ方程式パラメータ
             "Task_Lorenz_Gamma" : 28,                           #ローレンツ方程式パラメータ
             "Task_Lorenz_Const_B" : 8 / 3,                      #ローレンツ方程式パラメータ
             "Task_Lorenz_Dt" : 0.01,                            #時間スケール
-            "Task_Lorenz_A" : 0.001,                             #ギャップジャンクションパラメータ
-            "Task_Lorenz_Tau" : 5,                              #どれくらい先を予測するか
+            "Task_Lorenz_A" : 0.001,                            #ギャップジャンクションパラメータ
+            "Task_Lorenz_Tau" : 10,                              #どれくらい先を予測するか
             "Task_Lorenz_InitTerm" : 1000,                     #初期状態排除期間
-        
+
+            #------------------------------------------------------------------------------------------
             "Task_LogisticEquation_A" : 4,
             "Task_LogisticEquation_Tau" : 1,
 
+            #------------------------------------------------------------------------------------------
             "Task_Lorenz96_Scale" : 1/50,
             "Task_Lorenz96_Dt" : 0.01,
             "Task_Lorenz96_Tau" : 5,
             "Task_Lorenz96_InitTerm" : 1000,
-
             "Task_Lorenz96_N" : 10,
             "Task_Lorenz96_F" : 8,
+
+            #------------------------------------------------------------------------------------------
+            "Task_MackeyGlass_Scale" : 1/ 50,
+            "Task_Predict_Tau" : 1, 
+            "Task_MackeyGlass_Tau": 0,
+            "Task_MackeyGlass_InitTerm": 1000,
+            
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "Model_EMChialvo_D_u" : 1,                          #入力信号次元
             "Model_EMChialvo_D_x" : 100,                        #ニューロン数
             "Model_EMChialvo_D_y" : 1,                          #出力信号次元
 
-            "Model_EMChialvo_Ring" : False,                     #結合の形態を指定するか（値は乱数）
-            "Model_EMChialvo_Star" : False,                     #結合の形態を指定するか（値は乱数）
-            
             "Model_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
             "Model_EMChialvo_InputScale" : 0.1,                 #入力スケーリング
             
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "Model_EMChialvo_a" : 0.89,                         #変数:a
             "Model_EMChialvo_b" : 0.6,                          #変数:b
             "Model_EMChialvo_c" : 0.28,                         #変数:c
@@ -204,8 +209,9 @@ class Process_SishuESN_GridSearch:
             "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
             "Model_EMChialvo_k" : Param_k,                         #変数:k
-            "Model_EMChialvo_Rho" : Param_Rho,
-        
+            
+            "Model_EMChialvo_Rho" : Param_Rho,                      #スペクトル半径
+
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             # "Module_Reservoir" に直接渡す
             "EMChialvo_Reservoir_Density" : 1,                          #結合密度
@@ -221,16 +227,15 @@ class Process_SishuESN_GridSearch:
             param.update({
                 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 "NRMSE_F_OutputLog" : False,                        #経過の出力を行うか
+
                 "NRMSE_D_u" : 1,                            #入力信号次元
                 "NRMSE_D_x" : 100,
                 "NRMSE_D_y" : 1,                            #出力信号次元
 
-                "NRMSE_Reservoir_Neurons" : 10,                     #描写するリザバー層のニューロン数
-
                 "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
                 "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
                 "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-                "NRMSE_T_Task" : Task_EM.Task_NDLorenz,                                #評価用タスク（Type型）
+                "NRMSE_T_Task" : Task_EM.Task_MackeyGlass,                                #評価用タスク（Type型）
                 "NRMSE_T_Model" : Param_Model,                                      #モデル（Type型）
                 "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         

@@ -124,6 +124,10 @@ class Evaluation_NRMSE(Evaluation):
         RS_Y = np.array([None for _ in range(self.Length_Total * self.RS_neuron)]).reshape(-1,self.Length_Total)      #リザバー層のY
         RS_Phi = np.array([None for _ in range(self.Length_Total * self.RS_neuron)]).reshape(-1,self.Length_Total)      #リザバー層のPhi
 
+        RS_X_A = np.array([None for _ in range(self.Length_Total * self.D_x)]).reshape(-1,self.Length_Total)      #リザバー層のX
+        RS_Y_A = np.array([None for _ in range(self.Length_Total * self.D_x)]).reshape(-1,self.Length_Total)      #リザバー層のY
+        RS_Phi_A = np.array([None for _ in range(self.Length_Total * self.D_x)]).reshape(-1,self.Length_Total)      #リザバー層のPhi
+
         RS_HeatMap = np.array([None for _ in range(self.Length_Total * self.D_x)]).reshape(-1,self.Length_Total)    #リザバー層のXのヒートマップ
 
         #モデルリセット
@@ -145,7 +149,7 @@ class Evaluation_NRMSE(Evaluation):
         for i, t in enumerate(T[self.Length_Burnin : self.Length_Burnin + self.Length_Train]):
             if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Train), end = "")
             U[t], Y_d[t] = self.Task.getData(t)
-            Z[t], RS_X[:, t], RS_Y[:, t], RS_Phi[:, t] = self.Model.forwardReservoir(U[t])
+            Z[t], RS_X[:, t], RS_Y[:, t], RS_Phi[:, t], RS_X_A[:, t], RS_Y_A[:, t], RS_Phi_A[:, t] = self.Model.forwardReservoir(U[t])
         if self.F_OutputLog : print("\n", end = "")
     
         #学習
@@ -172,7 +176,7 @@ class Evaluation_NRMSE(Evaluation):
         for i, t in enumerate(T[self.Length_Burnin + self.Length_Train : self.Length_Burnin + self.Length_Train + self.Length_Test]):
             if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Test), end = "")
             U[t], Y_d[t] = self.Task.getData(t)
-            Y[t], E[t], RS_HeatMap[:, t], RS_X[:, t], RS_Y[:, t], RS_Phi[:, t] = self.Model.forwardWithRMSE(U[t], Y_d[t])
+            Y[t], E[t], RS_HeatMap[:, t], RS_X[:, t], RS_Y[:, t], RS_Phi[:, t], RS_X_A[:, t], RS_Y_A[:, t], RS_Phi_A[:, t] = self.Model.forwardWithRMSE(U[t], Y_d[t])
         if self.F_OutputLog : print("\n", end = "")
         
         #評価時間計測終了(オーバーフローしてた場合はNaN)
@@ -204,7 +208,15 @@ class Evaluation_NRMSE(Evaluation):
             "NRMSE_R_Y" : Y,
             "NRMSE_R_Y_d" : Y_d,
             "NRMSE_R_E" : E,
-            "Reservoir_Move" : RS_X,
+
+            "Reservoir_X" : RS_X,
+            "Reservoir_Y" : RS_Y,
+            "Reservoir_Phi" : RS_Phi,
+            
+            "Reservoir_X_All" : RS_X_A,
+            "Reservoir_Y_All" : RS_Y_A,
+            "Reservoir_Phi_All" : RS_Phi_A,
+
             "Reservoir_HeatMap" : RS_HeatMap,
             })
         

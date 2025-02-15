@@ -66,7 +66,8 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
         self.Length_Burnin = self.Param["NRMSE_Length_Burnin"]      #空走用データ時間長
         self.Length_Train = self.Param["NRMSE_Length_Train"]        #学習用データ時間長
         self.Length_Test = self.Param["NRMSE_Length_Test"]          #評価用データ時間長
-        self.Length_Total = self.Length_Burnin + self.Length_Train + self.Length_Test#全体データ時間長
+        self.Length_Total = self.Length_Burnin + self.Length_Train + self.Length_Test #全体データ時間長
+        self.N = self.Param["NRMSE_D_x"]
         self.RS_neuron = self.Param["Model_Reservoir_Neurons"]  #リザバー層のニューロン数
 
         #フォルダ構造
@@ -114,7 +115,15 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 Y = np.array(result_param["NRMSE_R_Y"][start : end])
                 Y_d = np.array(result_param["NRMSE_R_Y_d"][start : end])
                 E = np.array(result_param["NRMSE_R_E"][start : end])
-                RS = np.array(result_param["Reservoir_Move"][:,start : end])
+
+                RS_X = np.array(result_param["Reservoir_X"][:,start : end])
+                RS_Y = np.array(result_param["Reservoir_Y"][:,start : end])
+                RS_Phi = np.array(result_param["Reservoir_Phi"][:,start : end])
+                
+                RS_X_A = np.array(result_param["Reservoir_X_All"][:,start : end])
+                RS_Y_A = np.array(result_param["Reservoir_Y_All"][:,start : end])
+                RS_Phi_A = np.array(result_param["Reservoir_Phi_All"][:,start : end])
+                
                 RS_HeatMap = np.array(result_param["Reservoir_HeatMap"][:,start : end])
 
                 #各種波形
@@ -130,6 +139,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.plot(T, Y_d, "orange", label = "y_d", lw = LineWidth)
                 ax.legend()
                 fig.savefig(self.Plt_Charts_UYYdWaves.Path + FileFormat)
+                plt.close()
 
                 #誤差波形
                 Title = "ErrorWaves" + self.AxisTag     #図題
@@ -142,6 +152,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.plot(T, E, "skyblue", label = "RMSE", lw = LineWidth)
                 ax.legend()
                 fig.savefig(self.Plt_Charts_ErrorWaves.Path + FileFormat)
+                plt.close()
 
                 #リザバー層内の状態
                 Title =  None
@@ -154,10 +165,49 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.grid(True)
                 cmap = plt.get_cmap("tab10")
                 for i in range(self.RS_neuron):
-                    ax.plot(T, RS[i,:], color = cmap(i), label = r'$x_{R}$', lw = LineWidth)
+                    ax.plot(T, RS_X[i,:], color = cmap(i), label = r'$x_{R}$', lw = LineWidth)
                 ax.legend()
                 plt.tight_layout()
-                fig.savefig(self.Plt_Charts_MOVEWaves.Path + FileFormat)
+                fig.savefig(self.Plt_Charts_Reservoir_X.Path + FileFormat)
+                plt.close()
+
+                #リザバー層のX, Y, Phiの状態
+                Title =  "3D Chialvo" + self.AxisTag
+                fig = plt.figure(figsize = FigSize)
+                ax = fig.add_subplot(1,1,1, projection = '3d')
+                plt.tick_params(labelsize=18)
+                ax.set_title(Title, fontsize = FontSize_Title)
+                ax.set_xlabel("X", fontsize = FontSize_Label * 0.6)
+                ax.set_ylabel("Y", fontsize = FontSize_Label * 0.6)
+                ax.set_zlabel("Phi", fontsize = FontSize_Label * 0.6)
+                for i in range(self.N):
+                    ax.plot(RS_X_A[i, :], RS_Y_A[i, :], RS_Phi_A[i, :],'-', lw=LineWidth)
+                ax.view_init(azim=150)
+                ax.grid(True)
+                ax.legend()
+                plt.tight_layout()
+                fig.savefig(self.Plt_Charts_Reservoir_3D.Path + FileFormat)
+                plt.close()
+
+
+                #Chialvo_X, ニューロン数, 時間軸を3Dに描写した
+                Title =  "Chialvo X" + self.AxisTag
+                fig = plt.figure(figsize = FigSize)
+                ax = fig.add_subplot(1,1,1, projection = '3d')
+                plt.tick_params(labelsize=15)
+                ax.set_title(Title, fontsize = FontSize_Title)
+                ax.set_xlabel("Neuron", fontsize = FontSize_Label * 0.5)
+                ax.set_ylabel("Time Steps", fontsize = FontSize_Label * 0.6)
+                ax.set_zlabel("X", fontsize = FontSize_Label * 0.6)
+                for i in range(0, self.N, 5):
+                    x_vals = np.full_like(T, i)  # ニューロンのインデックスを T と同じサイズの配列に
+                    ax.plot(x_vals, T, RS_X_A[i, :],'-', lw=LineWidth)
+                ax.view_init(azim=150)
+                ax.grid(True)
+                ax.legend()
+                plt.tight_layout()
+                fig.savefig(self.Plt_Charts_Reservoir_3DTime.Path + FileFormat)
+                plt.show()
 
                 #リザバー層のヒートマップ
                 Title = None
@@ -173,7 +223,6 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.legend()
                 plt.tight_layout()
                 fig.savefig(self.Plt_Charts_ReservoirHeatMap.Path + FileFormat)
-
                 plt.close()
     
     #以下ファイルとフォルダ単位のセーブとロード        
@@ -207,8 +256,10 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
         self.CSV_Charts_Param = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_dict("ResultAndParam"))
         self.Plt_Charts_UYYdWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("UYYdWaves"))
         self.Plt_Charts_ErrorWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("ErrorWaves"))
-        self.Plt_Charts_MOVEWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("MOVEWaves"))
-        self.Plt_Charts_ReservoirHeatMap = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("ReservoirHeatMap"))
+        self.Plt_Charts_Reservoir_X = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("Reservoir_X"))
+        self.Plt_Charts_ReservoirHeatMap = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("Reservoir_HeatMap"))
+        self.Plt_Charts_Reservoir_3D = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("Reservoir_3D"))
+        self.Plt_Charts_Reservoir_3DTime = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("Reservoir_X_3D"))
         
 #--------------------------------------------------------------------
 class Output_Single_MC_2023_05_25_13_28(Output):

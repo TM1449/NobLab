@@ -18,7 +18,7 @@ maru
 
 #====================================================================
 import numpy as np
-from scipy.integrate import odeint
+import signalz
 
 #====================================================================
 #タスク
@@ -460,51 +460,64 @@ class Task_MackeyGlass(Task):
     def __init__(self, param: dict, evaluation: any):
         super().__init__(param, evaluation)
 
-        #パラメータ取得
         self.Scale = param["Task_MackeyGlass_Scale"]                 #信号のスケール
-        self.Dt = param["Task_MackeyGlass_Dt"]                       #時間スケール
+        
+        self.PredictTau = param["Task_Predict_Tau"]                     #どれくらい先を予測するか
+        self.MackeyTau = param["Task_MackeyGlass_Tau"]                     #どれくらい先を予測するか
         self.InitTerm = param["Task_MackeyGlass_InitTerm"]          #初期状態排除期間
-        self.Tau = param["Task_MackeyGlass_Tau"]             
-
-        self.MackeyBeta = param["Task_MackeyGlass_Beta"]
-        self.MackeyGamma = param["Task_MackeyGlass_Gamma"]
-        self.MackeyN = param["Task_MackeyGlass_N"]
-        self.MackeyTau = param["Task_MackeyGlass_Tau"]
 
         self.makeData()
     
     #時刻tの入出力データ取得
     def getData(self, t: int) -> tuple:
-        return self.X[t], self.X[t + self.Tau]
+        return self.X[t], self.X[t + self.PredictTau]
     
-    def MackeyGlass(self, x, x_tau):
-        dx = (self.MackeyBeta * x_tau) /(1 + pow(x_tau, 2)) - self.MackeyGamma * x
-
-        return x + (dx * self.Dt)
-
     #データ生成
     def makeData(self):
+
         # 乱数シードの設定
         np.random.seed(seed=999)
-        self.X = np.zeros((self.Length + self.Tau, self.D_u))
+        
+        N = self.InitTerm + self.Length + self.PredictTau
+        self.XmI = signalz.mackey_glass(N, 0.2, 0.8, 0.9, 23, 10, 0.1)
+        self.Xm = np.delete(self.XmI, np.s_[:self.InitTerm])
+        self.X = np.expand_dims(self.Xm, 1)
 
-        # 遅延項のためのバッファを初期化
-        buffer_size = int(self.MackeyTau / self.Dt) + 1
-        history = np.zeros(buffer_size)
-        history[0] = 1.2  # 初期値
 
-        for i in range(self.Length + self.Tau + self.InitTerm):
-            t_idx = i % buffer_size
-            t_tau_idx = (i - int(self.MackeyTau / self.Dt)) % buffer_size
+class Task_MackeyGlass_DDE(Task):
+    """
+    DDEマッキー・グラス方程式
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, evaluation: any):
+        super().__init__(param, evaluation)
 
-            # 遅延項が初期化期間内の場合はゼロとして扱う
-            x_t_tau = history[t_tau_idx] if i >= self.MackeyTau / self.Dt else 0.0
-            x_t = history[t_idx]
+        self.Scale = param["Task_MackeyGlassDDE_Scale"]                 #信号のスケール
+        self.Dt = param["Task_MackeyGlassDDE_Dt"]                       #時間スケール
+        self.PredictTau = param["Task_PredictDDE_Tau"]                     #どれくらい先を予測するか
 
-            # マッキー・グラス方程式で次の値を計算
-            next_value = self.MackeyGlass(x_t, x_t_tau)
-            history[(i + 1) % buffer_size] = next_value
+        self.MackeyA = param["Task_MackeyGlassDDE_A"]                      #γの役割
+        self.MackeyB = param["Task_MackeyGlassDDE_B"]                      #βの役割
+        self.MackeyN = param["Task_MackeyGlassDDE_N"]                      #乗数
+        self.MackeyTau = param["Task_MackeyGlassDDE_Tau"]                     #どれくらい先を予測するか
+        self.InitTerm = param["Task_MackeyGlassDDE_InitTerm"]          #初期状態排除期間
 
-            # 初期期間を過ぎたらデータを保存
-            if i >= self.InitTerm:
-                self.X[i - self.InitTerm] = next_value * self.Scale
+        self.makeData()
+    
+    #時刻tの入出力データ取得
+    def getData(self, t: int) -> tuple:
+        return self.Y[t], self.Y[t + self.PredictTau]
+    
+    #データ生成
+    def makeData(self):
+
+        np.random.seed(seed=999)
+        self.X = np.zeros([self.MackeyTau + self.Length + self.PredictTau, self.D_u])
+        self.Y = np.zeros([self.Length + self.PredictTau, self.D_u])
+        self.X[0] = np.random.rand(1) 
+        
+        for t in range(self.MackeyTau, self.InitTerm + self.Length + self.PredictTau - 1):
+            if self.InitTerm <= t:
+                self.Y[t - self.InitTerm] = self.X[t] * self.Scale
+
+            self.X[t + 1] = ((self.MackeyB * self.X[t - self.MackeyTau]) / (1 + pow(self.X[t - self.MackeyTau], self.MackeyN)) - self.MackeyA * self.X[t]) * self.Dt + self.X[t]

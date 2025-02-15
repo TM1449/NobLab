@@ -184,14 +184,16 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Task_MC_Tau" : 10,                                  #遅延量，MCのτ
         
         #------------------------------------------------------------------------------------------
+        #レスラー方程式のパラメータ
         "Task_Rosslor_Scale" : 1 / 30,                      #信号のスケール
         "Task_Rosslor_Mu" : 5.7,                            #レスラー方程式パラメータ
-        "Task_Rosslor_Dt" : 0.02,                           #時間スケール
-        "Task_Rosslor_A" : 0.005,                            #ギャップジャンクションパラメータ
+        "Task_Rosslor_Dt" : 0.01,                           #時間スケール
+        "Task_Rosslor_A" : 0.005,                           #ギャップジャンクションパラメータ
         "Task_Rosslor_Tau" : 5,                             #どれくらい先を予測するか
         "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
 
         #------------------------------------------------------------------------------------------
+        #ローレンツ方程式のパラメータ
         "Task_Lorenz_Scale" : 1 / 50,                       #信号のスケール
         "Task_Lorenz_Sigma" : 10,                           #ローレンツ方程式パラメータ
         "Task_Lorenz_Gamma" : 28,                           #ローレンツ方程式パラメータ
@@ -199,23 +201,42 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Task_Lorenz_Dt" : 0.01,                            #時間スケール
         "Task_Lorenz_A" : 0.001,                            #ギャップジャンクションパラメータ
         "Task_Lorenz_Tau" : 5,                              #どれくらい先を予測するか
-        "Task_Lorenz_InitTerm" : 1000,                     #初期状態排除期間
+        "Task_Lorenz_InitTerm" : 1000,                      #初期状態排除期間
 
         #------------------------------------------------------------------------------------------
-        "Task_LogisticEquation_A" : 4,
-        "Task_LogisticEquation_Tau" : 1,
+        #ロジスティック写像のパラメータ
+        "Task_LogisticEquation_A" : 4,                      #ロジスティック写像（離散）の大きさ
+        "Task_LogisticEquation_Tau" : 1,                    #どれくらい先を予測するか
 
         #------------------------------------------------------------------------------------------
-        "Task_Lorenz96_Scale" : 1/50,
-        "Task_Lorenz96_Dt" : 0.01,
-        "Task_Lorenz96_Tau" : 5,
-        "Task_Lorenz96_InitTerm" : 1000,
-        "Task_Lorenz96_N" : 10,
-        "Task_Lorenz96_F" : 8,
+        #ローレンツ方程式96のパラメータ
+        "Task_Lorenz96_Scale" : 1/50,                       #ローレンツ方程式96の大きさ
+        "Task_Lorenz96_Dt" : 0.01,                          #時間刻み幅
+        "Task_Lorenz96_Tau" : 5,                            #どれくらい先を予測するか
+        "Task_Lorenz96_InitTerm" : 1000,                    #初期状態排除期間
+        "Task_Lorenz96_N" : 10,                             #ニューロン数
+        "Task_Lorenz96_F" : 8,                              #大きさ？
 
         #------------------------------------------------------------------------------------------
+        #離散時間のマッキー・グラス方程式のパラメータ
+        "Task_MackeyGlass_Scale" : 1/ 50,                   #信号のスケール
+        "Task_Predict_Tau" : 2,                             #どれくらい先を予測するか
+        "Task_MackeyGlass_Tau": 0,                          #マッキー・グラスの遅延量
+        "Task_MackeyGlass_InitTerm": 1000,                  #初期状態排除期間
+
+        #------------------------------------------------------------------------------------------
+        #連続時間のマッキー・グラス方程式のパラメータ
+        "Task_PredictDDE_Tau" : 5,                          #どれくらい先を予測するか
         
+        "Task_MackeyGlassDDE_Scale" : 1/50,                 #信号のスケール
+        "Task_MackeyGlassDDE_Dt" : 0.01,                    #時間刻み幅
+        "Task_MackeyGlassDDE_A" : -2,                       #γ（？）:0.1
+        "Task_MackeyGlassDDE_B" : 3.54,                     #β（？）:0.2
+        "Task_MackeyGlassDDE_N" : 10,                       #乗数: 10
+        "Task_MackeyGlassDDE_Tau" : 1,                      #マッキー・グラスの遅延量 :17
+        "Task_MackeyGlassDDE_InitTerm" : 1000,              #初期状態排除期間
         
+        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Model_EMChialvo_D_u" : 1,                          #入力信号次元
         "Model_EMChialvo_D_x" : 100,                        #ニューロン数
@@ -235,13 +256,13 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
         "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
-        "Model_EMChialvo_k" : -3.2,                         #変数:k
+        "Model_EMChialvo_k" : -3.5,                         #変数:k
         
         "Model_EMChialvo_Rho" : 0.001,                      #スペクトル半径
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         # "Module_Reservoir" に直接渡す
-        "EMChialvo_Reservoir_Density" : 0.5,                          #結合密度
+        "EMChialvo_Reservoir_Density" : 1,                          #結合密度
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "LinerTransformer_Beta" : 0.2,                      #正規化係数
@@ -264,7 +285,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
 
             #------------------------------------------------------------------------------------------
-            "NRMSE_T_Task" : Task_EM.Task_SinCurve,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_MackeyGlass,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
