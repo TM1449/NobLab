@@ -199,7 +199,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.set_xlabel("Neuron", fontsize = FontSize_Label * 0.5)
                 ax.set_ylabel("Time Steps", fontsize = FontSize_Label * 0.6)
                 ax.set_zlabel("X", fontsize = FontSize_Label * 0.6)
-                for i in range(0, self.N, 5):
+                for i in range(0, self.N, 10):
                     x_vals = np.full_like(T, i)  # ニューロンのインデックスを T と同じサイズの配列に
                     ax.plot(x_vals, T, RS_X_A[i, :],'-', lw=LineWidth)
                 ax.view_init(azim=150)
@@ -207,7 +207,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.legend()
                 plt.tight_layout()
                 fig.savefig(self.Plt_Charts_Reservoir_3DTime.Path + FileFormat)
-                plt.show()
+                plt.close()
 
                 #リザバー層のヒートマップ
                 Title = None

@@ -19,6 +19,8 @@ maru
 #====================================================================
 import numpy as np
 import signalz
+from scipy.integrate import solve_ivp
+
 
 #====================================================================
 #タスク
@@ -479,7 +481,7 @@ class Task_MackeyGlass(Task):
         np.random.seed(seed=999)
         
         N = self.InitTerm + self.Length + self.PredictTau
-        self.XmI = signalz.mackey_glass(N, 0.2, 0.8, 0.9, 23, 10, 0.1)
+        self.XmI = signalz.mackey_glass(N, 0.2, 0.8, 0.9, 12, 15, 0.1)
         self.Xm = np.delete(self.XmI, np.s_[:self.InitTerm])
         self.X = np.expand_dims(self.Xm, 1)
 
@@ -487,6 +489,7 @@ class Task_MackeyGlass(Task):
 class Task_MackeyGlass_DDE(Task):
     """
     DDEマッキー・グラス方程式
+    ただし、全く最適化されていないため、非常に重い
     """
     #コンストラクタ
     def __init__(self, param: dict, evaluation: any):
@@ -496,12 +499,11 @@ class Task_MackeyGlass_DDE(Task):
         self.Dt = param["Task_MackeyGlassDDE_Dt"]                       #時間スケール
         self.PredictTau = param["Task_PredictDDE_Tau"]                     #どれくらい先を予測するか
 
-        self.MackeyA = param["Task_MackeyGlassDDE_A"]                      #γの役割
-        self.MackeyB = param["Task_MackeyGlassDDE_B"]                      #βの役割
+        self.MackeyBeta = param["Task_MackeyGlassDDE_Beta"]                      #γの役割
+        self.MackeyGamma = param["Task_MackeyGlassDDE_Gamma"]                      #βの役割
         self.MackeyN = param["Task_MackeyGlassDDE_N"]                      #乗数
         self.MackeyTau = param["Task_MackeyGlassDDE_Tau"]                     #どれくらい先を予測するか
         self.InitTerm = param["Task_MackeyGlassDDE_InitTerm"]          #初期状態排除期間
-
         self.makeData()
     
     #時刻tの入出力データ取得
@@ -511,13 +513,38 @@ class Task_MackeyGlass_DDE(Task):
     #データ生成
     def makeData(self):
 
-        np.random.seed(seed=999)
-        self.X = np.zeros([self.MackeyTau + self.Length + self.PredictTau, self.D_u])
-        self.Y = np.zeros([self.Length + self.PredictTau, self.D_u])
-        self.X[0] = np.random.rand(1) 
-        
-        for t in range(self.MackeyTau, self.InitTerm + self.Length + self.PredictTau - 1):
-            if self.InitTerm <= t:
-                self.Y[t - self.InitTerm] = self.X[t] * self.Scale
+        t_max = self.Dt * (self.InitTerm + self.Length + self.PredictTau)
+        # 時間配列
+        times = np.arange(0, t_max, self.Dt)  # dt = 0.001, ステップ数 20000
 
-            self.X[t + 1] = ((self.MackeyB * self.X[t - self.MackeyTau]) / (1 + pow(self.X[t - self.MackeyTau], self.MackeyN)) - self.MackeyA * self.X[t]) * self.Dt + self.X[t]
+        # 遅延データを管理するリスト
+        delay_buffer = [(0, 1.2)]  # (t, x) のリスト（初期値 x(0) = 1.2）
+
+        # 遅延データを補間する関数
+        def delayed_x(t):
+            for i in range(len(delay_buffer) - 1, -1, -1):
+                if delay_buffer[i][0] <= t:
+                    return delay_buffer[i][1]
+            return 1.2  # t < 0 の場合
+
+        # マッキー・グラス方程式（常微分方程式として表現）
+        def mackey_glass(t, x):
+            xtau = delayed_x(t - self.MackeyTau)
+            dxdt = self.MackeyBeta * xtau / (1 + xtau ** self.MackeyN) - self.MackeyGamma * x
+            return dxdt
+
+        # 数値計算
+        results = []
+        x = 1.2  # 初期値
+
+        for t in times:
+            sol = solve_ivp(mackey_glass, [t, t + self.Dt], [x], t_eval=[t + self.Dt])
+            x = sol.y[0][0]  # 最新の値を取得
+            results.append(x)
+            delay_buffer.append((t + self.Dt, x))  # 遅延データを更新
+
+        self.Y = np.zeros((self.Length + self.PredictTau, self.D_u))
+        
+        for i in range(self.InitTerm + self.Length + self.PredictTau):
+            if self.InitTerm <= i:
+                self.Y[i - self.InitTerm] = results[i]

@@ -229,11 +229,12 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Task_PredictDDE_Tau" : 5,                          #どれくらい先を予測するか
         
         "Task_MackeyGlassDDE_Scale" : 1/50,                 #信号のスケール
-        "Task_MackeyGlassDDE_Dt" : 0.01,                    #時間刻み幅
-        "Task_MackeyGlassDDE_A" : -2,                       #γ（？）:0.1
-        "Task_MackeyGlassDDE_B" : 3.54,                     #β（？）:0.2
+        "Task_MackeyGlassDDE_Dt" : 0.2,                    #時間刻み幅
+        
+        "Task_MackeyGlassDDE_Beta" : 0.2,                       #γ（？）:0.1
+        "Task_MackeyGlassDDE_Gamma" : 0.1,                     #β（？）:0.2
         "Task_MackeyGlassDDE_N" : 10,                       #乗数: 10
-        "Task_MackeyGlassDDE_Tau" : 1,                      #マッキー・グラスの遅延量 :17
+        "Task_MackeyGlassDDE_Tau" : 22,                      #マッキー・グラスの遅延量 :17
         "Task_MackeyGlassDDE_InitTerm" : 1000,              #初期状態排除期間
         
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -285,7 +286,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
 
             #------------------------------------------------------------------------------------------
-            "NRMSE_T_Task" : Task_EM.Task_MackeyGlass,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_MackeyGlass_DDE,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
