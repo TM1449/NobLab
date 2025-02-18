@@ -6,29 +6,24 @@ import ddeint
 beta = 0.2
 gamma = 0.1
 n = 10
-tau = 6
+tau = 32
+
+dt = 0.1
+steps = 10000
 
 def MackeyGlass(X, t, tau):
     return (beta * X(t - tau)) / (1 + pow(X(t - tau), n)) - gamma * X(t)
 
 def DLEEE(t):
-    return 1.2
-
-# 遅延微分方程式の定義（ddeint に合わせて history を第2引数にする）
-def mackey_glass(history, t):
-    x_tau = history(t - tau) if t - tau > 0 else 1.2  # 遅延の処理
-    return (beta * x_tau) / (1 + x_tau**n) - gamma * history(t)
-
-# 初期関数（遅延を考慮）
-def history(t):
-    return 1.2  # t <= 0 のときの値
+    return 0.1
 
 # 時間範囲
-times = np.linspace(0, 5000, 50000)
+times = np.linspace(0, steps * dt, steps)
 
 # 遅延微分方程式を解く
 solution = ddeint.ddeint(MackeyGlass, DLEEE, times, fargs=(tau,))
 
+print(len(solution))
 # 結果をプロット
 plt.figure(figsize=(10, 5))
 plt.plot(solution, label='Mackey-Glass Equation')
@@ -38,3 +33,4 @@ plt.title('Mackey-Glass Delay Differential Equation')
 plt.legend()
 plt.grid()
 plt.show()
+

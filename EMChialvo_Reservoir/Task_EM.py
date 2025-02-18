@@ -20,6 +20,7 @@ maru
 import numpy as np
 import signalz
 from scipy.integrate import solve_ivp
+import ddeint
 import bisect
 
 #====================================================================
@@ -627,50 +628,34 @@ class Task_MackeyGlass_DDE(Task):
         self.MackeyN = param["Task_MackeyGlassDDE_N"]                      #乗数
         self.MackeyTau = param["Task_MackeyGlassDDE_Tau"]                     #どれくらい先を予測するか
         self.InitTerm = param["Task_MackeyGlassDDE_InitTerm"]          #初期状態排除期間
+        
         self.makeData()
     
     #時刻tの入出力データ取得
     def getData(self, t: int) -> tuple:
         return self.Y[t], self.Y[t + self.PredictTau]
     
+
     #データ生成
     def makeData(self):
-
-        t_max = self.Dt * (self.InitTerm + self.Length + self.PredictTau)
+        t_max = (self.InitTerm + self.Length + self.PredictTau)
+        
         # 時間配列
-        times = np.arange(0, t_max, self.Dt)  # dt = 0.001, ステップ数 20000
+        times = np.linspace(0, t_max * self.Dt, t_max)  # dt = 0.001, ステップ数 20000
 
-        # 遅延データを管理するリスト
-        delay_buffer = [(0, 1.2)]  # (t, x) のリスト（初期値 x(0) = 1.2）
-
-        # 遅延データを補間する関数
-        def delayed_x(t):
-            for i in range(len(delay_buffer) - 1, -1, -1):
-                if delay_buffer[i][0] <= t:
-                    return delay_buffer[i][1]
-            return 1.2  # t < 0 の場合
-
-        # マッキー・グラス方程式（常微分方程式として表現）
-        def mackey_glass(t, x):
-            xtau = delayed_x(t - self.MackeyTau)
-            dxdt = self.MackeyBeta * xtau / (1 + xtau ** self.MackeyN) - self.MackeyGamma * x
-            return dxdt
-
-        # 数値計算
-        results = []
-        x = 1.2  # 初期値
-
-        for t in times:
-            sol = solve_ivp(mackey_glass, [t, t + self.Dt], [x], t_eval=[t + self.Dt])
-            x = sol.y[0][0]  # 最新の値を取得
-            results.append(x)
-            delay_buffer.append((t + self.Dt, x))  # 遅延データを更新
-
+        def MackeyGlass(X, t, tau):
+            return (self.MackeyBeta * X(t - tau)) / (1 + pow(X(t - tau), self.MackeyN)) - self.MackeyGamma * X(t)
+    
+        def DLE(t):
+            return 0.1
+        
+        solution = ddeint.ddeint(MackeyGlass, DLE, times, fargs=(self.MackeyTau,))
+    
         self.Y = np.zeros((self.Length + self.PredictTau, self.D_u))
         
         for i in range(self.InitTerm + self.Length + self.PredictTau):
             if self.InitTerm <= i:
-                self.Y[i - self.InitTerm] = results[i]
+                self.Y[i - self.InitTerm] = solution[i]
 
 
 class Task_MackeyGlass_DDE_Euler(Task):
