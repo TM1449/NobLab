@@ -68,40 +68,9 @@ def Project_GridSearch_EMChialvo_NRMSE():
         "GridSearch_MaxNumberInOnePool" : 1000,                       #１プール（並列する）最大のポイント数（この分メモリを消費） 初期値:50
         "GridSearch_NumberOfSamples" : 10,                           #サンプル数
         "GridSearch_ProjectName" : "NRMSE_EMChialvo",                    #プロジェクト名
-        "GridSearch_ProjectDate" : "2025_02_15_23_25",              #プロジェクト日時
+        "GridSearch_ProjectDate" : "2025_02_18_16_06",              #プロジェクト日時
         "GridSearch_T_Process" : Process_SishuESN_GridSearch,     #GS処理指定
         "GridSearch_T_Output" : OutputLog_SishuESN_2024_06_01_10_30             #GS出力処理指定
-        })()
-
-def Project_GridSearch_SishuESN_NRMSEAndMC_Tau():
-    """ 
-    Sishu提案モデル（結合形態のみ指定、強度は乱数）のNRMSEやMC測定
-    """
-    GridSearch_EM.Normal({
-        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        "Project_F_NRMSE" : True,                                   #NRMSEを調査するか
-        "Project_F_MemoryCapacity" : True,                          #MCを調査するか
-
-        "Project_F_OutputResults" : True,                           #各評価地点でパラメータを出力するか
-
-        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        #軸
-        "_Param_Tau" : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
-        "_Param_Model" : ["SishuESN"],
-
-        #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        "GridSearch_MachineName" : "SishuESN",                            #計算機名
-        "GridSearch_StartPoint" : 0,                                #担当開始ポイントインデックス
-        "GridSearch_EndPoint" : 150,                                #担当終了ポイントインデックス(MAX:4410(21*21*10))
-        
-        "GridSearch_MultiThread" : 12,                               #スレッド数（0で逐次処理）初期値:2
-        "GridSearch_MaxNumberInOneFile" : 100,                        #１ファイルの最大のポイント数 初期値:5
-        "GridSearch_MaxNumberInOnePool" : 1000,                       #１プール（並列する）最大のポイント数（この分メモリを消費） 初期値:50
-        "GridSearch_NumberOfSamples" : 10,                           #サンプル数
-        "GridSearch_ProjectName" : "NRMSEAndMC_SishuESN",                    #プロジェクト名
-        "GridSearch_ProjectDate" : "2024_06_01_10_30",              #プロジェクト日時
-        "GridSearch_T_Process" : Process_SishuESN_Tau_GridSearch,     #GS処理指定
-        "GridSearch_T_Output" : Output_Tau_SishuESN_2024_06_01_10_30             #GS出力処理指定
         })()
 
 #********************************************************************
@@ -152,42 +121,88 @@ class Process_SishuESN_GridSearch:
             
             "Task_MC_Tau" : 10,                                  #遅延量，MCのτ
             
-            #------------------------------------------------------------------------------------------
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #レスラー方程式のパラメータ
             "Task_Rosslor_Scale" : 1 / 30,                      #信号のスケール
             "Task_Rosslor_Mu" : 5.7,                            #レスラー方程式パラメータ
-            "Task_Rosslor_Dt" : 0.02,                           #時間スケール
-            "Task_Rosslor_A" : 0.005,                            #ギャップジャンクションパラメータ
+            "Task_Rosslor_Dt" : 0.01,                           #時間スケール
+            "Task_Rosslor_A" : 0.005,                           #ギャップジャンクションパラメータ
             "Task_Rosslor_Tau" : 5,                             #どれくらい先を予測するか
             "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
 
             #------------------------------------------------------------------------------------------
+            #ルンゲクッタ法通常レスラー方程式
+            "Task_NormalRosslor_Scale" : 1 / 30,
+            "Task_NormalRosslor_Dt" : 0.1,
+            "Task_NormalRosslor_Tau" : 5,
+            "Task_NormalRosslor_InitTerm" : 1000,
+
+            "Task_NormalRosslor_a" : 0.2,
+            "Task_NormalRosslor_b" : 0.2,
+            "Task_NormalRosslor_c" : 5.7,
+
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #ローレンツ方程式のパラメータ
             "Task_Lorenz_Scale" : 1 / 50,                       #信号のスケール
             "Task_Lorenz_Sigma" : 10,                           #ローレンツ方程式パラメータ
             "Task_Lorenz_Gamma" : 28,                           #ローレンツ方程式パラメータ
             "Task_Lorenz_Const_B" : 8 / 3,                      #ローレンツ方程式パラメータ
             "Task_Lorenz_Dt" : 0.01,                            #時間スケール
             "Task_Lorenz_A" : 0.001,                            #ギャップジャンクションパラメータ
-            "Task_Lorenz_Tau" : 10,                              #どれくらい先を予測するか
-            "Task_Lorenz_InitTerm" : 1000,                     #初期状態排除期間
+            "Task_Lorenz_Tau" : 5,                              #どれくらい先を予測するか
+            "Task_Lorenz_InitTerm" : 1000,                      #初期状態排除期間
 
             #------------------------------------------------------------------------------------------
-            "Task_LogisticEquation_A" : 4,
-            "Task_LogisticEquation_Tau" : 1,
+            #ルンゲクッタ法通常ローレンツ方程式
+            "Task_NormalLorenz_Scale" : 1/50,
+            "Task_NormalLorenz_Dt" : 0.01,
+            "Task_NormalLorenz_Tau" : 5,
+            "Task_NormalLorenz_InitTerm" : 1000,
 
-            #------------------------------------------------------------------------------------------
-            "Task_Lorenz96_Scale" : 1/50,
-            "Task_Lorenz96_Dt" : 0.01,
-            "Task_Lorenz96_Tau" : 5,
-            "Task_Lorenz96_InitTerm" : 1000,
-            "Task_Lorenz96_N" : 10,
-            "Task_Lorenz96_F" : 8,
+            "Task_NormalLorenz_Sigma" : 10,
+            "Task_NormalLorenz_Beta" : 8/3,
+            "Task_NormalLorenz_Rho" : 28,
 
-            #------------------------------------------------------------------------------------------
-            "Task_MackeyGlass_Scale" : 1/ 50,
-            "Task_Predict_Tau" : 1, 
-            "Task_MackeyGlass_Tau": 0,
-            "Task_MackeyGlass_InitTerm": 1000,
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #ロジスティック写像のパラメータ
+            "Task_LogisticEquation_A" : 4,                      #ロジスティック写像（離散）の大きさ
+            "Task_LogisticEquation_Tau" : 1,                    #どれくらい先を予測するか
+
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #ローレンツ方程式96のパラメータ
+            "Task_Lorenz96_Scale" : 1/50,                       #ローレンツ方程式96の大きさ
+            "Task_Lorenz96_Dt" : 0.01,                          #時間刻み幅
+            "Task_Lorenz96_Tau" : 5,                            #どれくらい先を予測するか
+            "Task_Lorenz96_InitTerm" : 1000,                    #初期状態排除期間
+            "Task_Lorenz96_N" : 10,                             #ニューロン数
+            "Task_Lorenz96_F" : 8,                              #大きさ？
+
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #離散時間のマッキー・グラス方程式のパラメータ
+            "Task_MackeyGlass_Scale" : 1/ 50,                   #信号のスケール
+            "Task_Predict_Tau" : 2,                             #どれくらい先を予測するか
+            "Task_MackeyGlass_Tau": 0,                          #マッキー・グラスの遅延量
+            "Task_MackeyGlass_InitTerm": 1000,                  #初期状態排除期間
+
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+            #連続時間のマッキー・グラス方程式のパラメータ
+            "Task_PredictDDE_Tau" : 5,                          #どれくらい先を予測するか
             
+            "Task_MackeyGlassDDE_Scale" : 1/50,                 #信号のスケール
+            "Task_MackeyGlassDDE_Dt" : 0.5,                    #時間刻み幅
+            
+            "Task_MackeyGlassDDE_Beta" : 0.2,                       #γ（？）:0.1
+            "Task_MackeyGlassDDE_Gamma" : 0.1,                     #β（？）:0.2
+            "Task_MackeyGlassDDE_N" : 10,                       #乗数: 10
+            "Task_MackeyGlassDDE_Tau" : 128,                      #マッキー・グラスの遅延量 :17
+            "Task_MackeyGlassDDE_InitTerm" : 1000,              #初期状態排除期間
+        
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "Model_EMChialvo_D_u" : 1,                          #入力信号次元
@@ -235,7 +250,7 @@ class Process_SishuESN_GridSearch:
                 "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
                 "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
                 "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-                "NRMSE_T_Task" : Task_EM.Task_MackeyGlass,                                #評価用タスク（Type型）
+                "NRMSE_T_Task" : Task_EM.Task_NormalRosslor,                                #評価用タスク（Type型）
                 "NRMSE_T_Model" : Param_Model,                                      #モデル（Type型）
                 "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
@@ -284,146 +299,6 @@ class Process_SishuESN_GridSearch:
     #軸パラメータを文字列化
     def getTag(self, param: dict) -> str:
         return "Rho : " + str(param["Rho"]) + " k : " + str(param["k"]) + " Model : " + param["Model"]
-
-class Process_SishuESN_Tau_GridSearch:
-    """ 
-    上記のパラメータに対応する処理
-    """
-    #コンストラクタ
-    def __init__(self, param: dict, grid_search: any):
-        self.Param = param
-        self.GridSearch = grid_search
-        
-    #メイン処理
-    def __call__(self, chank_i, param):
-        Results = chank_i.copy()
-        Results.update(self.Exp_GridWorld2D(chank_i, param))
-        
-        #表示
-        print(("---Index in Chank : %d / %d, Index : %d, Sample : %d\n"
-                + "<%s>\n"
-                + "NRMSE : %f, LogNRMSE : %f, TimeForTraining : %f, TimeForTesting : %f, MC : %f\n")
-                    %(Results["IndexInChank"], Results["NumPointsInChank"], Results["Index"], Results["Samples"],
-                    self.getTag(chank_i),
-                    Results["NRMSE_R_NRMSE"] if "NRMSE_R_NRMSE" in Results else 0,
-                    Results["NRMSE_R_LogNRMSE"] if "NRMSE_R_LogNRMSE" in Results else 0,
-                    Results["NRMSE_R_TimeForTraining"] if "NRMSE_R_TimeForTraining" in Results else 0,
-                    Results["NRMSE_R_TimeForTesting"] if "NRMSE_R_TimeForTesting" in Results else 0,
-                    Results["MemoryCapacity_R_MC"] if "MemoryCapacity_R_MC" in Results else 0))
-    
-        return Results
-
-    #ポイントのパラメータ設定
-    def Exp_GridWorld2D(self, chank_i, gs_param):
-        #各軸パラメータ
-        Param_Tau = chank_i["Tau"]
-        if chank_i["Model"] == "SishuESN":
-            Param_Model = Model_EM.Model_SishuESN
-            
-        #共通パラメータ
-        Param = {
-            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "Task_SinCurve_RK_h" : 0.01,                        #ルンゲクッタ法刻み幅
-        
-            "Task_MC_Tau" : 5,                                  #遅延量，MCのτ
-
-            "Task_Parity_Tau" : 5,                              #遅延量
-            "Task_Parity_MinTerm" : 100,                         #同じ状態を維持する最小期間
-            "Task_Parity_MaxTerm" : 200,                        #同じ状態を維持する最大期間
-        
-            "Task_Rosslor_Scale" : 1 / 30,                      #信号のスケール
-            "Task_Rosslor_Mu" : 5.7,                            #レスラー方程式パラメータ
-            "Task_Rosslor_Dt" : 0.01,                           #時間スケール
-            "Task_Rosslor_A" : 0.005,                            #ギャップジャンクションパラメータ
-            "Task_Rosslor_Tau" : 5,                             #どれくらい先を予測するか
-            "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
-        
-            "Task_Lorenz_Scale" : 1 / 50,                       #信号のスケール
-            "Task_Lorenz_Sigma" : 10,                           #ローレンツ方程式パラメータ
-            "Task_Lorenz_Gamma" : 28,                           #ローレンツ方程式パラメータ
-            "Task_Lorenz_Const_B" : 8 / 3,                      #ローレンツ方程式パラメータ
-            "Task_Lorenz_Dt" : 0.01,                            #時間スケール
-            "Task_Lorenz_A" : 0.001,                             #ギャップジャンクションパラメータ
-            "Task_Lorenz_Tau" : Param_Tau,                              #どれくらい先を予測するか
-            "Task_Rosslor_InitTerm" : 1000,                     #初期状態排除期間
-
-            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "Model_SishuESN_D_u" : 1,                  #入力信号次元
-            "Model_SishuESN_D_x" : 100,                #ニューロン数
-            "Model_SishuESN_D_y" : 1,                  #出力信号次元
-            
-            "Model_SishuESN_InputScale" : 0.1,                 #入力スケーリング
-            "Model_SishuESN_sigma" : False,                   #リング・ネットワークの結合強度
-            "Model_SishuESN_mu" : False,                     #スター・ネットワークの結合強度
-            "Model_SishuESN_k" : -3.2,
-
-            "Model_SishuESN_Rho" : 0.0032,                             #スペクトル半径
-            "SishuReservoir_Density" : 1,                         #結合密度
-            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "LinerTransformer_Beta" : 0.2,                      #正規化係数
-            }
-    
-        Results = dict()
-        #NRMSE評価
-        if gs_param["Project_F_NRMSE"]:
-            param = Param.copy()
-            param.update({
-                #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                "NRMSE_F_OutputLog" : False,                        #経過の出力を行うか
-                "NRMSE_D_u" : 1,                            #入力信号次元
-                "NRMSE_D_y" : 1,                            #出力信号次元
-                "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
-                "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
-                "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-                "NRMSE_T_Task" : Task_EM.Task_NDLorenz,                                #評価用タスク（Type型）
-                "NRMSE_T_Model" : Param_Model,                                      #モデル（Type型）
-                "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
-        
-                #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                "DirPath_Project" : self.GridSearch.Dir_Points_Branch,              #GSのパスを使用
-                "AxisTag" : self.getTag(chank_i),                                   #GSのパラメータを図題に使用
-
-                "NRMSE_F_OutputCharts" : False,                      #図の出力フラグ
-                "NRMSE_F_OutputCharts_UYYdEWaves" : False,           #入出力＆誤差波形図の出力フラグ
-
-                })
-            Results.update(Evaluation_EM.Evaluation_NRMSE(param)())
-    
-        #MC評価
-        if gs_param["Project_F_MemoryCapacity"]:
-            param = Param.copy()
-            param.update({
-                #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                "MemoryCapacity_F_OutputLog" : False,               #経過の出力を行うか
-                "MemoryCapacity_D_u" : 1,                   #入力信号次元
-                "MemoryCapacity_D_y" : 1,                   #出力信号次元            
-                "MemoryCapacity_Length_Burnin" : 1000,              #空走用データ時間長
-                "MemoryCapacity_Length_Train" : 5000,               #学習用データ時間長
-                "MemoryCapacity_Length_Test" : 1000,                #評価用データ時間長
-                "MemoryCapacity_MaxTau" : 100,                      #評価する最大遅延
-                "MemoryCapacity_T_Task" : Task_EM.Task_MC,                                     #評価用タスク（Type型）
-                "MemoryCapacity_T_Model" : Param_Model,                                     #モデル（Type型）
-                "MemoryCapacity_T_Output" : Output_EM.Output_Single_MC_2023_05_25_13_28,       #作図出力（Type型）
-        
-                #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                "DirPath_Project" : self.GridSearch.Dir_Points_Branch,                      #GSのパスを使用
-                "AxisTag" : self.getTag(chank_i),                                           #GSのパラメータを図題に使用
-
-                "MemoryCapacity_F_OutputCharts" : False,             #図の出力フラグ
-                "MemoryCapacity_F_OutputCharts_MCGraph" : False,     #MC曲線の出力フラグ
-
-                })
-            Results.update(Evaluation_EM.Evaluation_MC(param)())
-        
-        #地点のパラメータを改めて設定
-        if gs_param["Project_F_OutputResults"]:
-            self.GridSearch.CSV_Point_Param.Save(Results)
-
-        return Results
-
-    #軸パラメータを文字列化
-    def getTag(self, param: dict) -> str:
-        return "Tau : " + str(param["Tau"]) + " Model : " + param["Model"]
 
 #********************************************************************
 #********************************************************************
@@ -614,7 +489,7 @@ class OutputLog_SishuESN_2024_06_01_10_30(Output_EM.Output):
                     FigSize = (16, 9)                   #図の大きさとアスペクト比
                     FontSize_Label = 36                 #ラベルのフォントサイズ
                     FontSize_Title = 36                 #図題のフォントサイズ
-                    LineWidth = 0.5                     #線の太さ
+                    LineWidth = 0                     #線の太さ
                     FileFormat = ".png"                 #ファイル拡張子
                     MapCode = "jet"                     #カラーマップ
                     Annot = False#True                  #数値を表示するか
@@ -638,115 +513,6 @@ class OutputLog_SishuESN_2024_06_01_10_30(Output_EM.Output):
                     #表示せず図を閉じる
                     plt.close()
     
-    #DataFrameをNdarrayに変換し，結果のキーから結果を抽出
-    def MakeData(self, data, key):
-        return data[key].values.reshape([axis.NumberOfPoints for axis in self.Parent.GridSearch_AxisList])
-
-    #以下フォルダ構造
-    def ConstractFileTree_Charts(self):
-        pass
-
-class Output_Tau_SishuESN_2024_06_01_10_30(Output_EM.Output):
-    """
-    Sishu提案モデル（結合形態のみ指定、強度は乱数）のNRMSEやMC測定
-    """
-    #コンストラクタ
-    def __init__(self, param: dict, parent: any):
-        super().__init__(param, parent)
-        
-        #グリッドサーチ用図題用
-        #self.AxisTag = self.Param["AxisTag"] if "AxisTag" in self.Param else ""
-
-        #各種図の出力フラグ
-        #self.F_OutputCharts = self.Param["NRMSE_F_OutputCharts"]
-        #self.F_OutputCharts_UYYdEWaves = self.Param["NRMSE_F_OutputCharts_UYYdEWaves"]
-        
-    #本体
-    def __call__(self, result_param): 
-        #結果の取得
-        AllData = pd.DataFrame(result_param)
-        #図までのパスを作成
-        self.Parent.ConstractFileTree_Charts_Branch(True)
-        #指標の文字列一覧（タイトル用，辞書用，ファイル名用）
-        L_Score = [["NRMSE", "NRMSE_R_NRMSE", "NRMSE"], 
-                ["Log NRMSE", "NRMSE_R_LogNRMSE", "LogNRMSE"], 
-                ["Time For Training", "NRMSE_R_TimeForTraining", "TimeTrain"], 
-                ["Time For Testing" , "NRMSE_R_TimeForTesting", "TimeTest"],
-                ["Memory Capacity", "MemoryCapacity_R_MC", "MC"]]
-        
-        test = 0
-
-        #指標でループ
-        for score in L_Score:
-            #データ抽出
-            ScoreData = self.MakeData(AllData, score[1])
-            SishuESN_Score = ScoreData[:, :, 0]
-            #指標の文字列一覧（タイトル用，データ，ファイル名用）
-            L_Chart = [["SishuESN", SishuESN_Score, "SishuESN"]]
-            #フォルダパスを作成
-            Plt_Score = self.Parent.Dir_Charts_Branch.AddChild(
-                FileAndDir_EM.DirNode(score[1]))
-
-            #とる軸毎にループ
-            for chart in L_Chart:
-                #データ生成
-                #平均
-                mean = np.nanmean(chart[1], axis = 0)
-                #標準偏差
-                std = np.nanstd(chart[1], axis = 0)
-                #サンプル数２以上の場合
-                if self.Parent.NumberOfSamples > 1:
-                    #縦方向の影響を無くした平均
-                    scaled_mean = (mean - np.nanmean(mean, axis = 0)) / (np.nanstd(mean, axis = 0))
-                    #縦方向の影響を無くした標準偏差
-                    scaled_std = (std - np.nanmean(std, axis = 0)) / (np.nanstd(std, axis = 0))
-                else:
-                    scaled_mean = np.zeros(mean.shape)
-                    scaled_std = np.zeros(mean.shape)
-                #統計処理の文字列一覧（タイトル用，データ，ファイル名用）
-                L_Stats = [["Mean", mean, "Mean"],
-                        ["Std", std, "Std"],
-                        ["Mean Scaled in each Row", scaled_mean, "ScaleMean"],
-                        ["Std Scaled in each Row", scaled_std, "ScaleStd"]]
-                
-                #統計処理でループ
-                for stats in L_Stats:
-                    #軸パラメータ作成
-                    AxisX = np.array(self.Param["_Param_Tau"])
-                    AxisY = np.array(stats[0])
-                    #ファイル作成
-                    Plt_Chart = Plt_Score.AddChild(
-                        FileAndDir_EM.FileNode_plt(chart[2] + "_" + stats[2]))
-                    Plt_Chart.Save()
-
-                    #図の設定
-                    LabelsX = "Tau"                     #x軸ラベル
-                    LabelsY = L_Score[test][0]                     #y軸ラベル
-                    FigSize = (16, 9)                   #図の大きさとアスペクト比
-                    FontSize_Label = 36                 #ラベルのフォントサイズ
-                    FontSize_Title = 36                 #図題のフォントサイズ
-                    LineWidth = 3                       #線の太さ
-                    FileFormat = ".png"                 #ファイル拡張子
-                    MapCode = "jet"                     #カラーマップ
-                    Annot = False#True                  #数値を表示するか
-
-                    #図題
-                    Title = None
-                    #作図
-                    fig  = plt.figure(figsize = FigSize)
-                    sub = fig.add_subplot(1, 1, 1)
-                    #body = sns.heatmap(stats[1], xticklabels = AxisX, yticklabels = AxisY, cmap = MapCode, linewidth = LineWidth, annot = Annot, ax = sub)
-                    plt.plot(self.Param["_Param_Tau"],stats[1])
-                    plt.gca().invert_yaxis()
-                    plt.xlabel(LabelsX, fontsize = FontSize_Label)
-                    plt.ylabel(LabelsY, fontsize = FontSize_Label)
-                    plt.title(Title, fontsize = FontSize_Title)
-                    plt.tight_layout()
-                    fig.savefig(Plt_Chart.Path + FileFormat)
-            
-                    #表示せず図を閉じる
-                    plt.close()
-            test += 1
     #DataFrameをNdarrayに変換し，結果のキーから結果を抽出
     def MakeData(self, data, key):
         return data[key].values.reshape([axis.NumberOfPoints for axis in self.Parent.GridSearch_AxisList])

@@ -20,7 +20,7 @@ maru
 import numpy as np
 import signalz
 from scipy.integrate import solve_ivp
-
+import bisect
 
 #====================================================================
 #タスク
@@ -238,7 +238,7 @@ class Task_NDRosslor(Task):
                 s[s_i][1] = y + (x + 0.2 * y + self.A * (prev_y + next_y - 2 * y)) * self.Dt
                 s[s_i][2] = z + (0.2 + z * (x - self.Mu)) * self.Dt
             
-#--------------------------------------------------------------------
+
 class Task_NDLorenz(Task):
     """
     N次元ローレンツ結合系時系列予測タスク
@@ -297,6 +297,125 @@ class Task_NDLorenz(Task):
                 s[s_i][1] = y + (-x * z + self.Gamma * x - (y)) * self.Dt
                 s[s_i][2] = z + (x * y - self.Const_B * z) * self.Dt
 
+
+
+#--------------------------------------------------------------------
+class Task_NormalRosslor(Task):
+    """
+    レスラー方程式
+    1次元のみ!!!!
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, evaluation: any):
+        super().__init__(param, evaluation)
+
+        #パラメータ取得
+        self.Scale = param["Task_NormalRosslor_Scale"]                #信号のスケール    
+        self.Dt = param["Task_NormalRosslor_Dt"]                      #時間スケール
+        self.Tau = param["Task_NormalRosslor_Tau"]                    #どれくらい先を予測するか
+        self.InitTerm = param["Task_NormalRosslor_InitTerm"]          #初期状態排除期間
+
+        self.a = param["Task_NormalRosslor_a"]                  #レスラー方程式パラメータ
+        self.b = param["Task_NormalRosslor_b"]                  #レスラー方程式パラメータ
+        self.c = param["Task_NormalRosslor_c"]                  #レスラー方程式パラメータ（μ）
+
+        self.makeData()
+        
+    #時刻tの入出力データ取得
+    def getData(self, t: int) -> tuple:
+        return self.X[t], self.X[t + self.Tau]
+    
+    #レスラー方程式の関数
+    def Rosslor(self, old_x, old_y, old_z):
+        x = - (old_y + old_z)
+        y = old_x + self.a * old_y
+        z = self.b + old_z * (old_x - self.c)
+
+        return x, y, z
+
+    #データ生成
+    def makeData(self):
+        self.X = np.zeros([self.Length + self.Tau, 1])
+
+        np.random.seed(seed=99)
+        
+        s = (np.random.rand(1, 3) - 0.5) * 10
+        
+        for t in range(self.InitTerm + self.Length + self.Tau):
+
+            if self.InitTerm <= t:
+                #self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
+                self.X[t - self.InitTerm] = s[0][0] * self.Scale        #1次元の信号に限り、列要素を変えることで、成分を変更できる。
+
+            s_old = s
+            s = np.zeros([1, 3])
+
+            x, y, z = s_old[0,:]
+
+            k1 = np.array(self.Rosslor(x, y, z))
+            k2 = np.array(self.Rosslor(x + 0.5 * self.Dt * k1[0], y + 0.5 * self.Dt * k1[1], z + 0.5 * self.Dt * k1[2]))
+            k3 = np.array(self.Rosslor(x + 0.5 * self.Dt * k2[0], y + 0.5 * self.Dt * k2[1], z + 0.5 * self.Dt * k2[2]))
+            k4 = np.array(self.Rosslor(x + self.Dt * k3[0], y + self.Dt * k3[1], z + self.Dt * k3[2]))
+
+            s[0, :] = [x + (self.Dt / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
+                       y + (self.Dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
+                       z + (self.Dt / 6) * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2])]
+
+class Task_NormalLorenz(Task):
+    """
+    ローレンツ方程式
+    1次元のみ!!!!
+    """
+    def __init__(self, param: dict, evaluation: any):
+        super().__init__(param, evaluation)
+
+        self.Scale = param["Task_NormalLorenz_Scale"]
+        self.Dt = param["Task_NormalLorenz_Dt"]
+        self.Tau = param["Task_NormalLorenz_Tau"]
+        self.InitTerm = param["Task_NormalLorenz_InitTerm"]
+
+        self.sigma = param["Task_NormalLorenz_Sigma"]
+        self.beta = param["Task_NormalLorenz_Beta"]
+        self.rho = param["Task_NormalLorenz_Rho"]
+
+        self.makeData()
+        
+    def getData(self, t: int) -> tuple:
+        return self.X[t], self.X[t + self.Tau]
+    
+    def Lorenz(self, x, y, z):
+        dx = self.sigma * (y - x)
+        dy = x * (self.rho - z) - y
+        dz = x * y - self.beta * z
+        return dx, dy, dz
+
+    def makeData(self):
+        self.X = np.zeros([self.Length + self.Tau, 1])
+        np.random.seed(seed=99)
+        
+        s = (np.random.rand(1, 3) - 0.5) * 10
+        
+        for t in range(self.InitTerm + self.Length + self.Tau):
+            if self.InitTerm <= t:
+                self.X[t - self.InitTerm] = s[0][0] * self.Scale
+            
+            s_old = s.copy()
+            s = np.zeros([1, 3])
+            
+            x, y, z = s_old[0,:]
+            
+            k1 = np.array(self.Lorenz(x, y, z))
+            k2 = np.array(self.Lorenz(x + 0.5 * self.Dt * k1[0], y + 0.5 * self.Dt * k1[1], z + 0.5 * self.Dt * k1[2]))
+            k3 = np.array(self.Lorenz(x + 0.5 * self.Dt * k2[0], y + 0.5 * self.Dt * k2[1], z + 0.5 * self.Dt * k2[2]))
+            k4 = np.array(self.Lorenz(x + self.Dt * k3[0], y + self.Dt * k3[1], z + self.Dt * k3[2]))
+
+            s[0, :] = [x + (self.Dt / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
+                       y + (self.Dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
+                       z + (self.Dt / 6) * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2])]
+
+
+#--------------------------------------------------------------------
+
 class Task_tcVDP(Task):
     """
     van der Pol振動子の結合タスク
@@ -348,6 +467,8 @@ class Task_tcVDP(Task):
         self.X = np.concatenate([x1s, y1s, x2s, y2s],1)
         self.Y = np.concatenate([x1s, y1s, x2s, y2s],1)
 
+
+#--------------------------------------------------------------------
 class Task_LogisticEquation(Task):
     """
     ロジスティック写像
@@ -388,6 +509,7 @@ class Task_LogisticEquation(Task):
         return self.next_x
     
 
+#--------------------------------------------------------------------
 class Task_Lorenz96(Task):
     """
     ローレンツ96
@@ -433,6 +555,7 @@ class Task_Lorenz96(Task):
             self.s = self.Lorenz96(self.s)
 
 
+#--------------------------------------------------------------------
 class Task_Zeros(Task):
     """
     入力0
@@ -453,7 +576,7 @@ class Task_Zeros(Task):
     def makeData(self):
         self.X = np.zeros([self.Length + 1, self.D_u])
 
-
+#--------------------------------------------------------------------
 class Task_MackeyGlass(Task):
     """
     マッキー・グラス方程式
@@ -548,3 +671,65 @@ class Task_MackeyGlass_DDE(Task):
         for i in range(self.InitTerm + self.Length + self.PredictTau):
             if self.InitTerm <= i:
                 self.Y[i - self.InitTerm] = results[i]
+
+
+class Task_MackeyGlass_DDE_Euler(Task):
+    """
+    DDEマッキー・グラス方程式
+    """
+
+    # コンストラクタ
+    def __init__(self, param: dict, evaluation: any):
+        super().__init__(param, evaluation)
+
+        self.Scale = param["Task_MackeyGlassDDE_Scale"]
+        self.Dt = param["Task_MackeyGlassDDE_Dt"]
+        self.PredictTau = param["Task_PredictDDE_Tau"]
+
+        self.MackeyBeta = param["Task_MackeyGlassDDE_Beta"]
+        self.MackeyGamma = param["Task_MackeyGlassDDE_Gamma"]
+        self.MackeyN = param["Task_MackeyGlassDDE_N"]
+        self.MackeyTau = param["Task_MackeyGlassDDE_Tau"]
+        self.InitTerm = param["Task_MackeyGlassDDE_InitTerm"]
+
+
+        self.makeData()
+
+    # 時刻tの入出力データ取得
+    def getData(self, t: int) -> tuple:
+        return self.Y[t], self.Y[t + self.PredictTau]
+
+    # データ生成（修正＆最適化版）
+    def makeData(self):
+        t_max = self.Dt * (self.InitTerm + self.Length + self.PredictTau)
+        times = np.arange(0, t_max, self.Dt)
+
+        delay_buffer = [(0, 1.2)]  # (t, x) のリスト（初期値 x(0) = 1.2）
+
+        # バイナリサーチを用いた遅延データ取得
+        def delayed_x(t):
+            i = bisect.bisect_right(delay_buffer, (t, float('inf'))) - 1
+            return delay_buffer[i][1] if i >= 0 else 1.2
+
+        results = []
+        x = 1.2  # 初期値
+
+        for t in times:
+            xtau = delayed_x(t - self.MackeyTau)
+            dxdt = self.MackeyBeta * xtau / (1 + pow(xtau, self.MackeyN)) - self.MackeyGamma * x
+            x += dxdt * self.Dt  # オイラー法で更新
+            results.append(x)
+            delay_buffer.append((t + self.Dt, x))
+
+            # 古いデータを削除しメモリ最適化（最大 5000 件保持）
+            if len(delay_buffer) > 5000:
+                delay_buffer.pop(0)
+
+        # self.Y を適切なサイズで初期化
+        self.Y = np.zeros((self.Length + self.PredictTau, self.D_u))
+
+        # results のインデックス修正
+        for i in range(self.InitTerm, self.InitTerm + self.Length + self.PredictTau):
+            self.Y[i - self.InitTerm] = results[i] if i < len(results) else 0.0  # インデックス範囲外のエラー防止
+
+#--------------------------------------------------------------------

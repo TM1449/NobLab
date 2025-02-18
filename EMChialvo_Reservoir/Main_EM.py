@@ -66,11 +66,10 @@ if __name__ == '__main__':
 
 #====================================================================
     """Sishu提案モデルに関連するプロジェクト"""
-    Project_EM.Project_EMChialvo_NRMSE_MC_2025_01_28_12_34()
+    #Project_EM.Project_EMChialvo_NRMSE_MC_2025_01_28_12_34()
     #Project_RS_Sishu_EM.Project_RandomSearch_NRMSE_EMChialvo()
 
-    #Project_GS_Sishu_EM.Project_GridSearch_EMChialvo_NRMSE()
-    #Project_GS_Sishu.Project_GridSearch_SishuESN_NRMSEAndMC_Tau()
+    Project_GS_Sishu_EM.Project_GridSearch_EMChialvo_NRMSE()
 #====================================================================
 #====================================================================
     #+++終了+++
