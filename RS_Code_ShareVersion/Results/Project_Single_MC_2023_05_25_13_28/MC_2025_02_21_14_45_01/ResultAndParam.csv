@@ -1,0 +1,31 @@
+Project_F_UsePytorch,Project_DeviceCode,Project_DataType,MemoryCapacity_F_OutputLog,MemoryCapacity_D_u,MemoryCapacity_D_y,MemoryCapacity_Length_Burnin,MemoryCapacity_Length_Train,MemoryCapacity_Length_Test,MemoryCapacity_MaxTau,MemoryCapacity_T_Task,MemoryCapacity_T_Model,MemoryCapacity_T_Output,Task_MC_Tau,Task_Parity_Tau,Task_Parity_MinTerm,Task_Parity_MaxTerm,Model_NormalESN_D_u,Model_NormalESN_D_x,Model_NormalESN_D_y,Model_NormalAESN_D_u,Model_NormalAESN_D_x,Model_NormalAESN_D_y,Model_HetAESN_D_u,Model_HetAESN_D_x,Model_HetAESN_D_y,Model_HetAESN_LeakingRate,Model_HetAESN_InputScale,Model_HetAESN_Rho,Model_HetAESN_Density,Model_AESNwithHub_D_u,Model_AESNwithHub_D_h,Model_AESNwithHub_D_x,Model_AESNwithHub_D_y,Model_AESNwithHub_F_Use_U2HubConnection,Model_AESNwithHub_F_Use_x2zConnection,Model_AESNwithHub_F_Use_x2AESNConnection,Model_AESNwithHub_F_Use_AverageHInHub,Model_AESNwithHub_Hub_LeakingRate,Model_AESNwithHub_Hub_InputScale,Model_AESNwithHub_Hub_Rho,Model_AESNwithHub_Hub_Density,Model_ModifiedDeepESN_D_u,Model_ModifiedDeepESN_D_x,Model_ModifiedDeepESN_D_y,Model_ModifiedDeepESN_LeakingRate,Model_ModifiedDeepESN_InputScale,Model_ModifiedDeepESN_Rho,Model_ModifiedDeepESN_Density,SubReservoir_LeakingRate,SubReservoir_InputScale,SubReservoir_Rho,SubReservoir_Density,SubReservoir_ActivationFunc,LinearTransformer_Beta,DNN_LearningRate,DNN_MaxLearningLoop,DNN_AimingError,DirPath_Project,MemoryCapacity_F_OutputCharts,MemoryCapacity_F_OutputCharts_MCGraph,MemoryCapacity_R_MC,MemoryCapacity_R_Tau,MemoryCapacity_R_MC_Tau
+False,cpu,torch.float32,True,1,1,1000,5000,1000,100,<class 'Task.Task_MC'>,<class 'Model.Model_NormalESN'>,<class 'Project_Single_MC.Output_Single_MC_2023_05_25_13_28'>,5,5,100,200,1,100,1,1,100,1,5,100,5,"[0.01, 0.1, 1.0]",,,,5,100,100,5,False,True,False,False,,,,,1,"[100, 100, 100, 100, 100, 100, 100, 100, 100, 100]",1,,,,,1,0.1,1,1,<ufunc 'tanh'>,0.2,0.001,1000,0.001,./Results/Project_Single_MC_2023_05_25_13_28,True,True,20.217292969250174,"[  1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+  91  92  93  94  95  96  97  98  99 100]","[9.99793489e-01 9.99511054e-01 9.99207824e-01 9.98854160e-01
+ 9.97879600e-01 9.96477293e-01 9.93654906e-01 9.90639814e-01
+ 9.85684732e-01 9.77698317e-01 9.67230105e-01 9.46935311e-01
+ 9.27778268e-01 8.93539464e-01 8.58441686e-01 8.30352629e-01
+ 7.71170727e-01 7.03914981e-01 6.44021213e-01 6.01235547e-01
+ 4.97090238e-01 4.27398537e-01 3.28443278e-01 2.35832356e-01
+ 1.65451300e-01 1.20282693e-01 1.00353159e-01 6.44550232e-02
+ 4.68084280e-02 3.24590512e-02 2.55595382e-02 2.01058602e-02
+ 1.24935719e-02 8.93660408e-03 7.26501223e-03 6.43428187e-03
+ 5.37822178e-03 3.70047406e-03 1.76365243e-03 8.85988217e-04
+ 8.02987310e-04 8.36949016e-04 1.15651856e-03 1.75894797e-03
+ 1.59368290e-03 1.20081861e-03 9.47011864e-05 1.13418990e-04
+ 4.82472715e-05 5.98268445e-04 3.22052038e-04 5.77199525e-04
+ 1.82024630e-04 1.57978899e-07 1.29506159e-04 1.86444716e-04
+ 6.14434821e-05 9.23980143e-06 1.16715378e-05 5.34776914e-06
+ 4.52202954e-05 4.07199112e-05 1.65511483e-06 3.71018777e-05
+ 2.92609248e-05 1.18195668e-05 1.93870526e-05 1.79705776e-07
+ 1.19584703e-06 1.57950754e-05 2.83952184e-04 3.37683165e-04
+ 3.79702616e-04 3.65787705e-04 1.33825849e-04 8.09423875e-05
+ 1.28805226e-04 3.36620492e-05 5.43628911e-05 5.54502547e-05
+ 1.60151368e-04 1.71593396e-04 1.51261294e-04 1.07607160e-04
+ 4.28584129e-05 3.47112361e-06 3.39652164e-04 5.84342804e-04
+ 7.75181935e-04 5.26027091e-04 3.23944037e-04 5.73973406e-04
+ 1.36850678e-03 1.53350556e-03 2.03714993e-03 2.48267299e-04
+ 4.48583414e-05 9.31186555e-07 6.98796427e-05 1.36528294e-03]"

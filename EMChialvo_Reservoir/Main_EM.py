@@ -21,11 +21,7 @@ import matplotlib
 
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 import Project_EM
-
-import Project_GS_Template_EM
 import Project_GS_Sishu_EM
-
-import Project_RS_Template_EM
 import Project_RS_Sishu_EM
 
 import Evaluation_EM
@@ -61,15 +57,11 @@ if __name__ == '__main__':
     #---試行---
 
 #====================================================================
-    """通常のESNモデルに関連するプロジェクト"""
-    #Project_EM.Project_ESN_NRMSE_MC_2024_04_16_13_58()
-
-#====================================================================
     """Sishu提案モデルに関連するプロジェクト"""
-    #Project_EM.Project_EMChialvo_NRMSE_MC_2025_01_28_12_34()l
+    Project_EM.Project_EMChialvo_NRMSE_MC_2025_01_28_12_34()
     #Project_RS_Sishu_EM.Project_RandomSearch_NRMSE_EMChialvo()
 
-    Project_GS_Sishu_EM.Project_GridSearch_EMChialvo_NRMSE()
+    #Project_GS_Sishu_EM.Project_GridSearch_EMChialvo_NRMSE()
 #====================================================================
 #====================================================================
     #+++終了+++

@@ -314,14 +314,14 @@ class Evaluation_MC(Evaluation):
         for i, t in enumerate(T[self.Length_Burnin : self.Length_Burnin + self.Length_Train]):
             if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Train), end = "")
             U[t], _ = self.Task.getData(t)
-            Z[t] = self.Model.forwardReservoir(U[t])
+            Z[t], _, _, _, _, _, _ = self.Model.forwardReservoir(U[t])
         if self.F_OutputLog : print("\n", end = "")
     
         if self.F_OutputLog : print("--- Collecting Data for Test ---")
         for i, t in enumerate(T[self.Length_Burnin + self.Length_Train : self.Length_Burnin + self.Length_Train + self.Length_Test]):
             if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Test), end = "")
             U[t], _ = self.Task.getData(t)
-            Z[t] = self.Model.forwardReservoir(U[t])
+            Z[t], _, _, _, _, _, _ = self.Model.forwardReservoir(U[t])
         if self.F_OutputLog : print("\n", end = "")
 
         #テスト

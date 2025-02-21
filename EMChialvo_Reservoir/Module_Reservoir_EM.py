@@ -164,12 +164,20 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #変数
-        self.x = np.zeros([self.D_x])                           #xの状態ベクトル
-        self.x_old = self.x                                     #1step前のxの状態ベクトル
-        self.y = np.ones([self.D_x])                           #xの状態ベクトル
-        self.y_old = self.y                                     #1step前のxの状態ベクトル
-        self.phi = np.ones([self.D_x])                           #xの状態ベクトル
-        self.phi_old = self.phi                                     #1step前のxの状態ベクトル
+        self.x = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                     #xの状態ベクトル
+        self.x_old = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                 #1step前のxの状態ベクトル
+        self.y = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                     #yの状態ベクトル
+        self.y_old = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                 #1step前のyの状態ベクトル
+        self.phi = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                   #phiの状態ベクトル
+        self.phi_old = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)               #1step前のphiの状態ベクトル
+
+        #変数
+        self.xP = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                     #xの状態ベクトル
+        self.xP_old = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                 #1step前のxの状態ベクトル
+        self.yP = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                     #yの状態ベクトル
+        self.yP_old = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                 #1step前のyの状態ベクトル
+        self.phiP = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                   #phiの状態ベクトル
+        self.phiP_old = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)               #1step前のphiの状態ベクトル
         
         #重み初期化
         self.W_in = self._makeInputWeight()                     #入力重み
@@ -215,12 +223,46 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         self.phi = self.k1 * self.x_old - self.k2 * self.phi_old
 
         return self.x, self.y, self.phi
+    
+    #最大リアプノフ指数用
+    def forward_MLE(self, u: np.array, x_D: np.array, y_D: np.array, phi_D: np.array) -> np.ndarray:
 
+        #基準軌道の計算
+        self.x = (pow(self.x_old, 2) * np.exp(self.y_old - self.x_old) + self.k0 \
+            + self.k * self.x_old * (self.alpha + 3 * self.beta * pow(self.phi_old, 2)) \
+                + np.dot(self.x_old, self.W_rec)) + np.dot(np.concatenate([self.Bias, u]), self.W_in)
+        self.y = self.a * self.y_old - self.b * self.x_old + self.c
+        self.phi = self.k1 * self.x_old - self.k2 * self.phi_old
+
+        #摂動軌道の計算
+        self.xP = (pow((self.x_old + x_D), 2) * np.exp((self.y_old + y_D) - (self.x_old + x_D)) + self.k0 \
+            + self.k * (self.x_old + x_D) * (self.alpha + 3 * self.beta * pow((self.phi_old + phi_D), 2)) \
+                + np.dot((self.x_old + x_D), self.W_rec)) + np.dot(np.concatenate([self.Bias, u]), self.W_in)
+        self.yP = self.a * (self.y_old + y_D) - self.b * (self.x_old + x_D) + self.c
+        self.phiP = self.k1 * (self.x_old + x_D) - self.k2 * (self.phi_old + phi_D)
+
+        #returnの説明
+        #1行目：基準軌道の1時刻前のニューロンの値
+        #2行目：基準軌道の現時刻のニューロンの値
+        #3行目：摂動軌道の1時刻前のニューロンの値
+        #4行目：摂動軌道の現時刻のニューロンの値
+
+        return self.x_old, self.y_old, self.phi_old, \
+            self.x, self.y, self.phi, \
+                (self.x_old + x_D), (self.y_old + y_D), (self.phi_old + phi_D), \
+                    self.xP, self.yP, self.phiP
+    
     #時間発展
     def update(self):
         self.x_old = self.x
         self.y_old = self.y
         self.phi_old = self.phi
+
+    #時間発展（最大リアプノフ指数用）
+    def update_MLE(self):
+        self.xP_old = self.x_old
+        self.yP_old = self.yP
+        self.phiP_old = self.phiP
 
     #リザバーの初期化
     def reset(self):

@@ -1,0 +1,31 @@
+Project_F_NRMSE,Project_F_MemoryCapacity,Project_F_MLE,Task_SinCurve_RK_h,Task_MC_Tau,Task_Rosslor_Scale,Task_Rosslor_Mu,Task_Rosslor_Dt,Task_Rosslor_A,Task_Rosslor_Tau,Task_Rosslor_InitTerm,Task_NormalRosslor_Scale,Task_NormalRosslor_Dt,Task_NormalRosslor_Tau,Task_NormalRosslor_InitTerm,Task_NormalRosslor_a,Task_NormalRosslor_b,Task_NormalRosslor_c,Task_Lorenz_Scale,Task_Lorenz_Sigma,Task_Lorenz_Gamma,Task_Lorenz_Const_B,Task_Lorenz_Dt,Task_Lorenz_A,Task_Lorenz_Tau,Task_Lorenz_InitTerm,Task_NormalLorenz_Scale,Task_NormalLorenz_Dt,Task_NormalLorenz_Tau,Task_NormalLorenz_InitTerm,Task_NormalLorenz_Sigma,Task_NormalLorenz_Beta,Task_NormalLorenz_Rho,Task_LogisticEquation_A,Task_LogisticEquation_Tau,Task_Lorenz96_Scale,Task_Lorenz96_Dt,Task_Lorenz96_Tau,Task_Lorenz96_InitTerm,Task_Lorenz96_N,Task_Lorenz96_F,Task_MackeyGlass_Scale,Task_Predict_Tau,Task_MackeyGlass_Tau,Task_MackeyGlass_InitTerm,Task_PredictDDE_Tau,Task_MackeyGlassDDE_Scale,Task_MackeyGlassDDE_Dt,Task_MackeyGlassDDE_Beta,Task_MackeyGlassDDE_Gamma,Task_MackeyGlassDDE_N,Task_MackeyGlassDDE_Tau,Task_MackeyGlassDDE_InitTerm,Model_EMChialvo_D_u,Model_EMChialvo_D_x,Model_EMChialvo_D_y,Model_Reservoir_Neurons,Model_EMChialvo_InputScale,Model_EMChialvo_a,Model_EMChialvo_b,Model_EMChialvo_c,Model_EMChialvo_k0,Model_EMChialvo_k1,Model_EMChialvo_k2,Model_EMChialvo_alpha,Model_EMChialvo_beta,Model_EMChialvo_k,Model_EMChialvo_Rho,EMChialvo_Reservoir_Density,LinerTransformer_Beta,MemoryCapacity_F_OutputLog,MemoryCapacity_D_u,MemoryCapacity_D_y,MemoryCapacity_Length_Burnin,MemoryCapacity_Length_Train,MemoryCapacity_Length_Test,MemoryCapacity_MaxTau,MemoryCapacity_T_Task,MemoryCapacity_T_Model,MemoryCapacity_T_Output,DirPath_Project,MemoryCapacity_F_OutputCharts,MemoryCapacity_F_OutputCharts_MCGraph,MemoryCapacity_R_MC,MemoryCapacity_R_Tau,MemoryCapacity_R_MC_Tau
+True,True,True,0.01,10,0.03333333333333333,5.7,0.01,0.005,5,1000,0.03333333333333333,0.05,5,1000,0.2,0.2,5.7,0.02,10,28,2.6666666666666665,0.01,0.001,5,1000,0.02,0.01,5,1000,10,2.6666666666666665,28,4,1,0.02,0.01,5,1000,10,8,0.02,2,0,1000,5,0.02,0.5,0.2,0.1,10,128,1000,1,100,1,10,0.1,0.89,0.6,0.28,0.04,0.1,0.2,0.1,0.2,-3.5,0.001,1,0.2,True,1,1,1000,20000,1000,100,<class 'Task_EM.Task_MC'>,<class 'Model_EM.Model_EMChialvo'>,<class 'Output_EM.Output_Single_MC_2023_05_25_13_28'>,./EMChialvo_Reservoir/Results/Single_Task/MC,True,True,6.482390764320725,"[  1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+  91  92  93  94  95  96  97  98  99 100]","[7.41149862e-01 2.93699370e-01 1.80137795e-01 1.40576862e-01
+ 1.46057216e-01 1.59421145e-01 1.67608938e-01 1.69266833e-01
+ 1.67007478e-01 1.64129738e-01 1.54530230e-01 1.42196450e-01
+ 1.27147037e-01 1.21823961e-01 1.22242493e-01 1.12689107e-01
+ 1.02887821e-01 9.49358525e-02 9.53333229e-02 9.72213658e-02
+ 9.59816605e-02 9.85311414e-02 9.40601414e-02 9.59162067e-02
+ 9.05109428e-02 8.90857975e-02 8.75633071e-02 8.52501646e-02
+ 8.34255599e-02 8.36998688e-02 8.57397775e-02 8.87870642e-02
+ 9.01287555e-02 8.38972761e-02 7.96911439e-02 7.66447512e-02
+ 6.97758390e-02 6.54441857e-02 6.19590573e-02 5.22046693e-02
+ 5.63861524e-02 5.44418373e-02 5.44210362e-02 5.31709781e-02
+ 5.52822398e-02 4.98533052e-02 4.57183047e-02 4.54139592e-02
+ 4.58783213e-02 4.41804996e-02 4.37687143e-02 4.15488875e-02
+ 3.95917624e-02 3.77242481e-02 3.83910755e-02 3.20546387e-02
+ 2.75959357e-02 2.17402825e-02 2.06645240e-02 2.35920362e-02
+ 2.76254385e-02 2.43653753e-02 2.85682014e-02 2.37937675e-02
+ 2.09964660e-02 2.49225983e-02 2.48053733e-02 1.85039673e-02
+ 1.52536800e-02 1.47917870e-02 9.93168407e-03 1.05568916e-02
+ 1.14413982e-02 6.49022733e-03 5.57955667e-03 5.78033509e-03
+ 5.04574504e-03 6.69440502e-03 8.69606015e-03 1.22851093e-02
+ 1.01483908e-02 1.38044011e-02 1.58767830e-02 1.11009292e-02
+ 9.99845318e-03 1.47640092e-02 1.55776532e-02 9.37990275e-03
+ 8.50119476e-03 1.20809723e-02 1.12074892e-02 9.05306525e-03
+ 5.00323930e-03 9.63958356e-03 1.34833207e-02 1.04456970e-02
+ 4.10697388e-03 7.45951355e-04 9.80739351e-05 1.46768699e-03]"

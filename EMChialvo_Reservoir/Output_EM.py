@@ -360,3 +360,112 @@ class Output_Single_MC_2023_05_25_13_28(Output):
         self.CSV_Charts_Param = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_dict("ResultAndParam"))
         self.Plt_Charts_MCGraph = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("MCGraph"))
         
+
+#--------------------------------------------------------------------
+class Output_Single_MLE_2023_07_08_17_12(Output):
+    """
+    MLEのデバッグ用
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, parent: any):
+        super().__init__(param, parent)
+
+        #パラメータ取得
+        self.F_OutputLog = self.Param["MLE_F_OutputLog"]                #経過の出力を行うか
+        self.Length_Burnin = self.Param["MLE_Length_Burnin"]            #空走用データ時間長
+        self.Length_Test = self.Param["MLE_Length_Test"]                #評価用データ時間長
+        self.Length_Total = self.Length_Burnin + self.Length_Test       #全体データ時間長
+        
+        self.DirPath_Project = self.Param["DirPath_Project"]            #プロジェクトのフォルダパス
+        self.ConstractFileTree_Root(self.DirPath_Project)
+
+        #グリッドサーチ用図題用
+        self.AxisTag = self.Param["AxisTag"] if "AxisTag" in self.Param else ""
+
+        #各種図の出力フラグ
+        self.F_OutputCharts = self.Param["MLE_F_OutputCharts"]
+        self.F_OutputCharts_MMLEWaves = self.Param["MLE_F_OutputCharts_MMLEWaves"]
+
+    #本体
+    def __call__(self, result_param): 
+        #コンソール結果出力
+        if self.F_OutputLog : print("+++ Outputing Results +++")
+        if self.F_OutputLog : 
+            print("< MLE >")
+
+                
+        #作図
+        if self.F_OutputLog : print("+++ Making Charts +++")
+        if self.F_OutputCharts:
+            #結果のフォルダ
+            self.ConstractFileTree_Charts_Branch(True)
+            self.Save_Charts_Param(result_param, "")
+            
+            #入力波形と瞬時最大リアプノフ指数
+            if self.F_OutputCharts_MMLEWaves:
+                FigSize = (16, 9)                   #アスペクト比
+                FontSize_Label = 24                 #ラベルのフォントサイズ
+                FontSize_Title = 24                 #タイトルのフォントサイズ
+                LineWidth = 3                       #線の太さ
+                FileFormat = ".png"#".pdf"          #ファイルフォーマット
+                
+                #出力部分切り取り
+                start = self.Length_Burnin
+                end = self.Length_Burnin + self.Length_Test
+                T = np.array(result_param["MLE_R_T"][start : end])
+                U = np.array(result_param["MLE_R_U"][start : end])
+                MMLE = np.array(result_param["MLE_R_MMLE"][start : end])
+
+                #MMLE波形
+                fig = plt.figure(figsize = FigSize)
+                ax = fig.add_subplot(2, 1, 1)
+                Title = "U Wave" + self.AxisTag          #図題
+                ax.set_title(Title, fontsize = FontSize_Title)
+                #ax.set_xlabel("Time Step", fontsize = FontSize_Label)
+                ax.set_ylabel("Input Signal", fontsize = FontSize_Label)
+                ax.grid(True)
+                ax.plot(T, U, "skyblue", label = "u", lw = LineWidth)
+                ax.legend()
+
+                ax = fig.add_subplot(2, 1, 2)
+                Title = "Moument MLE Wave" + self.AxisTag          #図題
+                ax.set_title(Title, fontsize = FontSize_Title)
+                ax.set_xlabel("Time Step", fontsize = FontSize_Label)
+                ax.set_ylabel("Moument MLE", fontsize = FontSize_Label)
+                ax.grid(True)
+                ax.plot(T, MMLE, lw = LineWidth)
+                ax.legend()
+                fig.savefig(self.Plt_Charts_MMLEWaves.Path + FileFormat)
+                
+                plt.close()
+                
+    #以下ファイルとフォルダ単位のセーブとロード        
+    def Load_Project(self, save_type: str):
+        pass
+        
+    def Save_Project(self, save_type: str):
+        pass
+        
+    def Load_Charts_Param(self, save_type: str):
+        pass
+
+    def Save_Charts_Param(self, result_param: dict, save_type: str):
+        self.CSV_Charts_Param.Save(result_param)
+        
+    #以下フォルダ構造
+    def ConstractFileTree_Root(self, root: str):
+        if type(root) is str:
+            self.Dir_Project = FileAndDir_EM.RootNode(root)
+        else:
+            self.Dir_Project = root
+        
+        self.ConstractFileTree_Project()
+        
+    def ConstractFileTree_Project(self):
+        self.Dir_Results = self.Dir_Project.AddChild(FileAndDir_EM.LogDirNode("."))
+        
+    def ConstractFileTree_Charts_Branch(self, f_new: bool = False, tag: str = ""):
+        self.Dir_Results_Branch = self.Dir_Results.AddChild(FileAndDir_EM.DirNode("MLE_"), FileAndDir_EM.Manager.getDate(), tag)
+        
+        self.CSV_Charts_Param = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_dict("ResultAndParam"))
+        self.Plt_Charts_MMLEWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("MMLEWaves"))

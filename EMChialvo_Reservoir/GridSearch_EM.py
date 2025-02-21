@@ -310,13 +310,13 @@ class Normal:
         
     #以下フォルダ構造
     def ConstractFileTree_Root(self):
-        self.Dir_Root = FileAndDir_EM.RootNode(".")
+        self.Dir_Root = FileAndDir_EM.RootNode("./EMChialvo_Reservoir")
         self.Dir_Results = self.Dir_Root.AddChild(FileAndDir_EM.DirNode("Results"))
         
         self.ConstractFileTree_Project()
         
     def ConstractFileTree_Project(self):
-        self.Dir_Project = self.Dir_Results.AddChild(FileAndDir_EM.DirNode("Prj" + self.ProjectName + self.ProjectDate))
+        self.Dir_Project = self.Dir_Results.AddChild(FileAndDir_EM.DirNode("GridSearch" + self.ProjectName + self.ProjectDate))
         self.CSV_Project_Param = self.Dir_Project.AddChild(FileAndDir_EM.FileNode_dict("Param"))
         
         self.ConstractFileTree_Samples()
