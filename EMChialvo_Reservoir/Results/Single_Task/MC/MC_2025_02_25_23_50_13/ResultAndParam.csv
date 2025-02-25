@@ -1,0 +1,23 @@
+Project_F_NRMSE,Project_F_MemoryCapacity,Project_F_MLE,Task_SinCurve_RK_h,Task_MC_Tau,Task_Rosslor_Scale,Task_Rosslor_Mu,Task_Rosslor_Dt,Task_Rosslor_A,Task_Rosslor_Tau,Task_Rosslor_InitTerm,Task_NormalRosslor_Scale,Task_NormalRosslor_Dt,Task_NormalRosslor_Tau,Task_NormalRosslor_InitTerm,Task_NormalRosslor_a,Task_NormalRosslor_b,Task_NormalRosslor_c,Task_Lorenz_Scale,Task_Lorenz_Sigma,Task_Lorenz_Gamma,Task_Lorenz_Const_B,Task_Lorenz_Dt,Task_Lorenz_A,Task_Lorenz_Tau,Task_Lorenz_InitTerm,Task_NormalLorenz_Scale,Task_NormalLorenz_Dt,Task_NormalLorenz_Tau,Task_NormalLorenz_InitTerm,Task_NormalLorenz_Sigma,Task_NormalLorenz_Beta,Task_NormalLorenz_Rho,Task_LogisticEquation_A,Task_LogisticEquation_Tau,Task_Lorenz96_Scale,Task_Lorenz96_Dt,Task_Lorenz96_Tau,Task_Lorenz96_InitTerm,Task_Lorenz96_N,Task_Lorenz96_F,Task_MackeyGlass_Scale,Task_Predict_Tau,Task_MackeyGlass_Tau,Task_MackeyGlass_InitTerm,Task_PredictDDE_Tau,Task_MackeyGlassDDE_Scale,Task_MackeyGlassDDE_Dt,Task_MackeyGlassDDE_Beta,Task_MackeyGlassDDE_Gamma,Task_MackeyGlassDDE_N,Task_MackeyGlassDDE_Tau,Task_MackeyGlassDDE_InitTerm,Model_EMChialvo_D_u,Model_EMChialvo_D_x,Model_EMChialvo_D_y,Model_Reservoir_Neurons,Model_EMChialvo_InputScale,Model_EMChialvo_a,Model_EMChialvo_b,Model_EMChialvo_c,Model_EMChialvo_k0,Model_EMChialvo_k1,Model_EMChialvo_k2,Model_EMChialvo_alpha,Model_EMChialvo_beta,Model_EMChialvo_k,Model_EMChialvo_Rho,EMChialvo_Reservoir_Density,LinerTransformer_Beta,MemoryCapacity_F_OutputLog,MemoryCapacity_D_u,MemoryCapacity_D_y,MemoryCapacity_Length_Burnin,MemoryCapacity_Length_Train,MemoryCapacity_Length_Test,MemoryCapacity_MaxTau,MemoryCapacity_T_Task,MemoryCapacity_T_Model,MemoryCapacity_T_Output,DirPath_Project,MemoryCapacity_F_OutputCharts,MemoryCapacity_F_OutputCharts_MCGraph,MemoryCapacity_R_MC,MemoryCapacity_R_Tau,MemoryCapacity_R_MC_Tau
+True,True,True,0.01,10,0.03333333333333333,5.7,0.01,0.005,5,1000,0.03333333333333333,0.05,5,1000,0.2,0.2,5.7,0.02,10,28,2.6666666666666665,0.01,0.001,5,1000,0.02,0.01,5,1000,10,2.6666666666666665,28,4,1,0.02,0.01,5,1000,10,8,0.02,2,0,1000,5,0.02,0.5,0.2,0.1,10,128,1000,1,100,1,10,0.1,0.89,0.6,0.28,0.04,0.1,0.2,0.1,0.2,-3.0,0.001,1,0.2,True,1,1,1000,20000,1000,100,<class 'Task_EM.Task_MC'>,<class 'Model_EM.Model_EMChialvo'>,<class 'Output_EM.Output_Single_MC_2023_05_25_13_28'>,./EMChialvo_Reservoir/Results/Single_Task/MC,True,True,6.805001004716807,"[  1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+  91  92  93  94  95  96  97  98  99 100]","[0.60288114 0.26377331 0.14381715 0.12500613 0.13643109 0.14840479
+ 0.15637159 0.15362117 0.15369467 0.14888737 0.14341628 0.13993558
+ 0.13426231 0.1262901  0.11933108 0.10864603 0.10543515 0.10069569
+ 0.09790752 0.09974137 0.09738284 0.09746418 0.09445601 0.09597996
+ 0.09299028 0.09383838 0.09467736 0.08982939 0.08656877 0.08660701
+ 0.08544432 0.08762797 0.09166166 0.09070951 0.08632888 0.08269752
+ 0.08213228 0.07939582 0.07571139 0.06927806 0.0694905  0.06134734
+ 0.05572018 0.05097072 0.04896267 0.05013855 0.05157313 0.05378948
+ 0.05005645 0.04512744 0.04456506 0.04242219 0.04864053 0.04265235
+ 0.03829843 0.03883811 0.03426398 0.02841646 0.025561   0.02931955
+ 0.03807504 0.03773958 0.03878257 0.03532314 0.03439343 0.03255882
+ 0.02500977 0.02377244 0.02332097 0.0219195  0.02269246 0.01909809
+ 0.02310998 0.02146871 0.01683204 0.0133918  0.01343645 0.0152091
+ 0.01334253 0.01474289 0.01622825 0.02042414 0.02682432 0.0318251
+ 0.02974236 0.02821212 0.02752179 0.01813776 0.01387051 0.01306333
+ 0.01431518 0.0204611  0.02606802 0.02940832 0.02676277 0.01989655
+ 0.01916281 0.02146623 0.01996419 0.01794161]"

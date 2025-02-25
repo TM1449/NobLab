@@ -350,7 +350,6 @@ class Evaluation_MC(Evaluation):
             #評価処理
             Cov = np.cov([array_Y_d_tau_test.reshape([-1]), array_Y_tau_test.reshape([-1])], bias = True)
             MC_Tau[i] = (Cov[0,1]**2) / (Cov[0,0] * Cov[1,1])
-
         if self.F_OutputLog : print("\n", end = "")
             
         #指標計算
@@ -379,7 +378,8 @@ class Evaluation_MC(Evaluation):
 
         return outputs
 
-#利用可能評価指標
+#********************************************************************
+#利用可能モデル
 class Evaluation_MLE(Evaluation):
     """
     Max Lyapunov Exponent評価クラス（摂動ベース）
@@ -534,26 +534,24 @@ class Evaluation_MLE(Evaluation):
         start = self.Length_Burnin
         end = self.Length_Burnin + self.Length_Test
         array_MMLE = np.array(MMLE[start : end])
-        MLE = np.mean(array_MMLE)#リアプノフ指数
+        MLE = np.mean(array_MMLE, axis = 0)#リアプノフ指数
         
         #終了処理
         if self.F_OutputLog : print("+++ Storing Results +++")
         results = self.Param.copy()
         results.update({
-            "MaximumLyapunovExponent_R_MLE" : MLE,
-            "MaximumLyapunovExponent_R_T" : T,
-            "MaximumLyapunovExponent_R_U" : U,
-            "MaximumLyapunovExponent_R_MMLE" : MMLE,
-            "MaximumLyapunovExponent_R_MLETS" : MLE_TS,
+            "MLE_R_MLE" : MLE,
+            "MLE_R_T" : T,
+            "MLE_R_U" : U,
+            "MLE_R_MMLE" : MMLE,
+            "MLE_R_MLE_TS" : MLE_TS,
             })
         
         outputs = self.Param.copy()
         outputs.update({
-            "MaximumLyapunovExponent_R_MLE" : MLE,
-            "MaximumLyapunovExponent_R_T" : T,
-            "MaximumLyapunovExponent_R_U" : U,
-            "MaximumLyapunovExponent_R_MMLE" : MMLE,
-            "MaximumLyapunovExponent_R_MLETS" : MLE_TS,
+            "MLE_R_MLE" : MLE,
+            "MLE_R_MMLE" : MMLE,
+            "MLE_R_MLE_TS" : MLE_TS,
             })
         
         #作図出力
@@ -562,5 +560,3 @@ class Evaluation_MLE(Evaluation):
         if self.F_OutputLog : print("*** Finished Evaluation Max-Lyapunov-Exponent ***")
 
         return outputs
-    
-#--------------------------------------------------------------------

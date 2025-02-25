@@ -375,7 +375,7 @@ def Project_EMChialvo_2025_01_28_12_34():
             "DirPath_Project" : "./EMChialvo_Reservoir/Results/Single_Task/MLE",
         
             "MLE_F_OutputCharts" : True,             #図の出力フラグ
-            "MLE_F_OutputCharts_MMLEWaves" : True,     #MC曲線の出力フラグ
+            "MLE_F_OutputCharts_MLEWaves" : True,     #MC曲線の出力フラグ
         })
         Evaluation_EM.Evaluation_MLE(param)()
 

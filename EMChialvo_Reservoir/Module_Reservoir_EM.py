@@ -212,7 +212,7 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         #完全乱数
         """
         #乱数で重み調整
-        np.random.seed(seed=999)
+        #np.random.seed(seed=999)
         #一様分布
         #W = (np.random.rand(self.D_x,self.D_x) * 2 - 1)
         
@@ -225,7 +225,7 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
 
         #リング構造
         W = np.zeros((self.D_x, self.D_x))  # 初期化
-
+        np.random.seed(None)
         for i in range(self.D_x):
             forward_index = (i + 1) % self.D_x
             backward_index = (i - 1) % self.D_x

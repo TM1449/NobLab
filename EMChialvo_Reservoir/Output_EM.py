@@ -95,8 +95,6 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
         if self.F_OutputLog : print("+++ Making Charts +++")
         if self.F_OutputCharts:
             #結果のフォルダ
-            self.Date = FileAndDir_EM.Manager.getDate()
-
             self.ConstractFileTree_Charts_Branch(True)
             self.Save_Charts_Param(result_param, "")
 
@@ -392,7 +390,6 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
         self.Length_Test = self.Param["MLE_Length_Test"]                #評価用データ時間長
         self.Length_Total = self.Length_Burnin + self.Length_Test       #全体データ時間長
         
-        #フォルダ構造
         self.DirPath_Project = self.Param["DirPath_Project"]            #プロジェクトのフォルダパス
         self.ConstractFileTree_Root(self.DirPath_Project)
 
@@ -401,22 +398,19 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
 
         #各種図の出力フラグ
         self.F_OutputCharts = self.Param["MLE_F_OutputCharts"]
-        self.F_OutputCharts_MMLEWaves = self.Param["MLE_F_OutputCharts_MMLEWaves"]
+        self.F_OutputCharts_MMLEWaves = self.Param["MLE_F_OutputCharts_MLEWaves"]
 
     #本体
     def __call__(self, result_param): 
         #コンソール結果出力
         if self.F_OutputLog : print("+++ Outputing Results +++")
         if self.F_OutputLog : 
-            print("MLE : " + str(result_param["MaximumLyapunovExponent_R_MLE"]))
-
+            print("MLE : " + str(result_param["MLE_R_MLE"]))
                 
         #作図
         if self.F_OutputLog : print("+++ Making Charts +++")
         if self.F_OutputCharts:
             #結果のフォルダ
-            self.Date = FileAndDir_EM.Manager.getDate()
-            
             self.ConstractFileTree_Charts_Branch(True)
             self.Save_Charts_Param(result_param, "")
             
@@ -431,10 +425,10 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
                 #出力部分切り取り
                 start = self.Length_Burnin
                 end = self.Length_Burnin + self.Length_Test
-                T = np.array(result_param["MaximumLyapunovExponent_R_T"][start : end])
-                U = np.array(result_param["MaximumLyapunovExponent_R_U"][start : end])
-                MMLE = np.array(result_param["MaximumLyapunovExponent_R_MMLE"][start : end])
-                MLE_TimeStep = np.array(result_param["MaximumLyapunovExponent_R_MLETS"][start : end])
+                T = np.array(result_param["MLE_R_T"][start : end])
+                U = np.array(result_param["MLE_R_U"][start : end])
+                MMLE = np.array(result_param["MLE_R_MMLE"][start : end])
+                MLE_TimeStep = np.array(result_param["MLE_R_MLE_TS"][start : end])
                 
                 #MMLE波形
                 fig = plt.figure(figsize = FigSize)
