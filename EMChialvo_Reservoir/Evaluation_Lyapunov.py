@@ -31,24 +31,11 @@ class Evaluation:
     #コンストラクタ
     def __init__(self, param: dict, parent: any = None):
         self.Param = param
-        
         self.Parent = parent                            #親オブジェクト
         
-        #パラメータ取得
-        self.F_UsePytorch = self.Param["Project_F_UsePytorch"]  #Pytorchを使うか（多層リードアウトでは強制的に使用）
-        self.DeviceCode = self.Param["Project_DeviceCode"]      #CPU/GPUを使うか（CPU -> cpu, GPU -> gpu:n（nはデバイス番号，無くてもいい））
-        self.DataType = self.Param["Project_DataType"]          #Pytorchのデータ型
-
     #本体
     def __call__(self) -> dict: pass
 
-    #収集行列作成補助（テンソルが入れ子のリストを２次元テンソルに変換）
-    def ListTensorToTensor(self, data: list) -> torch.tensor:
-        out = torch.zeros([len(data), len(data[0])], device = data[0].device, dtype = data[0].dtype)
-        for i, d in enumerate(data): 
-            out[i] = d
-        return out
-    
 #********************************************************************
 #利用可能評価指標
 class Evaluation_MLE(Evaluation):
@@ -112,6 +99,8 @@ class Evaluation_MLE(Evaluation):
         T = list(range(self.Length_Total))
         U = [None for _ in range(self.Length_Total)]
         MMLE = [None for _ in range(self.Length_Total)]#瞬時リアプノフ指数
+        MLE_TS = [None for _ in range(self.Length_Total)]#リアプノフ指数時系列
+        MLE_Sum = 0 #リアプノフ指数の合計
 
         #基準軌道の配列
         Standard_0 = np.zeros((3 * self.D_x, self.Length_Total))
@@ -122,27 +111,27 @@ class Evaluation_MLE(Evaluation):
         Pert_1 = np.zeros((3 * self.D_x, self.Length_Total))
 
         #リザバー層の配列
-        RS_xO_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のX
-        RS_yO_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のY
-        RS_phiO_MLE = np.array([None for _ in range(self.D_x)])    #リザバー層のPhi
+        RS_xO_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のX: 基準軌道用
+        RS_yO_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のY: 基準軌道用
+        RS_phiO_MLE = np.array([None for _ in range(self.D_x)])    #リザバー層のPhi: 基準軌道用
 
-        RS_x_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のX
-        RS_y_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のY
-        RS_phi_MLE = np.array([None for _ in range(self.D_x)])    #リザバー層のPhi
+        RS_x_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のX: 基準軌道用
+        RS_y_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のY: 基準軌道用
+        RS_phi_MLE = np.array([None for _ in range(self.D_x)])    #リザバー層のPhi: 基準軌道用
 
         #摂動軌道用のリザバー層の配列
-        RS_xPO_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のX
-        RS_yPO_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のY
-        RS_phiPO_MLE = np.array([None for _ in range(self.D_x)])    #リザバー層のPhi
+        RS_xPO_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のX: 摂動軌道用
+        RS_yPO_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のY: 摂動軌道用
+        RS_phiPO_MLE = np.array([None for _ in range(self.D_x)])    #リザバー層のPhi: 摂動軌道用
 
-        RS_xP_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のX
-        RS_yP_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のY
-        RS_phiP_MLE = np.array([None for _ in range(self.D_x)])    #リザバー層のPhi
+        RS_xP_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のX: 摂動軌道用
+        RS_yP_MLE = np.array([None for _ in range(self.D_x)])      #リザバー層のY: 摂動軌道用
+        RS_phiP_MLE = np.array([None for _ in range(self.D_x)])    #リザバー層のPhi: 摂動軌道用
         
         #モデルリセット
         self.Model.reset()
         
-        #Burn-in OOOOOOOO
+        #Burn-in
         if self.F_OutputLog : print("--- Burn-in Process---")
         for i, t in enumerate(T[0 : self.Length_Burnin]):
             if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Burnin), end = "")
@@ -153,10 +142,9 @@ class Evaluation_MLE(Evaluation):
         if self.F_OutputLog : print("--- Add perturbation Process---")
         
         #リザバー層の全ニューロンの誤差
-        e = np.ones(3 * self.D_x)
-        e = (e / np.linalg.norm(e)) * self.Epsilon
+        e0 = np.ones(3 * self.D_x)
+        e = (e0 / np.linalg.norm(e0)) * self.Epsilon
         
-
         if self.F_OutputLog : print("+++ Evaluating Model +++")
         #時間発展させ評価
         for i, t in enumerate(T[self.Length_Burnin : self.Length_Burnin + self.Length_Test]):
@@ -187,8 +175,12 @@ class Evaluation_MLE(Evaluation):
             Norm_0 = np.linalg.norm(Vector_0)
             Norm_1 = np.linalg.norm(Vector_1)
 
-            #最大リアプノフ指数の計算
-            MMLE[t] = np.log(Norm_1 / Norm_0 + 1e-20)
+            #瞬間最大リアプノフ指数の計算
+            MMLE[t] = np.log(Norm_1 / Norm_0)
+
+            #各時間ステップごとのリアプノフ指数を格納
+            MLE_Sum += MMLE[t]
+            MLE_TS[t] = MLE_Sum / (i + 1)
 
             #次の摂動の計算
             e = (Vector_1 / Norm_1) * self.Epsilon
@@ -201,6 +193,8 @@ class Evaluation_MLE(Evaluation):
         end = self.Length_Burnin + self.Length_Test
         array_MMLE = np.array(MMLE[start : end])
         MLE = np.mean(array_MMLE, axis = 0)#リアプノフ指数
+        round_MLE = np.round(MLE, 6)
+        print("MLE:", round_MLE)
         
         #終了処理
         if self.F_OutputLog : print("+++ Storing Results +++")
@@ -210,6 +204,7 @@ class Evaluation_MLE(Evaluation):
             "MLE_R_T" : T,
             "MLE_R_U" : U,
             "MLE_R_MMLE" : MMLE,
+            "MLE_R_MLE_TS" : MLE_TS,
             })
         
         #作図出力

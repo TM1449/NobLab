@@ -167,14 +167,14 @@ def Project_ESN_NRMSE_MC_2024_04_16_13_58():
 
 #********************************************************************
 #Sishu提案モデル
-def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
+def Project_EMChialvo_2025_01_28_12_34():
     """
     Sishu提案モデル（結合形態のみ指定、強度は乱数）のNRMSEやMC測定
     """
     #共通パラメータ
     Param = {
         #==========================================================================================
-        "Project_F_NRMSE" : False,                            #NRMSEを調査するか
+        "Project_F_NRMSE" : True,                            #NRMSEを調査するか
         "Project_F_MemoryCapacity" : False,                  #MCを調査するか
         "Project_F_MLE" : True,                             #MLE（最大リアプノフ指数）を調査するか
 
@@ -285,7 +285,7 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
         "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
-        "Model_EMChialvo_k" : 3.5,                         #変数:k
+        "Model_EMChialvo_k" : -2.0,                         #変数:k
         
         "Model_EMChialvo_Rho" : 0.001,                      #スペクトル半径
 
@@ -319,10 +319,10 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-            "DirPath_Project" : "./EMChialvo_Reservoir/Results/Single_Task/MLE",
+            "DirPath_Project" : "./EMChialvo_Reservoir/Results/Single_Task/NRMSE",
         
-            "MLE_F_OutputCharts" : True,                      #図の出力フラグ
-            "MLE_F_OutputCharts_UYYdEWaves" : True,           #入出力＆誤差波形図の出力フラグ
+            "NRMSE_F_OutputCharts" : True,                      #図の出力フラグ
+            "NRMSE_F_OutputCharts_UYYdEWaves" : True,           #入出力＆誤差波形図の出力フラグ
 
             })
         Evaluation_EM.Evaluation_NRMSE(param)()
@@ -357,11 +357,6 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
         param = Param.copy()
         param.update({
             #==========================================================================================
-            "Project_F_UsePytorch" : False,
-            "Project_DeviceCode" : False,
-            "Project_DataType" : False,
-            
-            #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
             "MLE_F_OutputLog" : True,                        #経過の出力を行うか
 
             "MLE_D_u" : 1,                                   #入力信号次元
@@ -369,11 +364,11 @@ def Project_EMChialvo_NRMSE_MC_2025_01_28_12_34():
             "MLE_D_y" : 1,                                   #出力信号次元
 
             "MLE_Length_Burnin" : 1000,                      #空走用データ時間長
-            "MLE_Length_Test" : 5000,                        #評価用データ時間長
+            "MLE_Length_Test" : 25000,                        #評価用データ時間長
 
-            "MLE_Epsilon" : 1e-10,                            #摂動の大きさ
+            "MLE_Epsilon" : 1e-06,                            #摂動の大きさ
 
-            "MLE_T_Task" : Task_EM.Task_Zeros,
+            "MLE_T_Task" : Task_EM.Task_NormalRosslor,
             "MLE_T_Model" : Model_EM.Model_EMChialvo,
             "MLE_T_Output" : Output_EM.Output_Single_MLE_2023_07_08_17_12,
 

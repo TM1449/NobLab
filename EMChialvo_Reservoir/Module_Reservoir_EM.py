@@ -173,11 +173,8 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
 
         #変数
         self.xP = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                     #xの状態ベクトル
-        self.xP_old = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                 #1step前のxの状態ベクトル
         self.yP = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                     #yの状態ベクトル
-        self.yP_old = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                 #1step前のyの状態ベクトル
         self.phiP = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                   #phiの状態ベクトル
-        self.phiP_old = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)               #1step前のphiの状態ベクトル
         
         #重み初期化
         self.W_in = self._makeInputWeight()                     #入力重み
@@ -260,9 +257,9 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
 
     #時間発展（最大リアプノフ指数用）
     def update_MLE(self):
-        self.xP_old = self.x_old
-        self.yP_old = self.yP
-        self.phiP_old = self.phiP
+        self.x_old = self.x
+        self.y_old = self.y
+        self.phi_old = self.phi
 
     #リザバーの初期化
     def reset(self):

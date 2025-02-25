@@ -415,7 +415,8 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
                 T = np.array(result_param["MLE_R_T"][start : end])
                 U = np.array(result_param["MLE_R_U"][start : end])
                 MMLE = np.array(result_param["MLE_R_MMLE"][start : end])
-
+                MLE_TimeStep = np.array(result_param["MLE_R_MLE_TS"][start : end])
+                
                 #MMLE波形
                 fig = plt.figure(figsize = FigSize)
                 ax = fig.add_subplot(2, 1, 1)
@@ -436,6 +437,18 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
                 ax.plot(T, MMLE, lw = LineWidth)
                 ax.legend()
                 fig.savefig(self.Plt_Charts_MMLEWaves.Path + FileFormat)
+
+                #時間経過による最大リアプノフ指数
+                Title = "Maxisum Lyapunov Exponent" + self.AxisTag          #図題
+                fig = plt.figure(figsize = FigSize)
+                ax = fig.add_subplot(1, 1, 1)
+                ax.set_title(Title, fontsize = FontSize_Title)
+                ax.set_xlabel("Time Step", fontsize = FontSize_Label)
+                ax.set_ylabel("Maxisum Lyapunov Exponent", fontsize = FontSize_Label)
+                ax.grid(True)
+                ax.plot(T, MLE_TimeStep, lw = LineWidth)
+                ax.legend()
+                fig.savefig(self.Plt_Charts_MLETimeStepWaves.Path + FileFormat)
                 
                 plt.close()
                 
@@ -469,3 +482,4 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
         
         self.CSV_Charts_Param = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_dict("ResultAndParam"))
         self.Plt_Charts_MMLEWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("MMLEWaves"))
+        self.Plt_Charts_MLETimeStepWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("MLETimeStepWaves"))

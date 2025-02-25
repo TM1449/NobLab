@@ -223,8 +223,11 @@ class Model_EMChialvo(Model):
     
     #最大リアプノフ指数（MLE: Maximum Lyapunov Exponent）
     def forwardReservoir_MLE(self, u: np.ndarray, Delta_x: np.array, Delta_y: np.array, Delta_phi: np.array):
-        xRo, yRo, phiRo, xR, yR, phiR, xPo, yPo, phiPo, xP, yP, phiP = self.EMChialvo_Reservoir.forward_MLE(u, Delta_x, Delta_y, Delta_phi)
-        self.EMChialvo_Reservoir.update()
+        xRo, yRo, phiRo, \
+            xR, yR, phiR, \
+                xPo, yPo, phiPo, \
+                    xP, yP, phiP = self.EMChialvo_Reservoir.forward_MLE(u, Delta_x, Delta_y, Delta_phi)
+        self.EMChialvo_Reservoir.update_MLE()
 
         return xRo, yRo, phiRo, xR, yR, phiR, xPo, yPo, phiPo, xP, yP, phiP
 
