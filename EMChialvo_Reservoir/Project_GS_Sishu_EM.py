@@ -46,6 +46,7 @@ def Project_GridSearch_EMChialvo_NRMSE():
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Project_F_NRMSE" : True,                                   #NRMSEを調査するか
         "Project_F_MemoryCapacity" : True,                          #MCを調査するか
+        "Project_F_MaxLyapunovExponent" : True,                   #MLEを調査するか
 
         "Project_F_OutputResults" : True,                           #各評価地点でパラメータを出力するか
 
@@ -54,14 +55,14 @@ def Project_GridSearch_EMChialvo_NRMSE():
         #[0.5, 0.4, 0.3, 0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.009, 0.008, 0.007, 0.006, 0.005, 0.004, 0.003, 0.002, 0.001,0.0009, 0.0008, 0.0007, 0.0006, 0.0005, 0.0004, 0.0003, 0.0002, 0.0001,0.00009, 0.00008, 0.00007, 0.00006, 0.00005, 0.00004, 0.00003, 0.00002, 0.00001]
         #[0.1, 0.099, 0.098, 0.097, 0.096, 0.095, 0.094, 0.093, 0.092, 0.091, 0.09, 0.089, 0.088, 0.087, 0.086, 0.085, 0.084, 0.083, 0.082, 0.081, 0.08, 0.079, 0.078, 0.077, 0.076, 0.075, 0.074, 0.073, 0.072, 0.071, 0.07, 0.069, 0.068, 0.067, 0.066, 0.065, 0.064, 0.063, 0.062, 0.061, 0.06, 0.059, 0.058, 0.057, 0.056, 0.055, 0.054, 0.053, 0.052, 0.051, 0.05, 0.049, 0.048, 0.047, 0.046, 0.045, 0.044, 0.043, 0.042, 0.041, 0.04, 0.039, 0.038, 0.037, 0.036, 0.035, 0.034, 0.033, 0.032, 0.031, 0.03, 0.029, 0.028, 0.027, 0.026, 0.025, 0.024, 0.023, 0.022, 0.021, 0.02, 0.019, 0.018, 0.017, 0.016, 0.015, 0.014, 0.013, 0.012, 0.011, 0.01, 0.009, 0.008, 0.007, 0.006, 0.005, 0.004, 0.003, 0.002, 0.001]
         
-        "_Param_Rho" : [0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01, 0.009, 0.008, 0.007, 0.006, 0.005, 0.004, 0.003, 0.002, 0.001, 0.0009, 0.0008, 0.0007, 0.0006, 0.0005, 0.0004, 0.0003, 0.0002, 0.0001],
-        "_Param_k" : [-5.0, -4.75, -4.5, -4.25, -4.0, -3.75, -3.5, -3.25, -3.0, -2.75, -2.5, -2.25, -2.0, -1.75, -1.5, -1.25, -1.0, -0.75, -0.5, -0.25, 0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5, 4.75, 5.0],
+        "_Param_Rho" : [0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01],
+        "_Param_k" : [-5.0, -1.0, 1.0, 5.0],
         "_Param_Model" : ["EMChialvo"],
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "GridSearch_MachineName" : "EMChialvo",                            #計算機名
         "GridSearch_StartPoint" : 0,                                #担当開始ポイントインデックス
-        "GridSearch_EndPoint" : 2296,                                #担当終了ポイントインデックス(MAX:4410(21*21*10)) new:1148
+        "GridSearch_EndPoint" : 80,                                #担当終了ポイントインデックス(MAX:4410(21*21*10)) new:1148
         
         "GridSearch_MultiThread" : 12,                               #スレッド数（0で逐次処理）初期値:2, 自宅PC:4, 研究室PC, 12
         "GridSearch_MaxNumberInOneFile" : 100,                        #１ファイルの最大のポイント数 初期値:5
@@ -92,16 +93,15 @@ class Process_SishuESN_GridSearch:
         Results.update(self.Exp_GridWorld2D(chank_i, param))
         
         #表示
-        print(("---Index in Chank : %d / %d, Index : %d, Sample : %d\n"
-                + "<%s>\n"
-                + "NRMSE : %f, LogNRMSE : %f, TimeForTraining : %f, TimeForTesting : %f, MC : %f\n")
+        print(("---Index in Chank : %d / %d, Index : %d, Sample : %d\n" + "<%s>\n" + "NRMSE : %f, LogNRMSE : %f, TimeForTraining : %f, TimeForTesting : %f, MC : %f, MLE : %f\n")
                     %(Results["IndexInChank"], Results["NumPointsInChank"], Results["Index"], Results["Samples"],
                     self.getTag(chank_i),
                     Results["NRMSE_R_NRMSE"] if "NRMSE_R_NRMSE" in Results else 0,
                     Results["NRMSE_R_LogNRMSE"] if "NRMSE_R_LogNRMSE" in Results else 0,
                     Results["NRMSE_R_TimeForTraining"] if "NRMSE_R_TimeForTraining" in Results else 0,
                     Results["NRMSE_R_TimeForTesting"] if "NRMSE_R_TimeForTesting" in Results else 0,
-                    Results["MemoryCapacity_R_MC"] if "MemoryCapacity_R_MC" in Results else 0))
+                    Results["MemoryCapacity_R_MC"] if "MemoryCapacity_R_MC" in Results else 0,
+                    Results["MaximumLyapunovExponent_R_MLE"] if "MaximumLyapunovExponent_R_MLE" in Results else 0))
     
         return Results
 
@@ -224,7 +224,6 @@ class Process_SishuESN_GridSearch:
             "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
             "Model_EMChialvo_k" : Param_k,                         #変数:k
-            
             "Model_EMChialvo_Rho" : Param_Rho,                      #スペクトル半径
 
             #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -289,7 +288,36 @@ class Process_SishuESN_GridSearch:
 
                 })
             Results.update(Evaluation_EM.Evaluation_MC(param)())
-        
+
+        #MLE評価
+        if gs_param["Project_F_MaxLyapunovExponent"]:
+            param = Param.copy()
+            param.update({
+                #==========================================================================================
+                "MLE_F_OutputLog" : False,                        #経過の出力を行うか
+
+                "MLE_D_u" : 1,                                   #入力信号次元
+                "MLE_D_x" : 100,                                 #リザバー層次元
+                "MLE_D_y" : 1,                                   #出力信号次元
+
+                "MLE_Length_Burnin" : 1000,                      #空走用データ時間長
+                "MLE_Length_Test" : 25000,                        #評価用データ時間長
+
+                "MLE_Epsilon" : 1e-06,                            #摂動の大きさ
+
+                "MLE_T_Task" : Task_EM.Task_NormalLorenz,
+                "MLE_T_Model" : Param_Model,
+                "MLE_T_Output" : Output_EM.Output_Single_MLE_2023_07_08_17_12,
+
+                #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                "DirPath_Project" : self.GridSearch.Dir_Points_Branch,                      #GSのパスを使用
+                "AxisTag" : self.getTag(chank_i),                                           #GSのパラメータを図題に使用
+
+                "MLE_F_OutputCharts" : False,             #図の出力フラグ
+                "MLE_F_OutputCharts_MMLEWaves" : False,     #MLEの出力フラグ
+                })
+            Results.update(Evaluation_EM.Evaluation_MLE(param)())
+
         #地点のパラメータを改めて設定
         if gs_param["Project_F_OutputResults"]:
             self.GridSearch.CSV_Point_Param.Save(Results)
@@ -304,113 +332,6 @@ class Process_SishuESN_GridSearch:
 #********************************************************************
 #GS出力
 #====================================================================
-class Output_SishuESN_2024_06_01_10_30(Output_EM.Output):
-    """
-    Sishu提案モデル（結合形態のみ指定、強度は乱数）のNRMSEやMC測定
-    """
-    #コンストラクタ
-    def __init__(self, param: dict, parent: any):
-        super().__init__(param, parent)
-        
-        #グリッドサーチ用図題用
-        #self.AxisTag = self.Param["AxisTag"] if "AxisTag" in self.Param else ""
-
-        #各種図の出力フラグ
-        #self.F_OutputCharts = self.Param["NRMSE_F_OutputCharts"]
-        #self.F_OutputCharts_UYYdEWaves = self.Param["NRMSE_F_OutputCharts_UYYdEWaves"]
-        
-    #本体
-    def __call__(self, result_param): 
-        #結果の取得
-        AllData = pd.DataFrame(result_param)
-        #図までのパスを作成
-        self.Parent.ConstractFileTree_Charts_Branch(True)
-        #指標の文字列一覧（タイトル用，辞書用，ファイル名用）
-        L_Score = [["NRMSE", "NRMSE_R_NRMSE", "NRMSE"], 
-                ["Log NRMSE", "NRMSE_R_LogNRMSE", "LogNRMSE"], 
-                ["Time For Training", "NRMSE_R_TimeForTraining", "TimeTrain"], 
-                ["Time For Testing" , "NRMSE_R_TimeForTesting", "TimeTest"],
-                ["Memory Capacity", "MemoryCapacity_R_MC", "MC"]]
-        
-        #指標でループ
-        for score in L_Score:
-            #データ抽出
-            ScoreData = self.MakeData(AllData, score[1])
-            SishuESN_Score = ScoreData[:, :, :, 0]
-            #指標の文字列一覧（タイトル用，データ，ファイル名用）
-            L_Chart = [["SishuESN", SishuESN_Score, "SishuESN"]]
-            #フォルダパスを作成
-            Plt_Score = self.Parent.Dir_Charts_Branch.AddChild(
-                FileAndDir_EM.DirNode(score[1]))
-
-            #とる軸毎にループ
-            for chart in L_Chart:
-                #データ生成
-                #平均
-                mean = np.nanmean(chart[1], axis = 0)
-                #標準偏差
-                std = np.nanstd(chart[1], axis = 0)
-                #サンプル数２以上の場合
-                if self.Parent.NumberOfSamples > 1:
-                    #縦方向の影響を無くした平均
-                    scaled_mean = (mean - np.nanmean(mean, axis = 0)) / (np.nanstd(mean, axis = 0))
-                    #縦方向の影響を無くした標準偏差
-                    scaled_std = (std - np.nanmean(std, axis = 0)) / (np.nanstd(std, axis = 0))
-                else:
-                    scaled_mean = np.zeros(mean.shape)
-                    scaled_std = np.zeros(mean.shape)
-                #統計処理の文字列一覧（タイトル用，データ，ファイル名用）
-                L_Stats = [["Mean", mean, "Mean"],
-                        ["Std", std, "Std"],
-                        ["Mean Scaled in each Row", scaled_mean, "ScaleMean"],
-                        ["Std Scaled in each Row", scaled_std, "ScaleStd"]]
-                
-                #統計処理でループ
-                for stats in L_Stats:
-                    #軸パラメータ作成
-                    AxisX = np.array(self.Param["_Param_k"])
-                    AxisY = [0.1, None, None, None, None, 0.095, None, None, None, None, 0.09, None, None, None, None, 0.085, None, None, None, None, 0.08, None, None, None, None, 0.075, None, None, None, None, 0.07, None, None, None, None, 0.065, None, None, None, None, 0.06, None, None, None, None, 0.055, None, None, None, None, 0.05, None, None, None, None, 0.045, None, None, None, None, 0.04, None, None, None, None, 0.035, None, None, None, None, 0.03, None, None, None, None, 0.025, None, None, None, None, 0.02, None, None, None, None, 0.015, None, None, None, None, 0.01, None, None, None, None, 0.005, None, None, None, 0.001]
-                    #ファイル作成
-                    Plt_Chart = Plt_Score.AddChild(
-                        FileAndDir_EM.FileNode_plt(chart[2] + "_" + stats[2]))
-                    Plt_Chart.Save()
-
-                    #図の設定
-                    LabelsX = "Strength of electromagnetic flux : k"                     #x軸ラベル
-                    LabelsY = "Scaling size : \u03c3"                     #y軸ラベル
-                    FigSize = (16, 9)                   #図の大きさとアスペクト比
-                    FontSize_Label = 36                 #ラベルのフォントサイズ
-                    FontSize_Title = 36                 #図題のフォントサイズ
-                    LineWidth = 0.5                       #線の太さ
-                    FileFormat = ".png"                 #ファイル拡張子
-                    MapCode = "jet"                     #カラーマップ
-                    Annot = False#True                  #数値を表示するか
-
-                    #図題
-                    Title = None
-                    #作図
-                    fig = plt.figure(figsize = FigSize)
-                    sub = fig.add_subplot(1, 1, 1)
-                    plt.tick_params(labelsize=15)
-                    body = sns.heatmap(stats[1], xticklabels = AxisX, yticklabels = AxisY, cmap = MapCode, linewidth = LineWidth, annot = Annot, ax = sub)
-                    body.collections[0].colorbar.set_label('Average NRMSE',fontsize=24)
-                    body.set_xlabel(LabelsX, fontsize = FontSize_Label)
-                    body.set_ylabel(LabelsY, fontsize = FontSize_Label)
-                    body.set_title(Title, fontsize = FontSize_Title)
-                    plt.tight_layout()
-                    fig.savefig(Plt_Chart.Path + FileFormat)
-            
-                    #表示せず図を閉じる
-                    plt.close()
-    
-    #DataFrameをNdarrayに変換し，結果のキーから結果を抽出
-    def MakeData(self, data, key):
-        return data[key].values.reshape([axis.NumberOfPoints for axis in self.Parent.GridSearch_AxisList])
-
-    #以下フォルダ構造
-    def ConstractFileTree_Charts(self):
-        pass
-
 class OutputLog_SishuESN_2024_06_01_10_30(Output_EM.Output):
     """
     Sishu提案モデル（結合形態のみ指定、強度は乱数）のNRMSEやMC測定
@@ -437,7 +358,8 @@ class OutputLog_SishuESN_2024_06_01_10_30(Output_EM.Output):
                 ["Log NRMSE", "NRMSE_R_LogNRMSE", "LogNRMSE"], 
                 ["Time For Training", "NRMSE_R_TimeForTraining", "TimeTrain"], 
                 ["Time For Testing" , "NRMSE_R_TimeForTesting", "TimeTest"],
-                ["Memory Capacity", "MemoryCapacity_R_MC", "MC"]]
+                ["Memory Capacity", "MemoryCapacity_R_MC", "MC"],
+                ["Maximum Lyapunov Exponent", "MaximumLyapunovExponent_R_MLE", "MLE"]]
         
         #指標でループ
         for score in L_Score:

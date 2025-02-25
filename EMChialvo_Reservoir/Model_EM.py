@@ -222,6 +222,11 @@ class Model_EMChialvo(Model):
         return z, xr[0:self.RS_neuron], yr[0:self.RS_neuron], phir[0:self.RS_neuron], xr, yr, phir
     
     #最大リアプノフ指数（MLE: Maximum Lyapunov Exponent）
+
+    #1行目：基準軌道の1時刻前のニューロンの値
+    #2行目：基準軌道の現時刻のニューロンの値
+    #3行目：摂動軌道の1時刻前のニューロンの値
+    #4行目：摂動軌道の現時刻のニューロンの値
     def forwardReservoir_MLE(self, u: np.ndarray, Delta_x: np.array, Delta_y: np.array, Delta_phi: np.array):
         xRo, yRo, phiRo, \
             xR, yR, phiR, \
@@ -229,7 +234,10 @@ class Model_EMChialvo(Model):
                     xP, yP, phiP = self.EMChialvo_Reservoir.forward_MLE(u, Delta_x, Delta_y, Delta_phi)
         self.EMChialvo_Reservoir.update_MLE()
 
-        return xRo, yRo, phiRo, xR, yR, phiR, xPo, yPo, phiPo, xP, yP, phiP
+        return xRo, yRo, phiRo, \
+            xR, yR, phiR, \
+                xPo, yPo, phiPo, \
+                    xP, yP, phiP
 
     #順伝播（リードアウトのみ）
     def forwardReadout(self, z: np.ndarray) -> np.ndarray:

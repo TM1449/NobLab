@@ -95,6 +95,8 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
         if self.F_OutputLog : print("+++ Making Charts +++")
         if self.F_OutputCharts:
             #結果のフォルダ
+            self.Date = FileAndDir_EM.Manager.getDate()
+
             self.ConstractFileTree_Charts_Branch(True)
             self.Save_Charts_Param(result_param, "")
 
@@ -152,6 +154,19 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.plot(T, E, "skyblue", label = "RMSE", lw = LineWidth)
                 ax.legend()
                 fig.savefig(self.Plt_Charts_ErrorWaves.Path + FileFormat)
+                plt.close()
+
+                #リザバー層内のx, yの状態
+                Title = None     #図題
+                fig = plt.figure(figsize = FigSize)
+                ax = fig.add_subplot(1, 1, 1)
+                ax.set_title(Title, fontsize = FontSize_Title)
+                ax.set_xlabel("x", fontsize = FontSize_Label)
+                ax.set_ylabel("y", fontsize = FontSize_Label)
+                ax.grid(True)
+                ax.plot(RS_X_A, RS_Y_A, lw = LineWidth)
+                ax.legend()
+                fig.savefig(self.Plt_Charts_Reservoir_XandY.Path + FileFormat)
                 plt.close()
 
                 #リザバー層内の状態
@@ -257,6 +272,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
         self.Plt_Charts_UYYdWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("UYYdWaves"))
         self.Plt_Charts_ErrorWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("ErrorWaves"))
         self.Plt_Charts_Reservoir_X = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("Reservoir_X"))
+        self.Plt_Charts_Reservoir_XandY = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("Reservoir_XandY"))
         self.Plt_Charts_ReservoirHeatMap = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("Reservoir_HeatMap"))
         self.Plt_Charts_Reservoir_3D = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("Reservoir_3D"))
         self.Plt_Charts_Reservoir_3DTime = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("Reservoir_X_3D"))
@@ -376,6 +392,7 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
         self.Length_Test = self.Param["MLE_Length_Test"]                #評価用データ時間長
         self.Length_Total = self.Length_Burnin + self.Length_Test       #全体データ時間長
         
+        #フォルダ構造
         self.DirPath_Project = self.Param["DirPath_Project"]            #プロジェクトのフォルダパス
         self.ConstractFileTree_Root(self.DirPath_Project)
 
@@ -391,13 +408,15 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
         #コンソール結果出力
         if self.F_OutputLog : print("+++ Outputing Results +++")
         if self.F_OutputLog : 
-            print("< MLE >")
+            print("MLE : " + str(result_param["MaximumLyapunovExponent_R_MLE"]))
 
                 
         #作図
         if self.F_OutputLog : print("+++ Making Charts +++")
         if self.F_OutputCharts:
             #結果のフォルダ
+            self.Date = FileAndDir_EM.Manager.getDate()
+            
             self.ConstractFileTree_Charts_Branch(True)
             self.Save_Charts_Param(result_param, "")
             
@@ -412,10 +431,10 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
                 #出力部分切り取り
                 start = self.Length_Burnin
                 end = self.Length_Burnin + self.Length_Test
-                T = np.array(result_param["MLE_R_T"][start : end])
-                U = np.array(result_param["MLE_R_U"][start : end])
-                MMLE = np.array(result_param["MLE_R_MMLE"][start : end])
-                MLE_TimeStep = np.array(result_param["MLE_R_MLE_TS"][start : end])
+                T = np.array(result_param["MaximumLyapunovExponent_R_T"][start : end])
+                U = np.array(result_param["MaximumLyapunovExponent_R_U"][start : end])
+                MMLE = np.array(result_param["MaximumLyapunovExponent_R_MMLE"][start : end])
+                MLE_TimeStep = np.array(result_param["MaximumLyapunovExponent_R_MLETS"][start : end])
                 
                 #MMLE波形
                 fig = plt.figure(figsize = FigSize)

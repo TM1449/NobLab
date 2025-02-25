@@ -20,7 +20,6 @@ maru
 import numpy as np
 
 import Evaluation_EM
-import Evaluation_Lyapunov
 import Task_EM
 import Model_EM
 import Output_EM
@@ -175,7 +174,7 @@ def Project_EMChialvo_2025_01_28_12_34():
     Param = {
         #==========================================================================================
         "Project_F_NRMSE" : True,                            #NRMSEを調査するか
-        "Project_F_MemoryCapacity" : False,                  #MCを調査するか
+        "Project_F_MemoryCapacity" : True,                  #MCを調査するか
         "Project_F_MLE" : True,                             #MLE（最大リアプノフ指数）を調査するか
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -285,7 +284,7 @@ def Project_EMChialvo_2025_01_28_12_34():
         "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
         "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
-        "Model_EMChialvo_k" : -2.0,                         #変数:k
+        "Model_EMChialvo_k" : -3.0,                         #変数:k
         
         "Model_EMChialvo_Rho" : 0.001,                      #スペクトル半径
 
@@ -314,7 +313,7 @@ def Project_EMChialvo_2025_01_28_12_34():
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
 
             #------------------------------------------------------------------------------------------
-            "NRMSE_T_Task" : Task_EM.Task_NormalRosslor,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_NormalLorenz,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
@@ -368,7 +367,7 @@ def Project_EMChialvo_2025_01_28_12_34():
 
             "MLE_Epsilon" : 1e-06,                            #摂動の大きさ
 
-            "MLE_T_Task" : Task_EM.Task_NormalRosslor,
+            "MLE_T_Task" : Task_EM.Task_NormalLorenz,
             "MLE_T_Model" : Model_EM.Model_EMChialvo,
             "MLE_T_Output" : Output_EM.Output_Single_MLE_2023_07_08_17_12,
 
@@ -378,7 +377,7 @@ def Project_EMChialvo_2025_01_28_12_34():
             "MLE_F_OutputCharts" : True,             #図の出力フラグ
             "MLE_F_OutputCharts_MMLEWaves" : True,     #MC曲線の出力フラグ
         })
-        Evaluation_Lyapunov.Evaluation_MLE(param)()
+        Evaluation_EM.Evaluation_MLE(param)()
 
 
 
