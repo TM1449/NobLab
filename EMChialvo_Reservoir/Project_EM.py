@@ -363,7 +363,7 @@ def Project_EMChialvo_2025_01_28_12_34():
             "MLE_D_y" : 1,                                   #出力信号次元
 
             "MLE_Length_Burnin" : 1000,                      #空走用データ時間長
-            "MLE_Length_Test" : 25000,                        #評価用データ時間長
+            "MLE_Length_Test" : 5000,                        #評価用データ時間長
 
             "MLE_Epsilon" : 1e-06,                            #摂動の大きさ
 

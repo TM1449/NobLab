@@ -68,8 +68,8 @@ def Project_GridSearch_EMChialvo_NRMSE():
         "GridSearch_MaxNumberInOneFile" : 100,                        #１ファイルの最大のポイント数 初期値:5
         "GridSearch_MaxNumberInOnePool" : 1000,                       #１プール（並列する）最大のポイント数（この分メモリを消費） 初期値:50
         "GridSearch_NumberOfSamples" : 10,                           #サンプル数
-        "GridSearch_ProjectName" : "EMChialvo",                    #プロジェクト名
-        "GridSearch_ProjectDate" : "2025_03_03_02_00",              #プロジェクト日時
+        "GridSearch_ProjectName" : "EMChialvoRing",                    #プロジェクト名
+        "GridSearch_ProjectDate" : "2025_03_04_01_00",              #プロジェクト日時
         "GridSearch_T_Process" : Process_SishuESN_GridSearch,     #GS処理指定
         "GridSearch_T_Output" : OutputLog_SishuESN_2024_06_01_10_30             #GS出力処理指定
         })()
@@ -414,7 +414,7 @@ class OutputLog_SishuESN_2024_06_01_10_30(Output_EM.Output):
                     FigSize = (16, 9)                   #図の大きさとアスペクト比
                     FontSize_Label = 36                 #ラベルのフォントサイズ
                     FontSize_Title = 36                 #図題のフォントサイズ
-                    LineWidth = 0.1                     #線の太さ
+                    LineWidth = 0                     #線の太さ
                     FileFormat = ".png"                 #ファイル拡張子
                     MapCode = "jet"                     #カラーマップ
                     Annot = False#True                  #数値を表示するか
