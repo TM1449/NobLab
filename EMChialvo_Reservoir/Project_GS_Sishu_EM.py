@@ -414,7 +414,7 @@ class OutputLog_SishuESN_2024_06_01_10_30(Output_EM.Output):
                     FigSize = (16, 9)                   #図の大きさとアスペクト比
                     FontSize_Label = 36                 #ラベルのフォントサイズ
                     FontSize_Title = 36                 #図題のフォントサイズ
-                    LineWidth = 0                     #線の太さ
+                    LineWidth = 0.1                     #線の太さ
                     FileFormat = ".png"                 #ファイル拡張子
                     MapCode = "jet"                     #カラーマップ
                     Annot = False#True                  #数値を表示するか
@@ -428,7 +428,7 @@ class OutputLog_SishuESN_2024_06_01_10_30(Output_EM.Output):
                     plt.yscale('log')
 
                     body = sns.heatmap(stats[1], xticklabels = AxisX, yticklabels = [0.1, None, None, None, None, 0.05, None, None, None, 0.01, None, None, None, None, 0.005, None, None, None, 0.001, None, None, None, None, 0.0005, None, None, None, 0.0001], cmap = MapCode, linewidth = LineWidth, annot = Annot, ax = sub)
-                    body.collections[0].colorbar.set_label('Average NRMSE',fontsize=24)
+                    body.collections[0].colorbar.set_label(f'Average {score[0]}',fontsize=24)
                     body.set_xlabel(LabelsX, fontsize = FontSize_Label)
                     body.set_ylabel(LabelsY,fontsize = FontSize_Label)
                     body.set_title(Title, fontsize = FontSize_Title)
