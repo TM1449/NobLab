@@ -465,8 +465,8 @@ class Task_tcVDP(Task):
         x2s = x2s.reshape([len(x2s),-1])
         y2s = y2s.reshape([len(y2s),-1])
         
-        self.X = np.concatenate([x1s, y1s, x2s, y2s],1)
-        self.Y = np.concatenate([x1s, y1s, x2s, y2s],1)
+        self.X = np.concatenate([x1s, y1s, x2s, y2s],1) * 0.1
+        self.Y = np.concatenate([x1s, y1s, x2s, y2s],1) * 0.1
 
 
 #--------------------------------------------------------------------
@@ -580,7 +580,7 @@ class Task_Zeros(Task):
 #--------------------------------------------------------------------
 class Task_MackeyGlass(Task):
     """
-    マッキー・グラス方程式
+    連続時間のマッキー・グラス方程式
     """
     #コンストラクタ
     def __init__(self, param: dict, evaluation: any):
@@ -656,65 +656,5 @@ class Task_MackeyGlass_DDE(Task):
         for i in range(self.InitTerm + self.Length + self.PredictTau):
             if self.InitTerm <= i:
                 self.Y[i - self.InitTerm] = solution[i]
-
-
-class Task_MackeyGlass_DDE_Euler(Task):
-    """
-    DDEマッキー・グラス方程式
-    """
-
-    # コンストラクタ
-    def __init__(self, param: dict, evaluation: any):
-        super().__init__(param, evaluation)
-
-        self.Scale = param["Task_MackeyGlassDDE_Scale"]
-        self.Dt = param["Task_MackeyGlassDDE_Dt"]
-        self.PredictTau = param["Task_PredictDDE_Tau"]
-
-        self.MackeyBeta = param["Task_MackeyGlassDDE_Beta"]
-        self.MackeyGamma = param["Task_MackeyGlassDDE_Gamma"]
-        self.MackeyN = param["Task_MackeyGlassDDE_N"]
-        self.MackeyTau = param["Task_MackeyGlassDDE_Tau"]
-        self.InitTerm = param["Task_MackeyGlassDDE_InitTerm"]
-
-
-        self.makeData()
-
-    # 時刻tの入出力データ取得
-    def getData(self, t: int) -> tuple:
-        return self.Y[t], self.Y[t + self.PredictTau]
-
-    # データ生成（修正＆最適化版）
-    def makeData(self):
-        t_max = self.Dt * (self.InitTerm + self.Length + self.PredictTau)
-        times = np.arange(0, t_max, self.Dt)
-
-        delay_buffer = [(0, 1.2)]  # (t, x) のリスト（初期値 x(0) = 1.2）
-
-        # バイナリサーチを用いた遅延データ取得
-        def delayed_x(t):
-            i = bisect.bisect_right(delay_buffer, (t, float('inf'))) - 1
-            return delay_buffer[i][1] if i >= 0 else 1.2
-
-        results = []
-        x = 1.2  # 初期値
-
-        for t in times:
-            xtau = delayed_x(t - self.MackeyTau)
-            dxdt = self.MackeyBeta * xtau / (1 + pow(xtau, self.MackeyN)) - self.MackeyGamma * x
-            x += dxdt * self.Dt  # オイラー法で更新
-            results.append(x)
-            delay_buffer.append((t + self.Dt, x))
-
-            # 古いデータを削除しメモリ最適化（最大 5000 件保持）
-            if len(delay_buffer) > 5000:
-                delay_buffer.pop(0)
-
-        # self.Y を適切なサイズで初期化
-        self.Y = np.zeros((self.Length + self.PredictTau, self.D_u))
-
-        # results のインデックス修正
-        for i in range(self.InitTerm, self.InitTerm + self.Length + self.PredictTau):
-            self.Y[i - self.InitTerm] = results[i] if i < len(results) else 0.0  # インデックス範囲外のエラー防止
 
 #--------------------------------------------------------------------

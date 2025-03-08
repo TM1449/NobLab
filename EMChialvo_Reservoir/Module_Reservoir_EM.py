@@ -155,7 +155,7 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         self.alpha = self.Param["EMChialvo_Reservoir_alpha"]
         self.beta = self.Param["EMChialvo_Reservoir_beta"]
 
-        self.k = self.Param["EMChialvo_Reservoir_k"] + 0.1 * ((np.random.rand(self.D_x) * 2) - 1)                   #k
+        self.k = self.Param["EMChialvo_Reservoir_k"] #+ ((np.random.rand(self.D_x) * 2) - 1) * 0.1                 #k
         
         self.Rho = self.Param["Model_EMChialvo_Rho"]                        #スペクトル半径
         
@@ -213,17 +213,19 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         
         #乱数で重み調整
         np.random.seed(seed=None)
+
+
         #一様分布
         #W = (np.random.rand(self.D_x,self.D_x) * 2 - 1)
-        """
+        
         W = np.random.randn(self.D_x, self.D_x) 
         W = self._makeWSparse(W)
         w , v = np.linalg.eig(W)
 
         Matrix = self.Rho * (W / np.max(np.abs(w)))
-        """
-
         
+
+        """
         #リング構造
         W = np.zeros((self.D_x, self.D_x))  # 初期化
         np.random.seed(None)
@@ -232,11 +234,10 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
             #backward_index = (i - 1) % self.D_x
 
             W[i, forward_index] = np.random.uniform(-1,1)
-            #W[i, backward_index] = np.random.uniform(-1,1)
 
         w, v = np.linalg.eig(W)
         Matrix = self.Rho * (W / np.max(np.abs(w)))
-        
+        """
 
         return Matrix
     
