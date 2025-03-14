@@ -155,7 +155,7 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         self.alpha = self.Param["EMChialvo_Reservoir_alpha"]
         self.beta = self.Param["EMChialvo_Reservoir_beta"]
 
-        self.k = self.Param["EMChialvo_Reservoir_k"] #+ ((np.random.rand(self.D_x) * 2) - 1) * 0.1                 #k
+        self.k = self.Param["EMChialvo_Reservoir_k"]                 #k
         
         self.Rho = self.Param["Model_EMChialvo_Rho"]                        #スペクトル半径
         

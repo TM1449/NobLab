@@ -222,7 +222,7 @@ class Task_NDRosslor(Task):
         for t in range(self.InitTerm + self.Length + self.Tau):
             if self.InitTerm <= t:
                 #self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
-                self.X[t - self.InitTerm] = s[0][2] * self.Scale        #1次元の信号に限り、列要素を変えることで、成分を変更できる。
+                self.X[t - self.InitTerm] = s[0][0] * self.Scale        #1次元の信号に限り、列要素を変えることで、成分を変更できる。
 
             s_old = s
             s = np.zeros([self.Systems, 3])
