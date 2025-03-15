@@ -209,21 +209,13 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
     
     #再帰重み生成
     def _makeRecurrentWeight(self) -> np.ndarray:
-        #完全乱数
         
         #乱数で重み調整
         np.random.seed(seed=None)
-
-
-        #一様分布
-        #W = (np.random.rand(self.D_x,self.D_x) * 2 - 1)
-        
         W = np.random.randn(self.D_x, self.D_x) 
         W = self._makeWSparse(W)
         w , v = np.linalg.eig(W)
-
         Matrix = self.Rho * (W / np.max(np.abs(w)))
-        
 
         """
         #リング構造
@@ -253,7 +245,6 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
     
     #最大リアプノフ指数用
     def forward_MLE(self, u: np.array, x_D: np.array, y_D: np.array, phi_D: np.array) -> np.ndarray:
-
         #基準軌道の計算
         self.x = (pow(self.x_old, 2) * np.exp(self.y_old - self.x_old) + self.k0 \
             + self.k * self.x_old * (self.alpha + 3 * self.beta * pow(self.phi_old, 2)) \
@@ -269,16 +260,18 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         self.phiP = self.k1 * (self.x_old + x_D) - self.k2 * (self.phi_old + phi_D)
 
         #returnの説明
-        #1行目：基準軌道の1時刻前のニューロンの値
-        #2行目：基準軌道の現時刻のニューロンの値
-        #3行目：摂動軌道の1時刻前のニューロンの値
-        #4行目：摂動軌道の現時刻のニューロンの値
-
+        """
+        1行目：基準軌道の1時刻前のニューロンの値
+        2行目：基準軌道の現時刻のニューロンの値
+        3行目：摂動軌道の1時刻前のニューロンの値
+        4行目：摂動軌道の現時刻のニューロンの値"
+        """
+        
         return self.x_old, self.y_old, self.phi_old, \
             self.x, self.y, self.phi, \
                 (self.x_old + x_D), (self.y_old + y_D), (self.phi_old + phi_D), \
                     self.xP, self.yP, self.phiP
-    
+
     #時間発展
     def update(self):
         self.x_old = self.x
