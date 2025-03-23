@@ -560,3 +560,316 @@ class Evaluation_MLE(Evaluation):
         if self.F_OutputLog : print("*** Finished Evaluation Max-Lyapunov-Exponent ***")
 
         return outputs
+    
+
+#********************************************************************
+#利用可能モデル
+class Evaluation_CovMatrixRank(Evaluation):
+    """
+    Covariance Matrix Rank評価クラス
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, parent: any = None):
+        super().__init__(param, parent)
+
+        #パラメータ取得
+        self.F_OutputLog = self.Param["CovMatrixRank_F_OutputLog"]      #経過の出力を行うか
+
+        if self.F_OutputLog : print("*** Evaluation Covariance Matrix Rank ***")
+        if self.F_OutputLog : print("+++ Initializing +++")
+
+        self.D_u = self.Param["CovMatrixRank_D_u"]                      #入力信号次元
+        self.D_x = self.Param["CovMatrixRank_D_x"]
+        self.D_y = self.Param["CovMatrixRank_D_y"]                      #出力信号次元
+        
+        self.Length_Burnin = self.Param["CovMatrixRank_Length_Burnin"]  #空走用データ時間長
+        self.Length_Test = self.Param["CovMatrixRank_Length_Test"]      #評価用データ時間長
+    
+        self.Length_Total = self.Length_Burnin + self.Length_Test       #全体データ時間長
+    
+        #評価用タスク（Type型）
+        self.T_Task = self.Param["CovMatrixRank_T_Task"]
+        #タスクのインスタンス
+        param = self.Param.copy()
+        param.update({
+            "Task_D_u" : self.D_u,
+            "Task_D_y" : self.D_y,
+            "Task_Length" : self.Length_Total,
+            })
+        self.Task = self.T_Task(param, self)
+        
+        #モデル（Type型）
+        self.T_Model = self.Param["CovMatrixRank_T_Model"]
+        #モデルのインスタンス
+        param = self.Param.copy()
+        param.update({
+            })
+        self.Model = self.T_Model(param, self)
+
+        #作図出力（Type型）
+        self.T_Output = self.Param["CovMatrixRank_T_Output"]
+        #作図出力のインスタンス
+        param = self.Param.copy()
+        param.update({
+            })
+        self.Output = self.T_Output(param, self)
+        
+    #本体
+    def __call__(self) -> dict:
+        if self.F_OutputLog : print("*** Started Evaluation Covariance Matrix Rank ***")
+
+        #エコー収集
+        if self.F_OutputLog : print("+++ Collecting Echo +++")
+        
+        #バッチ
+        T = list(range(self.Length_Total))                      #全体時間
+        U = [None for _ in range(self.Length_Total)]            #入力信号
+
+        X = np.array([None for _ in range(self.Length_Total * self.D_x)], dtype=float).reshape(-1, self.Length_Total)      #リザバー層のX
+        
+        #モデルリセット
+        self.Model.reset()
+        
+        #Burn-in
+        if self.F_OutputLog : print("--- Burn-in Process---")
+        for i, t in enumerate(T[0 : self.Length_Burnin]):
+            if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Burnin), end = "")
+            U[t], _ = self.Task.getData(t)
+            self.Model.forwardReservoir(U[t])
+        if self.F_OutputLog : print("\n", end = "")
+
+        #評価
+        if self.F_OutputLog : print("+++ Evaluating Model +++")
+        if self.F_OutputLog : print("--- Testing ---")
+                
+        for i, t in enumerate(T[self.Length_Burnin : self.Length_Burnin + self.Length_Test]):
+            if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Test), end = "")
+            U[t], _ = self.Task.getData(t)
+            _, _, _, _, X[:, t], _, _ = self.Model.forwardReservoir(U[t])
+        if self.F_OutputLog : print("\n", end = "")
+        
+        #指標計算
+        if self.F_OutputLog : print("--- Calculating ---")
+        start = self.Length_Burnin
+        end = self.Length_Burnin + self.Length_Test
+
+        #リザバー層のXの共分散行列のランクを計算
+        Omega = X[:, start : end].T
+        Bias = np.ones((self.Length_Test,1))         #バイアス項
+        Omega = np.concatenate([Omega, Bias], 1)            #バイアス項を追加
+        
+        
+        #論文の定義通りに共分散行列を計算
+        CovOmega = np.dot(Omega.T, Omega)
+        Gamma = np.linalg.matrix_rank(CovOmega)
+        
+
+        #終了処理
+        if self.F_OutputLog : print("+++ Storing Results +++")
+        results = self.Param.copy()
+        results.update({
+            "CovMatrixRank_R_CovarianceMatrix" : CovOmega,
+            "CovMatrixRank_R_CovMatrixRank" : Gamma,
+            "CovMatrixRank_R_T" : T,
+            "CovMatrixRank_R_U" : U,
+            
+            "Reservoir_X" : X,
+            })
+        
+        outputs = self.Param.copy()
+        outputs.update({
+            "CovMatrixRank_R_CovarianceMatrix" : CovOmega,
+            "CovMatrixRank_R_CovMatrixRank" : Gamma,
+            })
+
+        #作図出力
+        self.Output(results)
+        
+        if self.F_OutputLog : print("*** Finished Evaluation NRMSE ***")
+
+        return outputs
+
+
+class Evaluation_DelayCapacity(Evaluation):
+    """
+    Dalay Capacity評価クラス
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, parent: any = None):
+        super().__init__(param, parent)
+
+        #パラメータ取得
+        self.F_OutputLog = self.Param["DelayCapacity_F_OutputLog"]                  #経過の出力を行うか
+
+        if self.F_OutputLog : print("*** Evaluation Delay Capacity ***")
+        if self.F_OutputLog : print("+++ Initializing +++")
+
+        self.D_u = self.Param["DelayCapacity_D_u"]                                  #入力信号次元
+        self.D_x = self.Param["DelayCapacity_D_x"]                                  #リザバー層次元
+        self.D_y = self.Param["DelayCapacity_D_y"]                                  #出力信号次元
+        
+        self.Length_Burnin = self.Param["DelayCapacity_Length_Burnin"]              #空走用データ時間長
+        self.Length_Tdc = self.Param["DelayCapacity_Length_Tdc"]                  #評価用データ時間長
+        self.Length_Taumax = self.Param["DelayCapacity_Length_Taumax"]                            #最大遅延量
+
+        self.Length_Total = self.Length_Burnin + self.Length_Taumax + self.Length_Tdc    #全体データ長
+
+        #評価用タスク（Type型）
+        self.T_Task = self.Param["DelayCapacity_T_Task"]
+        #タスクのインスタンス
+        param = self.Param.copy()
+        param.update({
+            "Task_D_u" : self.D_u,
+            "Task_D_y" : self.D_y,
+            "Task_Length" : self.Length_Total,
+            })
+        self.Task = self.T_Task(param, self)
+        
+        #モデル（Type型）
+        self.T_Model = self.Param["DelayCapacity_T_Model"]
+        #モデルのインスタンス
+        param = self.Param.copy()
+        param.update({
+            })
+        self.Model = self.T_Model(param, self)
+
+        #作図出力（Type型）
+        self.T_Output = self.Param["DelayCapacity_T_Output"]
+        #作図出力のインスタンス
+        param = self.Param.copy()
+        param.update({
+            })
+        self.Output = self.T_Output(param, self)
+        
+    #本体
+    def __call__(self) -> dict:
+        if self.F_OutputLog : print("*** Started Evaluation Delay Capacity ***")
+
+        #エコー収集
+        if self.F_OutputLog : print("+++ Collecting Echo +++")
+        
+        #バッチ
+        T = list(range(self.Length_Total))                      #全体時間
+        U = [None for _ in range(self.Length_Total)]            #入力信号
+        Y = [None for _ in range(self.Length_Total)]            #出力層の信号
+
+        TimeDC = list(range(self.Length_Taumax))        
+        
+        RS_X = np.array([None for _ in range(self.Length_Total * self.D_x)], dtype=float).reshape(-1, self.Length_Total)      #リザバー層のX
+        CovTrace = np.zeros(self.Length_Taumax)
+
+        #モデルリセット
+        self.Model.reset()
+        
+        #Burn-in
+        if self.F_OutputLog : print("--- Burn-in Process---")
+        for i, t in enumerate(T[0 : self.Length_Burnin]):
+            if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Burnin), end = "")
+            U[t], _ = self.Task.getData(t)
+            Y[t], _, _, _, RS_X[:, t], _, _ = self.Model.forwardReservoir(U[t])
+        if self.F_OutputLog : print("\n", end = "")
+
+        #データ収集
+        if self.F_OutputLog : print("+++ Collecting Data for Tau_max +++")        
+        for i, t in enumerate(T[self.Length_Burnin : self.Length_Burnin + self.Length_Taumax]):
+            if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Taumax), end = "")
+            U[t], _ = self.Task.getData(t)
+            Y[t], _, _, _, RS_X[:, t], _, _ = self.Model.forwardReservoir(U[t])
+        if self.F_OutputLog : print("\n", end = "")
+        
+        if self.F_OutputLog : print("+++ Collecting Data for T_dc +++")        
+        for i, t in enumerate(T[self.Length_Burnin + self.Length_Taumax : self.Length_Burnin + self.Length_Taumax + self.Length_Tdc]):
+            if self.F_OutputLog : print("\r%d / %d"%(i, self.Length_Tdc), end = "")
+            U[t], _ = self.Task.getData(t)
+            Y[t], _, _, _, RS_X[:, t], _, _ = self.Model.forwardReservoir(U[t])
+        if self.F_OutputLog : print("\n", end = "")
+
+        #指標計算
+        if self.F_OutputLog : print("--- Calculating ---")
+
+        #空走時間とTau_max
+        start = self.Length_Burnin 
+        #T_dcの時間だけ行列収集
+        end = self.Length_Burnin + self.Length_Tdc - self.Length_Taumax
+
+        #行列の白色化関数
+        def Whitening_Matrix(X):
+            #行列サイズ
+            Ti, Ne = X.shape
+
+            #各ニューロンの時間平均ベクトル
+            #X_ave: [Time * Neurons]
+
+            #平均化したリザバー状態ベクトル
+            X_Cent = X - np.mean(X, axis=0)
+
+            #共分散行列
+            CovX = ((np.dot(X_Cent.T, X_Cent)) / (Ti)) + np.eye(Ne) * 1e-10
+            
+            #特異値分解
+            Uw, Sw, Vw = np.linalg.svd(CovX)
+            Sigma = np.diag(1 / np.sqrt(Sw))
+
+            #白色化行列１
+            #多分こっちが合ってる、はず
+            White_X0L = np.dot(X_Cent, Vw.T)
+            White_X0 = np.dot(White_X0L, Sigma)
+            
+            #白色化行列２
+            """
+            White_X0 = np.dot(np.dot(Sigma, Vw), X_Cent.T)
+            """
+            return White_X0
+
+        
+        for tau in range(1, self.Length_Taumax + 1):
+            print("\r%d / %d"%(tau, self.Length_Taumax+1), end = "")
+
+            #リザバー層のXの状態ベクトル（(T_dc - Taumax)×ニューロン数）の転置
+            RS_X_Standard = RS_X[:, start : end].T
+
+            #Tauステップだけ遅らせたリザバー層のXの状態ベクトル（(T_dc - Taumax)×ニューロン数）の転置
+            RS_X_Delay = RS_X[:, start - tau : end - tau].T
+            
+            #基準時間の白色化行列
+            X0_Standard = Whitening_Matrix(RS_X_Standard)
+            #遅延ありの白色化行列
+            X0_Delay = Whitening_Matrix(RS_X_Delay)
+
+            #共分散行列の計算１
+            C_tau = np.dot(X0_Standard.T, X0_Delay) / self.Length_Tdc
+            
+            #共分散行列の計算２
+            #C_tau = np.dot(X0_Standard, X0_Delay.T) / self.Length_Tdc
+            
+            #print(f"共分散行列のサイズ：{C_tau.shape}")
+            CovTrace[tau-1] = np.trace(np.abs(C_tau))
+            #print(f"DC: {CovTrace[tau-1]}")
+        
+        DelayCapacity = np.mean(CovTrace)
+
+        #終了処理
+        if self.F_OutputLog : print("+++ Storing Results +++")
+        results = self.Param.copy()
+        results.update({
+            "DelayCapacity_R_DelayCapacity" : DelayCapacity,
+
+            "DelayCapacity_R_DelayCapacity_Taumax" : TimeDC,
+            "DelayCapacity_R_DelayCapacity_Time" : CovTrace,
+            "DelayCapacity_R_T" : T,
+            "DelayCapacity_R_U" : U,
+            "DelayCapacity_R_Y" : Y,            
+            })
+        
+        outputs = self.Param.copy()
+        outputs.update({
+            "DelayCapacity_R_DelayCapacity" : DelayCapacity,
+            "DelayCapacity_R_DelayCapacity_Time" : CovTrace,
+            })
+
+        #作図出力
+        self.Output(results)
+        
+        if self.F_OutputLog : print("*** Finished Evaluation NRMSE ***")
+
+        return outputs

@@ -533,3 +533,227 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
         self.CSV_Charts_Param = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_dict("ResultAndParam"))
         self.Plt_Charts_MMLEWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("MMLEWaves"))
         self.Plt_Charts_MLETimeStepWaves = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("MLETimeStepWaves"))
+
+
+#********************************************************************
+class Output_Single_CovMatrixRank_2025_03_15_15_32(Output):
+    """
+    共分散行列のランクのデバッグ用
+    """
+
+    def __init__(self, param: dict, parent: any):
+        super().__init__(param, parent)
+
+        #パラメータ取得
+        self.F_OutputLog = self.Param["CovMatrixRank_F_OutputLog"]         #経過の出力を行うか
+        self.Length_Burnin = self.Param["CovMatrixRank_Length_Burnin"]     #空走用データ時間長
+        self.Length_Test = self.Param["CovMatrixRank_Length_Test"]         #評価用データ時間長
+        self.Length_Total = self.Length_Burnin + self.Length_Test          #全体データ時間長
+
+        #フォルダ構造
+        self.DirPath_Project = self.Param["DirPath_Project"]               #プロジェクトのフォルダパス
+        self.ConstractFileTree_Root(self.DirPath_Project)
+
+        #グリッドサーチ用図題用
+        self.AxisTag = self.Param["AxisTag"] if "AxisTag" in self.Param else ""
+
+        #各種図の出力フラグ
+        self.F_OutputCharts = self.Param["CovMatrixRank_F_OutputCharts"]
+        self.F_OutputCharts_CovMatrix = self.Param["CovMatrixRank_F_OutputCharts_CovMatrixRankWaves"]
+
+    #本体
+    def __call__(self, result_param):
+        #コンソール結果出力
+        if self.F_OutputLog : print("+++ Outputing Results +++")
+        if self.F_OutputLog :
+            print("CovMatrixRank : " + str(result_param["CovMatrixRank_R_CovMatrixRank"]))
+
+        #作図
+        if self.F_OutputLog : print("+++ Making Charts +++")
+        if self.F_OutputCharts:
+            #結果のフォルダ
+            self.ConstractFileTree_Charts_Branch(True)
+            self.Save_Charts_Param(result_param, "")
+
+            
+            #共分散行列のランク
+            if self.F_OutputCharts_CovMatrix:
+                FigSize = (16, 9)                   #アスペクト比
+                FontSize_Label = 24                 #ラベルのフォントサイズ
+                FontSize_Title = 24                 #タイトルのフォントサイズ
+                LineWidth = 2                       #線の太さ
+                FileFormat = ".png"
+
+                #出力部分切り取り
+                start = self.Length_Burnin
+                end = self.Length_Burnin + self.Length_Test
+                T = np.array(result_param["CovMatrixRank_R_T"][start : end])
+                U = np.array(result_param["CovMatrixRank_R_U"][start : end])
+                X = np.array(result_param["Reservoir_X"][0:5, start : end])
+
+                #====================================================================
+                #リザバー層のニューロンの状態
+                Title = None
+                fig = plt.figure(figsize = FigSize)
+                ax = fig.add_subplot(1, 1, 1)
+                ax.set_title(Title, fontsize = FontSize_Title)
+                ax.set_xlabel("Time Step", fontsize = FontSize_Label)
+                ax.set_ylabel(r'$x_{R}$', fontsize = FontSize_Label)
+                ax.grid(True)
+                for i in range(5):
+                    ax.plot(T, X[i, :], label = r'$x_{R}$', lw = LineWidth)
+                ax.legend()
+                fig.savefig(self.Plt_Charts_ReservoirDynamics.Path + FileFormat)
+                plt.close()
+
+                #====================================================================
+                #リザバー層のニューロンの状態+入力信号
+                Title = None
+                fig = plt.figure(figsize = FigSize)
+                ax = fig.add_subplot(1, 1, 1)
+                ax.set_title(Title, fontsize = FontSize_Title)
+                ax.set_xlabel("Time Step", fontsize = FontSize_Label)
+                ax.set_ylabel(r'$x_{R}$', fontsize = FontSize_Label)
+                ax.grid(True)
+                ax.plot(T, U, lw = LineWidth, label = "Input Signal", color='black')
+                #cmap = plt.get_cmap("Blues")
+                for i in range(5):
+                    ax.plot(T, X[i, :], label = r'$x_{R}$', lw = LineWidth)
+                ax.legend()
+                fig.savefig(self.Plt_Charts_ReservoirDynamics_And_InputSignal.Path + FileFormat)
+                plt.close()
+            
+                
+
+    #以下ファイルとフォルダ単位のセーブとロード
+    def Load_Project(self, save_type: str):
+        pass
+
+    def Save_Project(self, save_type: str):
+        pass
+
+    def Load_Charts_Param(self, save_type: str):
+        pass
+
+    def Save_Charts_Param(self, result_param: dict, save_type: str):
+        self.CSV_Charts_Param.Save(result_param)
+
+    #以下フォルダ構造
+    def ConstractFileTree_Root(self, root: str):
+        if type(root) is str:
+            self.Dir_Project = FileAndDir_EM.RootNode(root)
+        else:
+            self.Dir_Project = root
+
+        self.ConstractFileTree_Project()
+
+    def ConstractFileTree_Project(self):
+        self.Dir_Results = self.Dir_Project.AddChild(FileAndDir_EM.LogDirNode("."))
+
+    def ConstractFileTree_Charts_Branch(self, f_new: bool = False, tag: str = ""):
+        self.Dir_Results_Branch = self.Dir_Results.AddChild(FileAndDir_EM.DirNode("CovMatrixRank_"), FileAndDir_EM.Manager.getDate(), tag)
+
+        self.CSV_Charts_Param = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_dict("ResultAndParam"))
+        self.Plt_Charts_ReservoirDynamics = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("ReservoirDynamics")) 
+        self.Plt_Charts_ReservoirDynamics_And_InputSignal = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("ReservoirDynamics_And_InputSignal"))
+
+class Output_Single_DelayCapacity_2025_03_15_15_32(Output):
+    
+    """
+    MCのデバッグ用
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, parent: any):
+        super().__init__(param, parent)
+
+        #パラメータ取得
+        self.F_OutputLog = self.Param["DelayCapacity_F_OutputLog"]         #経過の出力を行うか
+
+        self.Length_Burnin = self.Param["DelayCapacity_Length_Burnin"]     #空走用データ時間長
+        self.Length_Tdc = self.Param["DelayCapacity_Length_Tdc"]       #学習用データ時間長
+        self.Length_Taumax = self.Param["DelayCapacity_Length_Taumax"]         #評価用データ時間長
+
+        self.Length_Total = self.Length_Burnin + self.Length_Taumax + self.Length_Tdc       #全体データ時間長
+        
+        #フォルダ構造
+        self.DirPath_Project = self.Param["DirPath_Project"]        #プロジェクトのフォルダパス
+        self.ConstractFileTree_Root(self.DirPath_Project)
+
+        #グリッドサーチ用図題用
+        self.AxisTag = self.Param["AxisTag"] if "AxisTag" in self.Param else ""
+
+        #各種図の出力フラグ
+        self.F_OutputCharts = self.Param["DelayCapacity_F_OutputCharts"]
+        self.F_OutputCharts_DCGraph = self.Param["DelayCapacity_F_OutputCharts_DCGraph"]
+
+    #本体
+    def __call__(self, result_param): 
+        #コンソール結果出力
+        if self.F_OutputLog : print("+++ Outputing Results +++")
+        if self.F_OutputLog : 
+            print("DC : " + str(result_param["DelayCapacity_R_DelayCapacity"]))
+            
+        #作図
+        if self.F_OutputLog : print("+++ Making Charts +++")
+        if self.F_OutputCharts:
+            #結果のフォルダ
+            self.Date = FileAndDir_EM.Manager.getDate()
+            self.ConstractFileTree_Charts_Branch(True)
+            self.Save_Charts_Param(result_param, "")
+
+            #入出力波形
+            if self.F_OutputCharts_DCGraph:
+                FigSize = (16, 9)                   #アスペクト比
+                FontSize_Label = 24                 #ラベルのフォントサイズ
+                FontSize_Title = 24                 #タイトルのフォントサイズ
+                LineWidth = 3                       #線の太さ
+                FileFormat = ".png"#".pdf"          #ファイルフォーマット
+                
+                #出力データ
+                Tau = result_param["DelayCapacity_R_DelayCapacity_Taumax"]
+                DC_Tau = result_param["DelayCapacity_R_DelayCapacity_Time"]
+
+                #MCカーブ
+                Title = "DC" + self.AxisTag         #図題
+                fig = plt.figure(figsize = FigSize)
+                ax = fig.add_subplot(1, 1, 1)
+                ax.set_title(Title, fontsize = FontSize_Title)
+                ax.set_xlabel(r"$\tau$", fontsize = FontSize_Label)
+                ax.set_ylabel("Delay Capacity", fontsize = FontSize_Label)
+                ax.grid(True)
+                ax.plot(Tau, DC_Tau, "skyblue", label = r"$\mathrm{DC}_{\tau}$", lw = LineWidth)
+                ax.legend()
+                fig.savefig(self.Plt_Charts_DCGraph.Path + FileFormat)
+                
+                plt.close()
+            
+    #以下ファイルとフォルダ単位のセーブとロード        
+    def Load_Project(self, save_type: str):
+        pass
+        
+    def Save_Project(self, save_type: str):
+        pass
+        
+    def Load_Charts_Param(self, save_type: str):
+        pass
+
+    def Save_Charts_Param(self, result_param: dict, save_type: str):
+        self.CSV_Charts_Param.Save(result_param)
+        
+    #以下フォルダ構造
+    def ConstractFileTree_Root(self, root: str):
+        if type(root) is str:
+            self.Dir_Project = FileAndDir_EM.RootNode(root)
+        else:
+            self.Dir_Project = root
+        
+        self.ConstractFileTree_Project()
+        
+    def ConstractFileTree_Project(self):
+        self.Dir_Results = self.Dir_Project.AddChild(FileAndDir_EM.LogDirNode("."))
+        
+    def ConstractFileTree_Charts_Branch(self, f_new: bool = False, tag: str = ""):
+        self.Dir_Results_Branch = self.Dir_Results.AddChild(FileAndDir_EM.DirNode("DC_"), self.Date, tag)
+
+        self.CSV_Charts_Param = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_dict("ResultAndParam"))
+        self.Plt_Charts_DCGraph = self.Dir_Results_Branch.AddChild(FileAndDir_EM.FileNode_plt("DCGraph"))
