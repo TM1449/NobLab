@@ -785,7 +785,7 @@ class Evaluation_DelayCapacity(Evaluation):
         if self.F_OutputLog : print("\n", end = "")
 
         #指標計算
-        if self.F_OutputLog : print("--- Calculating ---")
+        if self.F_OutputLog : print("--- Calculating for Tau ---")
 
         #空走時間とTau_max
         start = self.Length_Burnin 
@@ -823,7 +823,7 @@ class Evaluation_DelayCapacity(Evaluation):
 
         
         for tau in range(1, self.Length_Taumax + 1):
-            print("\r%d / %d"%(tau, self.Length_Taumax+1), end = "")
+            if self.F_OutputLog :print("\r%d / %d"%(tau, self.Length_Taumax), end = "")
 
             #リザバー層のXの状態ベクトル（(T_dc - Taumax)×ニューロン数）の転置
             RS_X_Standard = RS_X[:, start : end].T
@@ -845,7 +845,8 @@ class Evaluation_DelayCapacity(Evaluation):
             #print(f"共分散行列のサイズ：{C_tau.shape}")
             CovTrace[tau-1] = np.trace(np.abs(C_tau))
             #print(f"DC: {CovTrace[tau-1]}")
-        
+        if self.F_OutputLog : print("\n", end = "")
+
         DelayCapacity = np.mean(CovTrace)
 
         #終了処理

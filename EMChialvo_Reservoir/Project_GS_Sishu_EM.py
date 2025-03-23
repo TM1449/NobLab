@@ -47,6 +47,8 @@ def Project_GridSearch_EMChialvo_NRMSE():
         "Project_F_NRMSE" : True,                                   #NRMSEを調査するか
         "Project_F_MemoryCapacity" : True,                          #MCを調査するか
         "Project_F_MLE" : True,                   #MLEを調査するか
+        "Project_F_CovMatrixRank" : True,                  #Covariance Matrix Rankを調査するか
+        "Project_F_DelayCapacity" : True,                   #Delay Capacityを調査するか
 
         "Project_F_OutputResults" : True,                           #各評価地点でパラメータを出力するか
 
@@ -69,11 +71,11 @@ def Project_GridSearch_EMChialvo_NRMSE():
         "GridSearch_EndPoint" : 11480,                                #担当終了ポイントインデックス
         
         "GridSearch_MultiThread" : 12,                               #スレッド数（0で逐次処理）初期値:2, 自宅PC:4, 研究室PC, 12
-        "GridSearch_MaxNumberInOneFile" : 100,                        #１ファイルの最大のポイント数 初期値:5
+        "GridSearch_MaxNumberInOneFile" : 10,                        #１ファイルの最大のポイント数 初期値:5
         "GridSearch_MaxNumberInOnePool" : 1000,                       #１プール（並列する）最大のポイント数（この分メモリを消費） 初期値:50
         "GridSearch_NumberOfSamples" : 10,                           #サンプル数
         "GridSearch_ProjectName" : "EMChialvo",                    #プロジェクト名
-        "GridSearch_ProjectDate" : "2025_03_14_00_00",              #プロジェクト日時
+        "GridSearch_ProjectDate" : "2025_03_23_16_00",              #プロジェクト日時
         "GridSearch_T_Process" : Process_SishuESN_GridSearch,     #GS処理指定
         "GridSearch_T_Output" : OutputLog_SishuESN_2024_06_01_10_30             #GS出力処理指定
         })()
@@ -87,7 +89,9 @@ def Project_GridSearch_EMChialvo_NRMSEandMCandMLE_Only_k():
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "Project_F_NRMSE" : True,                                   #NRMSEを調査するか
         "Project_F_MemoryCapacity" : True,                          #MCを調査するか
-        "Project_F_MLE" : True,                   #MLEを調査するか
+        "Project_F_MLE" : True,                                     #MLEを調査するか
+        "Project_F_CovMatrixRank" : True,                  #Covariance Matrix Rankを調査するか
+        "Project_F_DelayCapacity" : True,                   #Delay Capacityを調査するか
 
         "Project_F_OutputResults" : True,                           #各評価地点でパラメータを出力するか
 
@@ -105,14 +109,14 @@ def Project_GridSearch_EMChialvo_NRMSEandMCandMLE_Only_k():
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         "GridSearch_MachineName" : "EMChialvo",                            #計算機名
         "GridSearch_StartPoint" : 0,                                #担当開始ポイントインデックス
-        "GridSearch_EndPoint" : 8020,                                #担当終了ポイントインデックス
+        "GridSearch_EndPoint" : 4010,                                #担当終了ポイントインデックス
         
         "GridSearch_MultiThread" : 12,                               #スレッド数（0で逐次処理）初期値:2, 自宅PC:4, 研究室PC, 12
-        "GridSearch_MaxNumberInOneFile" : 100,                        #１ファイルの最大のポイント数 初期値:5
+        "GridSearch_MaxNumberInOneFile" : 10,                        #１ファイルの最大のポイント数 初期値:5
         "GridSearch_MaxNumberInOnePool" : 1000,                       #１プール（並列する）最大のポイント数（この分メモリを消費） 初期値:50
-        "GridSearch_NumberOfSamples" : 20,                           #サンプル数
+        "GridSearch_NumberOfSamples" : 10,                           #サンプル数
         "GridSearch_ProjectName" : "EMChialvo_Only_k",                    #プロジェクト名
-        "GridSearch_ProjectDate" : "2025_03_14_00_00",              #プロジェクト日時
+        "GridSearch_ProjectDate" : "2025_03_23_16_00",              #プロジェクト日時
         "GridSearch_T_Process" : Process_SishuESN_Only_k_GridSearch,     #GS処理指定
         "GridSearch_T_Output" : OutputLog_SishuESN_Only_k_2024_06_01_10_30             #GS出力処理指定
         })()
@@ -139,7 +143,7 @@ class Process_SishuESN_GridSearch:
         #表示
         print(("---Index in Chank : %d / %d, Index : %d, Sample : %d\n"
                 + "<%s>\n"
-                + "NRMSE : %f, LogNRMSE : %f, TimeForTraining : %f, TimeForTesting : %f, MC : %f, MLE : %f\n")
+                + "NRMSE : %f, LogNRMSE : %f, TimeForTraining : %f, TimeForTesting : %f, MC : %f, MLE : %f, CovRank : %f, DC : %f\n")
                     %(Results["IndexInChank"], Results["NumPointsInChank"], Results["Index"], Results["Samples"],
                     self.getTag(chank_i),
                     Results["NRMSE_R_NRMSE"] if "NRMSE_R_NRMSE" in Results else 0,
@@ -147,7 +151,10 @@ class Process_SishuESN_GridSearch:
                     Results["NRMSE_R_TimeForTraining"] if "NRMSE_R_TimeForTraining" in Results else 0,
                     Results["NRMSE_R_TimeForTesting"] if "NRMSE_R_TimeForTesting" in Results else 0,
                     Results["MemoryCapacity_R_MC"] if "MemoryCapacity_R_MC" in Results else 0,
-                    Results["MLE_R_MLE"] if "MLE_R_MLE" in Results else 0))
+                    Results["MLE_R_MLE"] if "MLE_R_MLE" in Results else 0,
+                    Results["CovMatrixRank_R_CovMatrixRank"] if "CovMatrixRank_R_CovMatrixRank" in Results else 0,
+                    Results["DelayCapacity_R_DelayCapacity"] if "DelayCapacity_R_DelayCapacity" in Results else 0
+                    ))
     
         return Results
 
@@ -365,6 +372,64 @@ class Process_SishuESN_GridSearch:
                 })
             Results.update(Evaluation_EM.Evaluation_MLE(param)())
 
+        #CovMatrixRank評価
+        if gs_param["Project_F_CovMatrixRank"]:
+            param = Param.copy()
+            param.update({
+                #==========================================================================================
+                "CovMatrixRank_F_OutputLog" : False,                        #経過の出力を行うか
+
+                "CovMatrixRank_D_u" : 1,                                   #入力信号次元
+                "CovMatrixRank_D_x" : 100,                                 #リザバー層次元
+                "CovMatrixRank_D_y" : 1,                                   #出力信号次元
+
+                "CovMatrixRank_Length_Burnin" : 1000,                      #空走用データ時間長
+                "CovMatrixRank_Length_Test" : 5000,                        #評価用データ時間長
+
+                "CovMatrixRank_T_Task" : Task_EM.Task_NormalLorenz,         #評価用タスク（Type型）
+                "CovMatrixRank_T_Model" : Param_Model,
+                "CovMatrixRank_T_Output" : Output_EM.Output_Single_CovMatrixRank_2025_03_15_15_32,
+
+                #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                "DirPath_Project" : self.GridSearch.Dir_Points_Branch,              #GSのパスを使用
+                "AxisTag" : self.getTag(chank_i),                                   #GSのパラメータを図題に使用
+
+                "CovMatrixRank_F_OutputCharts" : False,                      #図の出力フラグ
+                "CovMatrixRank_F_OutputCharts_CovMatrixRankWaves" : False,    #CovMatrixRank曲線の出力フラグ
+
+                })
+            Results.update(Evaluation_EM.Evaluation_CovMatrixRank(param)())
+
+        #DC評価
+        if gs_param["Project_F_DelayCapacity"]:
+            param = Param.copy()
+            param.update({
+                #==========================================================================================
+                "DelayCapacity_F_OutputLog" : False,                        #経過の出力を行うか
+
+                "DelayCapacity_D_u" : 1,                                   #入力信号次元
+                "DelayCapacity_D_x" : 100,                                 #リザバー層次元
+                "DelayCapacity_D_y" : 1,                                   #出力信号次元
+
+                "DelayCapacity_Length_Burnin" : 1000,                      #空走用データ時間長
+            
+                "DelayCapacity_Length_Tdc" : 5000,                        #評価用データ時間長
+                "DelayCapacity_Length_Taumax" : 50,
+
+                "DelayCapacity_T_Task" : Task_EM.Task_NormalLorenz,         #評価用タスク（Type型）
+                "DelayCapacity_T_Model" : Param_Model,
+                "DelayCapacity_T_Output" : Output_EM.Output_Single_DelayCapacity_2025_03_15_15_32,
+
+                #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                "DirPath_Project" : self.GridSearch.Dir_Points_Branch,              #GSのパスを使用
+                "AxisTag" : self.getTag(chank_i),                                   #GSのパラメータを図題に使用
+
+                "DelayCapacity_F_OutputCharts" : True,             #図の出力フラグ
+                "DelayCapacity_F_OutputCharts_DCGraph" : True,     #DC曲線の出力フラグ
+                
+                })
+            Results.update(Evaluation_EM.Evaluation_DelayCapacity(param)())
+
         #地点のパラメータを改めて設定
         if gs_param["Project_F_OutputResults"]:
             self.GridSearch.CSV_Point_Param.Save(Results)
@@ -393,7 +458,7 @@ class Process_SishuESN_Only_k_GridSearch:
         #表示
         print(("---Index in Chank : %d / %d, Index : %d, Sample : %d\n"
                 + "<%s>\n"
-                + "NRMSE : %f, LogNRMSE : %f, TimeForTraining : %f, TimeForTesting : %f, MC : %f, MLE : %f\n")
+                + "NRMSE : %f, LogNRMSE : %f, TimeForTraining : %f, TimeForTesting : %f, MC : %f, MLE : %f, CovRank : %f, DC : %f\n")
                     %(Results["IndexInChank"], Results["NumPointsInChank"], Results["Index"], Results["Samples"],
                     self.getTag(chank_i),
                     Results["NRMSE_R_NRMSE"] if "NRMSE_R_NRMSE" in Results else 0,
@@ -401,7 +466,10 @@ class Process_SishuESN_Only_k_GridSearch:
                     Results["NRMSE_R_TimeForTraining"] if "NRMSE_R_TimeForTraining" in Results else 0,
                     Results["NRMSE_R_TimeForTesting"] if "NRMSE_R_TimeForTesting" in Results else 0,
                     Results["MemoryCapacity_R_MC"] if "MemoryCapacity_R_MC" in Results else 0,
-                    Results["MLE_R_MLE"] if "MLE_R_MLE" in Results else 0))
+                    Results["MLE_R_MLE"] if "MLE_R_MLE" in Results else 0,
+                    Results["CovMatrixRank_R_CovMatrixRank"] if "CovMatrixRank_R_CovMatrixRank" in Results else 0,
+                    Results["DelayCapacity_R_DelayCapacity"] if "DelayCapacity_R_DelayCapacity" in Results else 0
+                    ))
     
         return Results
 
@@ -617,6 +685,64 @@ class Process_SishuESN_Only_k_GridSearch:
                 })
             Results.update(Evaluation_EM.Evaluation_MLE(param)())
 
+        #CovMatrixRank評価
+        if gs_param["Project_F_CovMatrixRank"]:
+            param = Param.copy()
+            param.update({
+                #==========================================================================================
+                "CovMatrixRank_F_OutputLog" : False,                        #経過の出力を行うか
+
+                "CovMatrixRank_D_u" : 1,                                   #入力信号次元
+                "CovMatrixRank_D_x" : 100,                                 #リザバー層次元
+                "CovMatrixRank_D_y" : 1,                                   #出力信号次元
+
+                "CovMatrixRank_Length_Burnin" : 1000,                      #空走用データ時間長
+                "CovMatrixRank_Length_Test" : 5000,                        #評価用データ時間長
+
+                "CovMatrixRank_T_Task" : Task_EM.Task_NormalLorenz,         #評価用タスク（Type型）
+                "CovMatrixRank_T_Model" : Param_Model,
+                "CovMatrixRank_T_Output" : Output_EM.Output_Single_CovMatrixRank_2025_03_15_15_32,
+
+                #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                "DirPath_Project" : self.GridSearch.Dir_Points_Branch,              #GSのパスを使用
+                "AxisTag" : self.getTag(chank_i),                                   #GSのパラメータを図題に使用
+
+                "CovMatrixRank_F_OutputCharts" : False,                      #図の出力フラグ
+                "CovMatrixRank_F_OutputCharts_CovMatrixRankWaves" : False,    #CovMatrixRank曲線の出力フラグ
+
+                })
+            Results.update(Evaluation_EM.Evaluation_CovMatrixRank(param)())
+
+        #DC評価
+        if gs_param["Project_F_DelayCapacity"]:
+            param = Param.copy()
+            param.update({
+                #==========================================================================================
+                "DelayCapacity_F_OutputLog" : False,                        #経過の出力を行うか
+
+                "DelayCapacity_D_u" : 1,                                   #入力信号次元
+                "DelayCapacity_D_x" : 100,                                 #リザバー層次元
+                "DelayCapacity_D_y" : 1,                                   #出力信号次元
+
+                "DelayCapacity_Length_Burnin" : 1000,                      #空走用データ時間長
+            
+                "DelayCapacity_Length_Tdc" : 5000,                        #評価用データ時間長
+                "DelayCapacity_Length_Taumax" : 100,
+
+                "DelayCapacity_T_Task" : Task_EM.Task_NormalLorenz,         #評価用タスク（Type型）
+                "DelayCapacity_T_Model" : Param_Model,
+                "DelayCapacity_T_Output" : Output_EM.Output_Single_DelayCapacity_2025_03_15_15_32,
+
+                #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                "DirPath_Project" : self.GridSearch.Dir_Points_Branch,              #GSのパスを使用
+                "AxisTag" : self.getTag(chank_i),                                   #GSのパラメータを図題に使用
+
+                "DelayCapacity_F_OutputCharts" : True,             #図の出力フラグ
+                "DelayCapacity_F_OutputCharts_DCGraph" : True,     #DC曲線の出力フラグ
+                
+                })
+            Results.update(Evaluation_EM.Evaluation_DelayCapacity(param)())
+
         #地点のパラメータを改めて設定
         if gs_param["Project_F_OutputResults"]:
             self.GridSearch.CSV_Point_Param.Save(Results)
@@ -659,7 +785,9 @@ class OutputLog_SishuESN_2024_06_01_10_30(Output_EM.Output):
                 ["Time For Training", "NRMSE_R_TimeForTraining", "TimeTrain"], 
                 ["Time For Testing" , "NRMSE_R_TimeForTesting", "TimeTest"],
                 ["Memory Capacity", "MemoryCapacity_R_MC", "MC"],
-                ["MLE", "MLE_R_MLE", "MLE"]]
+                ["MLE", "MLE_R_MLE", "MLE"],
+                ["CovMatrixRank", "CovMatrixRank_R_CovMatrixRank", "CovMatrixRank"],
+                ["DelayCapacity", "DelayCapacity_R_DelayCapacity", "DelayCapacity"]]
         
         #指標でループ
         for score in L_Score:
@@ -770,7 +898,9 @@ class OutputLog_SishuESN_Only_k_2024_06_01_10_30(Output_EM.Output):
                 ["Time For Training", "NRMSE_R_TimeForTraining", "TimeTrain"], 
                 ["Time For Testing" , "NRMSE_R_TimeForTesting", "TimeTest"],
                 ["Memory Capacity", "MemoryCapacity_R_MC", "MC"],
-                ["MLE", "MLE_R_MLE", "MLE"]]
+                ["MLE", "MLE_R_MLE", "MLE"],
+                ["CovMatrixRank", "CovMatrixRank_R_CovMatrixRank", "CovMatrixRank"],
+                ["DelayCapacity", "DelayCapacity_R_DelayCapacity", "DelayCapacity"]]
         
         Count = 0
 
@@ -851,12 +981,12 @@ class OutputLog_SishuESN_Only_k_2024_06_01_10_30(Output_EM.Output):
 
                     
                     #以下はNRMSE用の設定
-                    
+                    """
                     ax.set_xticks(np.arange(-5,-0.9,0.25))
                     ax.set_xticks(np.arange(-5,-0.9,0.1),minor=True)
                     ax.set_yticks(np.arange(0.09,0.19,0.01))
                     ax.set_yticks(np.arange(0.09,0.19,0.005),minor=True)
-                    
+                    """
 
 
                     ax.set_title(Title, fontsize = FontSize_Title)
