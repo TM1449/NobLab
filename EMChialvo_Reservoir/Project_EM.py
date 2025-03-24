@@ -172,11 +172,11 @@ def Project_EMChialvo_2025_01_28_12_34():
     #共通パラメータ
     Param = {
         #==========================================================================================
-        "Project_F_NRMSE" : False,                           #NRMSEを調査するか
+        "Project_F_NRMSE" : True,                           #NRMSEを調査するか
         "Project_F_MemoryCapacity" : False,                  #MCを調査するか
-        "Project_F_MLE" : False,                             #MLE（最大リアプノフ指数）を調査するか
+        "Project_F_MLE" : True,                             #MLE（最大リアプノフ指数）を調査するか
         
-        "Project_F_CovMatrixRank" : False,                  #Covariance Matrix Rankを調査するか
+        "Project_F_CovMatrixRank" : True,                  #Covariance Matrix Rankを調査するか
         "Project_F_DelayCapacity" : True,                   #Delay Capacityを調査するか
 
         #------------------------------------------------------------------------------------------
@@ -198,7 +198,7 @@ def Project_EMChialvo_2025_01_28_12_34():
         #------------------------------------------------------------------------------------------
         #ルンゲクッタ法通常レスラー方程式
         "Task_NormalRosslor_Scale" : 1 / 30,
-        "Task_NormalRosslor_Dt" : 0.03,
+        "Task_NormalRosslor_Dt" : 0.05,
         "Task_NormalRosslor_Tau" : 5,
         "Task_NormalRosslor_InitTerm" : 1000,
 
@@ -298,9 +298,9 @@ def Project_EMChialvo_2025_01_28_12_34():
         "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
         "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
-        "Model_EMChialvo_k" : -5.0,                         #変数:k
+        "Model_EMChialvo_k" : -3.0,                         #変数:k
         
-        "Model_EMChialvo_Rho" : 0.01,                      #スペクトル半径
+        "Model_EMChialvo_Rho" : 0.1,                      #スペクトル半径
 
         #------------------------------------------------------------------------------------------
         "EMChialvo_Reservoir_Density" : 1,                          #結合密度        
@@ -324,7 +324,7 @@ def Project_EMChialvo_2025_01_28_12_34():
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
 
             #------------------------------------------------------------------------------------------
-            "NRMSE_T_Task" : Task_EM.Task_NormalLorenz,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_NormalRosslor,                                #評価用タスク（Type型）
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
@@ -378,7 +378,7 @@ def Project_EMChialvo_2025_01_28_12_34():
 
             "MLE_Epsilon" : 1e-06,                            #摂動の大きさ
 
-            "MLE_T_Task" : Task_EM.Task_NormalLorenz,
+            "MLE_T_Task" : Task_EM.Task_NormalRosslor,
             "MLE_T_Model" : Model_EM.Model_EMChialvo,
             "MLE_T_Output" : Output_EM.Output_Single_MLE_2023_07_08_17_12,
 
@@ -404,7 +404,7 @@ def Project_EMChialvo_2025_01_28_12_34():
             "CovMatrixRank_Length_Burnin" : 1000,                      #空走用データ時間長
             "CovMatrixRank_Length_Test" : 5000,                        #評価用データ時間長
             
-            "CovMatrixRank_T_Task" : Task_EM.Task_NormalLorenz,
+            "CovMatrixRank_T_Task" : Task_EM.Task_NormalRosslor,
             "CovMatrixRank_T_Model" : Model_EM.Model_EMChialvo,
             "CovMatrixRank_T_Output" : Output_EM.Output_Single_CovMatrixRank_2025_03_15_15_32,
 
@@ -432,7 +432,7 @@ def Project_EMChialvo_2025_01_28_12_34():
             "DelayCapacity_Length_Tdc" : 5000,                        #評価用データ時間長
             "DelayCapacity_Length_Taumax" : 50,
 
-            "DelayCapacity_T_Task" : Task_EM.Task_NormalLorenz,
+            "DelayCapacity_T_Task" : Task_EM.Task_NormalRosslor,
             "DelayCapacity_T_Model" : Model_EM.Model_EMChialvo,
             "DelayCapacity_T_Output" : Output_EM.Output_Single_DelayCapacity_2025_03_15_15_32,
 

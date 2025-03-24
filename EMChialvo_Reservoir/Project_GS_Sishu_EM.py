@@ -75,7 +75,7 @@ def Project_GridSearch_EMChialvo_NRMSE():
         "GridSearch_MaxNumberInOnePool" : 1000,                       #１プール（並列する）最大のポイント数（この分メモリを消費） 初期値:50
         "GridSearch_NumberOfSamples" : 10,                           #サンプル数
         "GridSearch_ProjectName" : "EMChialvo",                    #プロジェクト名
-        "GridSearch_ProjectDate" : "2025_03_23_16_00",              #プロジェクト日時
+        "GridSearch_ProjectDate" : "2025_03_24_01_00",              #プロジェクト日時
         "GridSearch_T_Process" : Process_SishuESN_GridSearch,     #GS処理指定
         "GridSearch_T_Output" : OutputLog_SishuESN_2024_06_01_10_30             #GS出力処理指定
         })()
@@ -187,7 +187,7 @@ class Process_SishuESN_GridSearch:
             #------------------------------------------------------------------------------------------
             #ルンゲクッタ法通常レスラー方程式
             "Task_NormalRosslor_Scale" : 1 / 30,
-            "Task_NormalRosslor_Dt" : 0.1,
+            "Task_NormalRosslor_Dt" : 0.05,
             "Task_NormalRosslor_Tau" : 5,
             "Task_NormalRosslor_InitTerm" : 1000,
 
@@ -302,7 +302,7 @@ class Process_SishuESN_GridSearch:
                 "NRMSE_Length_Burnin" : 1000,                       #空走用データ時間長
                 "NRMSE_Length_Train" : 20000,                       #学習用データ時間長
                 "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
-                "NRMSE_T_Task" : Task_EM.Task_NormalLorenz,                                #評価用タスク（Type型）
+                "NRMSE_T_Task" : Task_EM.Task_NormalRosslor,                                #評価用タスク（Type型）
                 "NRMSE_T_Model" : Param_Model,                                      #モデル（Type型）
                 "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
@@ -358,7 +358,7 @@ class Process_SishuESN_GridSearch:
 
                 "MLE_Epsilon" : 1e-08,                            #摂動の大きさ
 
-                "MLE_T_Task" : Task_EM.Task_NormalLorenz,         #評価用タスク（Type型）
+                "MLE_T_Task" : Task_EM.Task_NormalRosslor,         #評価用タスク（Type型）
                 "MLE_T_Model" : Param_Model,
                 "MLE_T_Output" : Output_EM.Output_Single_MLE_2023_07_08_17_12,
 
@@ -386,7 +386,7 @@ class Process_SishuESN_GridSearch:
                 "CovMatrixRank_Length_Burnin" : 1000,                      #空走用データ時間長
                 "CovMatrixRank_Length_Test" : 5000,                        #評価用データ時間長
 
-                "CovMatrixRank_T_Task" : Task_EM.Task_NormalLorenz,         #評価用タスク（Type型）
+                "CovMatrixRank_T_Task" : Task_EM.Task_NormalRosslor,         #評価用タスク（Type型）
                 "CovMatrixRank_T_Model" : Param_Model,
                 "CovMatrixRank_T_Output" : Output_EM.Output_Single_CovMatrixRank_2025_03_15_15_32,
 
@@ -416,7 +416,7 @@ class Process_SishuESN_GridSearch:
                 "DelayCapacity_Length_Tdc" : 5000,                        #評価用データ時間長
                 "DelayCapacity_Length_Taumax" : 50,
 
-                "DelayCapacity_T_Task" : Task_EM.Task_NormalLorenz,         #評価用タスク（Type型）
+                "DelayCapacity_T_Task" : Task_EM.Task_NormalRosslor,         #評価用タスク（Type型）
                 "DelayCapacity_T_Model" : Param_Model,
                 "DelayCapacity_T_Output" : Output_EM.Output_Single_DelayCapacity_2025_03_15_15_32,
 
@@ -500,7 +500,7 @@ class Process_SishuESN_Only_k_GridSearch:
             #------------------------------------------------------------------------------------------
             #ルンゲクッタ法通常レスラー方程式
             "Task_NormalRosslor_Scale" : 1 / 30,
-            "Task_NormalRosslor_Dt" : 0.1,
+            "Task_NormalRosslor_Dt" : 0.05,
             "Task_NormalRosslor_Tau" : 5,
             "Task_NormalRosslor_InitTerm" : 1000,
 
@@ -970,7 +970,13 @@ class OutputLog_SishuESN_Only_k_2024_06_01_10_30(Output_EM.Output):
                     ax.set_xlabel(LabelsX, fontsize = FontSize_Label)
                     ax.set_ylabel(LabelsY, fontsize = FontSize_Label)
                     
-                    
+                    #以下はNRMSE用の設定
+                    """
+                    ax.set_xticks(np.arange(-5,-0.9,0.25))
+                    ax.set_xticks(np.arange(-5,-0.9,0.1),minor=True)
+                    ax.set_yticks(np.arange(0.09,0.19,0.01))
+                    ax.set_yticks(np.arange(0.09,0.185,0.005),minor=True)
+                    """
                     #以下はMLE用の設定
                     """
                     ax.set_xticks(np.arange(-5,-0.9,0.25))
@@ -978,16 +984,20 @@ class OutputLog_SishuESN_Only_k_2024_06_01_10_30(Output_EM.Output):
                     ax.set_yticks(np.arange(-0.1,0.02,0.01))
                     ax.set_yticks(np.arange(-0.1,0.015,0.005),minor=True)
                     """
-
-                    
-                    #以下はNRMSE用の設定
+                    #以下はCovMatrix用の設定
                     """
                     ax.set_xticks(np.arange(-5,-0.9,0.25))
                     ax.set_xticks(np.arange(-5,-0.9,0.1),minor=True)
-                    ax.set_yticks(np.arange(0.09,0.19,0.01))
-                    ax.set_yticks(np.arange(0.09,0.19,0.005),minor=True)
+                    ax.set_yticks(np.arange(84,103,2))
+                    ax.set_yticks(np.arange(84,103,1),minor=True)
                     """
-
+                    #以下はDelay Capacity用の設定
+                    
+                    ax.set_xticks(np.arange(-5,-0.9,0.25))
+                    ax.set_xticks(np.arange(-5,-0.9,0.1),minor=True)
+                    ax.set_yticks(np.arange(4,24,2))
+                    ax.set_yticks(np.arange(4,24,1),minor=True)
+                    
 
                     ax.set_title(Title, fontsize = FontSize_Title)
                     ax.grid()
