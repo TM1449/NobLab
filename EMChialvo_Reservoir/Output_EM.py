@@ -101,8 +101,9 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
             #入出力波形
             if self.F_OutputCharts_UYYdEWaves:
                 FigSize = (16, 9)                   #アスペクト比
-                FontSize_Label = 36                 #ラベルのフォントサイズ
-                FontSize_Title = 36                 #タイトルのフォントサイズ
+                FontSize_Label = 50                 #ラベルのフォントサイズ
+                FontSize_Title = 50                 #タイトルのフォントサイズ
+                FontSize_Tick = 45                  #目盛りのフォントサイズ
                 LineWidth = 2                       #線の太さ
                 FileFormat = ".png"#".pdf"          #ファイルフォーマット
                 
@@ -130,10 +131,13 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 #各種波形
                 Title = "UYYdWaves" + self.AxisTag  #図題
                 fig = plt.figure(figsize = FigSize)
+
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("Time Step", fontsize = FontSize_Label)
                 ax.set_ylabel("", fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+
                 ax.grid(True)
                 ax.plot(T, U, "skyblue", label = "u", lw = LineWidth)
                 ax.plot(T, Y, "lawngreen", label = "y", lw = LineWidth)
@@ -146,10 +150,13 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 #誤差波形
                 Title = "ErrorWaves" + self.AxisTag     #図題
                 fig = plt.figure(figsize = FigSize)
+
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("Time Step", fontsize = FontSize_Label)
                 ax.set_ylabel("", fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+
                 ax.grid(True)
                 ax.plot(T, E, "skyblue", label = "RMSE", lw = LineWidth)
                 ax.legend()
@@ -160,10 +167,13 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 #リザバー層内のx, yの状態
                 Title = None     #図題
                 fig = plt.figure(figsize = FigSize)
+
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("x", fontsize = FontSize_Label)
                 ax.set_ylabel("y", fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+
                 ax.grid(True)
                 ax.plot(RS_X_A, RS_Y_A, lw = LineWidth)
                 ax.legend()
@@ -174,10 +184,13 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 #リザバー層内のx, phiの状態
                 Title = None     #図題
                 fig = plt.figure(figsize = FigSize)
+
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("x", fontsize = FontSize_Label)
                 ax.set_ylabel("phi", fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+
                 ax.grid(True)
                 ax.plot(RS_X_A, RS_Phi_A, lw = LineWidth)
                 ax.legend()
@@ -188,10 +201,13 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 #リザバー層内のy, phiの状態
                 Title = None     #図題
                 fig = plt.figure(figsize = FigSize)
+
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("y", fontsize = FontSize_Label)
                 ax.set_ylabel("phi", fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+
                 ax.grid(True)
                 ax.plot(RS_Y_A, RS_Phi_A, lw = LineWidth)
                 ax.legend()
@@ -203,10 +219,12 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 Title =  None
                 fig = plt.figure(figsize = FigSize)
                 ax = fig.add_subplot(1, 1, 1)
-                plt.tick_params(labelsize=18)
+
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("Time Step", fontsize = FontSize_Label)
                 ax.set_ylabel(r'$x_{R}$', fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+
                 ax.grid(True)
                 cmap = plt.get_cmap("tab10")
                 for i in range(self.RS_neuron):
@@ -221,11 +239,13 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 Title =  "3D Chialvo" + self.AxisTag
                 fig = plt.figure(figsize = FigSize)
                 ax = fig.add_subplot(1,1,1, projection = '3d')
-                plt.tick_params(labelsize=18)
+
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("X", fontsize = FontSize_Label * 0.6)
                 ax.set_ylabel("Y", fontsize = FontSize_Label * 0.6)
                 ax.set_zlabel("Phi", fontsize = FontSize_Label * 0.6)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick * 0.5)
+
                 for i in range(self.N):
                     ax.plot(RS_X_A[i, :], RS_Y_A[i, :], RS_Phi_A[i, :],'-', lw=LineWidth)
                 ax.view_init(azim=150)
@@ -240,11 +260,13 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 Title =  "Chialvo X" + self.AxisTag
                 fig = plt.figure(figsize = FigSize)
                 ax = fig.add_subplot(1,1,1, projection = '3d')
-                plt.tick_params(labelsize=15)
+
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("Neuron", fontsize = FontSize_Label * 0.5)
                 ax.set_ylabel("Time Steps", fontsize = FontSize_Label * 0.6)
                 ax.set_zlabel("X", fontsize = FontSize_Label * 0.6)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick * 0.5)
+
                 for i in range(0, self.N, 10):
                     x_vals = np.full_like(T, i)  # ニューロンのインデックスを T と同じサイズの配列に
                     ax.plot(x_vals, T, RS_X_A[i, :],'-', lw=LineWidth)
@@ -260,12 +282,13 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 Title = None
                 fig = plt.figure(figsize = FigSize)
                 ax = fig.add_subplot(111)
-                plt.tick_params(labelsize=18)
+
                 RS_HeatMap = RS_HeatMap.astype(float).T
                 sns.heatmap(RS_HeatMap, cmap='hsv', xticklabels=10, yticklabels=1000)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 plt.xlabel("Reservoir Neurons", fontsize = FontSize_Label * 0.8)
                 plt.ylabel("Time Step", fontsize = FontSize_Label * 0.8)
+                
                 ax.invert_yaxis()
                 ax.legend()
                 plt.tight_layout()
@@ -357,8 +380,9 @@ class Output_Single_MC_2023_05_25_13_28(Output):
             #入出力波形
             if self.F_OutputCharts_MCGraph:
                 FigSize = (16, 9)                   #アスペクト比
-                FontSize_Label = 24                 #ラベルのフォントサイズ
-                FontSize_Title = 24                 #タイトルのフォントサイズ
+                FontSize_Label = 54                 #ラベルのフォントサイズ
+                FontSize_Title = 54                 #タイトルのフォントサイズ
+                FontSize_Tick = 45                  #目盛りのフォントサイズ
                 LineWidth = 3                       #線の太さ
                 FileFormat = ".png"#".pdf"          #ファイルフォーマット
                 
@@ -369,10 +393,13 @@ class Output_Single_MC_2023_05_25_13_28(Output):
                 #MCカーブ
                 Title = "MC" + self.AxisTag         #図題
                 fig = plt.figure(figsize = FigSize)
+
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel(r"$\tau$", fontsize = FontSize_Label)
                 ax.set_ylabel("Memory Capacity", fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+
                 ax.grid(True)
                 ax.plot(Tau, MC_Tau, "skyblue", label = r"$\mathrm{MC}_{\tau}$", lw = LineWidth)
                 ax.legend()
@@ -454,8 +481,9 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
             #入力波形と瞬時最大リアプノフ指数
             if self.F_OutputCharts_MMLEWaves:
                 FigSize = (16, 9)                   #アスペクト比
-                FontSize_Label = 24                 #ラベルのフォントサイズ
-                FontSize_Title = 24                 #タイトルのフォントサイズ
+                FontSize_Label = 54                 #ラベルのフォントサイズ
+                FontSize_Title = 54                 #タイトルのフォントサイズ
+                FontSize_Tick = 45                  #目盛りのフォントサイズ
                 LineWidth = 3                       #線の太さ
                 FileFormat = ".png"#".pdf"          #ファイルフォーマット
                 
@@ -491,10 +519,13 @@ class Output_Single_MLE_2023_07_08_17_12(Output):
                 #時間経過による最大リアプノフ指数
                 Title = "Maxisum Lyapunov Exponent" + self.AxisTag          #図題
                 fig = plt.figure(figsize = FigSize)
+
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("Time Step", fontsize = FontSize_Label)
                 ax.set_ylabel("Maxisum Lyapunov Exponent", fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+
                 ax.grid(True)
                 ax.plot(T, MLE_TimeStep, lw = LineWidth)
                 ax.legend()
@@ -579,8 +610,9 @@ class Output_Single_CovMatrixRank_2025_03_15_15_32(Output):
             #共分散行列のランク
             if self.F_OutputCharts_CovMatrix:
                 FigSize = (16, 9)                   #アスペクト比
-                FontSize_Label = 24                 #ラベルのフォントサイズ
-                FontSize_Title = 24                 #タイトルのフォントサイズ
+                FontSize_Label = 54                 #ラベルのフォントサイズ
+                FontSize_Title = 54                 #タイトルのフォントサイズ
+                FontSize_Tick = 45                  #目盛りのフォントサイズ
                 LineWidth = 2                       #線の太さ
                 FileFormat = ".png"
 
@@ -595,10 +627,13 @@ class Output_Single_CovMatrixRank_2025_03_15_15_32(Output):
                 #リザバー層のニューロンの状態
                 Title = None
                 fig = plt.figure(figsize = FigSize)
+
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("Time Step", fontsize = FontSize_Label)
                 ax.set_ylabel(r'$x_{R}$', fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+
                 ax.grid(True)
                 for i in range(5):
                     ax.plot(T, X[i, :], label = r'$x_{R}$', lw = LineWidth)
@@ -610,10 +645,13 @@ class Output_Single_CovMatrixRank_2025_03_15_15_32(Output):
                 #リザバー層のニューロンの状態+入力信号
                 Title = None
                 fig = plt.figure(figsize = FigSize)
+
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel("Time Step", fontsize = FontSize_Label)
                 ax.set_ylabel(r'$x_{R}$', fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+
                 ax.grid(True)
                 ax.plot(T, U, lw = LineWidth, label = "Input Signal", color='black')
                 #cmap = plt.get_cmap("Blues")
@@ -660,7 +698,7 @@ class Output_Single_CovMatrixRank_2025_03_15_15_32(Output):
 class Output_Single_DelayCapacity_2025_03_15_15_32(Output):
     
     """
-    MCのデバッグ用
+    DCのデバッグ用
     """
     #コンストラクタ
     def __init__(self, param: dict, parent: any):
@@ -704,8 +742,9 @@ class Output_Single_DelayCapacity_2025_03_15_15_32(Output):
             #入出力波形
             if self.F_OutputCharts_DCGraph:
                 FigSize = (16, 9)                   #アスペクト比
-                FontSize_Label = 24                 #ラベルのフォントサイズ
-                FontSize_Title = 24                 #タイトルのフォントサイズ
+                FontSize_Label = 54                 #ラベルのフォントサイズ
+                FontSize_Title = 54                 #タイトルのフォントサイズ
+                FontSize_Tick = 45                  #目盛りのフォントサイズ
                 LineWidth = 3                       #線の太さ
                 FileFormat = ".png"#".pdf"          #ファイルフォーマット
                 
@@ -716,10 +755,13 @@ class Output_Single_DelayCapacity_2025_03_15_15_32(Output):
                 #MCカーブ
                 Title = "DC" + self.AxisTag         #図題
                 fig = plt.figure(figsize = FigSize)
+                
                 ax = fig.add_subplot(1, 1, 1)
                 ax.set_title(Title, fontsize = FontSize_Title)
                 ax.set_xlabel(r"$\tau$", fontsize = FontSize_Label)
                 ax.set_ylabel("Delay Capacity", fontsize = FontSize_Label)
+                ax.tick_params(axis='both', labelsize=FontSize_Tick)
+                
                 ax.grid(True)
                 ax.plot(Tau, DC_Tau, "skyblue", label = r"$\mathrm{DC}_{\tau}$", lw = LineWidth)
                 ax.legend()

@@ -164,7 +164,7 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
         #変数
-        
+        """
         self.x = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                     #xの状態ベクトル
         self.x_old = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                 #1step前のxの状態ベクトル
         self.y = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                     #yの状態ベクトル
@@ -175,8 +175,8 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         self.xP = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                    #xPの状態ベクトル
         self.yP = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                    #yPの状態ベクトル
         self.phiP = np.ones([self.D_x]) * (np.random.rand(self.D_x) * 2 - 1)                  #phiPの状態ベクトル
-        
         """
+        #np.random.seed(999)
         self.x = np.random.rand(self.D_x) * 2 - 1                     #xの状態ベクトル
         self.x_old = np.random.rand(self.D_x) * 2 - 1                 #1step前のxの状態ベクトル
         self.y = np.random.rand(self.D_x) * 2 - 1                     #yの状態ベクトル
@@ -187,7 +187,7 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         self.xP = np.random.rand(self.D_x) * 2 - 1                    #xPの状態ベクトル
         self.yP = np.random.rand(self.D_x) * 2 - 1                    #yPの状態ベクトル
         self.phiP = np.random.rand(self.D_x) * 2 - 1                  #phiPの状態ベクトル
-        """
+        
         #重み初期化
         self.W_in = self._makeInputWeight()                     #入力重み
         self.W_rec = self._makeRecurrentWeight()                #再帰重み
@@ -212,11 +212,11 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         
         #乱数で重み調整
         np.random.seed(seed=None)
-        W = np.random.randn(self.D_x, self.D_x) 
+        W = np.random.randn(self.D_x, self.D_x)
         W = self._makeWSparse(W)
         w , v = np.linalg.eig(W)
         Matrix = self.Rho * (W / np.max(np.abs(w)))
-
+        
         """
         #リング構造
         W = np.zeros((self.D_x, self.D_x))  # 初期化
@@ -227,6 +227,20 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
 
             W[i, forward_index] = np.random.uniform(-1,1)
 
+        w, v = np.linalg.eig(W)
+        Matrix = self.Rho * (W / np.max(np.abs(w)))
+        """
+        """
+        #ブロック構造
+        W = np.zeros((self.D_x, self.D_x))  # 初期化
+        group_size = 10
+        num_groups = self.D_x // group_size  # 100を10で割ってグループ数は10
+
+        for g in range(num_groups):
+            start = g * group_size         # グループの開始インデックス
+            end = start + group_size
+            # 対応するブロック（行[start:end], 列[start:end]）に乱数を代入
+            W[start:end, start:end] = np.random.rand(group_size, group_size) * 2 - 1
         w, v = np.linalg.eig(W)
         Matrix = self.Rho * (W / np.max(np.abs(w)))
         """

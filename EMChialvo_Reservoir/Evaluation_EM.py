@@ -26,6 +26,7 @@ maru
 import time
 
 import numpy as np
+import sys
 
 #NRMSE_full_list : list = []
 
@@ -658,11 +659,30 @@ class Evaluation_CovMatrixRank(Evaluation):
         Bias = np.ones((self.Length_Test,1))         #バイアス項
         Omega = np.concatenate([Omega, Bias], 1)            #バイアス項を追加
         
-        
         #論文の定義通りに共分散行列を計算
         CovOmega = np.dot(Omega.T, Omega)
+        _, S, _ = np.linalg.svd(CovOmega)
+        TH = (max(CovOmega.shape) * sys.float_info.epsilon * max(S))
+        TH_Nolta = 1e-09
+
         Gamma = np.linalg.matrix_rank(CovOmega)
-        
+        print(f"通常の閾値：{TH}")
+        print(f"通常のランク：{Gamma}\n")
+
+        #TH1 = TH * 10
+        Gamma1 = np.linalg.matrix_rank(CovOmega, TH_Nolta)
+        print(f"閾値を1e-08：{TH_Nolta}")
+        print(f"閾値を1e-08したランク：{Gamma1}\n")
+
+        #TH333 = 1e-08
+        #Gamma333 = np.linalg.matrix_rank(CovOmega, TH333)
+        #print(f"条件が1e-08して緩くした閾値：{TH333}")
+        #print(f"条件が1e-08して緩くしたランク：{Gamma333}\n")
+
+        #TH2 = (max(S) * np.finfo(CovOmega.dtype).eps / 2. * np.sqrt(CovOmega.shape[0] + CovOmega.shape[1] +1))
+        #print(f"条件を厳しくした閾値：{TH2}")
+        #Gamma2 = np.linalg.matrix_rank(CovOmega, TH2)
+        #print(f"条件を厳しくしたランク：{Gamma2}\n")
 
         #終了処理
         if self.F_OutputLog : print("+++ Storing Results +++")
@@ -804,7 +824,7 @@ class Evaluation_DelayCapacity(Evaluation):
             X_Cent = X - np.mean(X, axis=0)
 
             #共分散行列
-            CovX = ((np.dot(X_Cent.T, X_Cent)) / (Ti)) + np.eye(Ne) * 1e-10
+            CovX = ((np.dot(X_Cent.T, X_Cent)) / (self.Length_Tdc)) + np.eye(self.D_x) * 1e-10
             
             #特異値分解
             Uw, Sw, Vw = np.linalg.svd(CovX)

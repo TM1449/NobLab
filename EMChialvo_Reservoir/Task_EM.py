@@ -22,6 +22,7 @@ import signalz
 from scipy.integrate import solve_ivp
 import ddeint
 import bisect
+import os
 
 #====================================================================
 #タスク
@@ -136,10 +137,10 @@ class Task_MC(Task):
         self.X = np.random.rand(self.Length, self.D_u) * 2 - 1
     
 #--------------------------------------------------------------------
-class Task_Parity(Task):
+class Task_parity(Task):
     """
     パリティタスク（正式名称ではない？）
-    Tau後に入力された多次元二値の偶奇（二値，1次元）を出力する課題
+    Tau後に入力された多次元二値の偶奇（二値,1次元）を出力する課題
     """
     #コンストラクタ
     def __init__(self, param: dict, evaluation: any):
@@ -183,122 +184,6 @@ class Task_Parity(Task):
                 if term[i] <= 0:
                     x[i] = 1 if x[i] <= 0 else 0
                     term[i] = np.random.randint(self.MinTerm, self.MaxTerm + 1, [1])[0]
-        
-#--------------------------------------------------------------------
-class Task_NDRosslor(Task):
-    """
-    N次元レスラー結合系時系列予測タスク
-    複数のレスラー方程式のyをギャップジャンクションでリング状に結合
-    ＠ノイズ入り入力信号を未実装
-    """
-    #コンストラクタ
-    def __init__(self, param: dict, evaluation: any):
-        super().__init__(param, evaluation)
-
-        #パラメータ取得
-        self.Scale = param["Task_Rosslor_Scale"]                #信号のスケール
-        self.Mu = param["Task_Rosslor_Mu"]                      #レスラー方程式パラメータ
-        self.A = param["Task_Rosslor_A"]                        #ギャップジャンクションパラメータ
-        self.Dt = param["Task_Rosslor_Dt"]                      #時間スケール
-        self.Tau = param["Task_Rosslor_Tau"]                    #どれくらい先を予測するか
-        self.InitTerm = param["Task_Rosslor_InitTerm"]          #初期状態排除期間
-
-        self.Systems = self.D_u // 3 + (0 if self.D_u % 3 == 0 else 1)#レスラー系の数
-
-        self.makeData()
-        
-    #時刻tの入出力データ取得
-    def getData(self, t: int) -> tuple:
-        return self.X[t], self.X[t + self.Tau]
-    
-    #データ生成
-    def makeData(self):
-        self.X = np.zeros([self.Length + self.Tau, self.D_u])
-
-        np.random.seed(seed=99)
-        
-        s = (np.random.rand(self.Systems, 3) - 0.5) * 10
-        
-        for t in range(self.InitTerm + self.Length + self.Tau):
-            if self.InitTerm <= t:
-                #self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
-                self.X[t - self.InitTerm] = s[0][0] * self.Scale        #1次元の信号に限り、列要素を変えることで、成分を変更できる。
-
-            s_old = s
-            s = np.zeros([self.Systems, 3])
-
-            for s_i in range(self.Systems):
-                x = s_old[s_i][0]
-                y = s_old[s_i][1]
-                z = s_old[s_i][2]
-
-                prev_y = s_old[s_i - 1][1] if s_i != 0 else s_old[self.Systems - 1][1]
-                next_y = s_old[s_i + 1][1] if s_i != self.Systems - 1 else s_old[0][1]
-
-                s[s_i][0] = x + (-(y + z)) * self.Dt
-                s[s_i][1] = y + (x + 0.2 * y + self.A * (prev_y + next_y - 2 * y)) * self.Dt
-                s[s_i][2] = z + (0.2 + z * (x - self.Mu)) * self.Dt
-            
-
-class Task_NDLorenz(Task):
-    """
-    N次元ローレンツ結合系時系列予測タスク
-    複数のローレンツ方程式のyをギャップジャンクションでリング状に結合
-    """
-    #コンストラクタ
-    def __init__(self, param: dict, evaluation: any):
-        super().__init__(param, evaluation)
-
-        #パラメータ取得
-        self.Scale = param["Task_Lorenz_Scale"]                 #信号のスケール
-        self.Sigma = param["Task_Lorenz_Sigma"]                 #ローレンツ方程式パラメータ
-        self.Gamma = param["Task_Lorenz_Gamma"]                 #ローレンツ方程式パラメータ
-        self.Const_B = param["Task_Lorenz_Const_B"]             #ローレンツ方程式パラメータ
-        self.Dt = param["Task_Lorenz_Dt"]                       #時間スケール
-        self.A = param["Task_Lorenz_A"]                         #ギャップジャンクションパラメータ
-        self.Tau = param["Task_Lorenz_Tau"]                     #どれくらい先を予測するか
-        self.InitTerm = param["Task_Lorenz_InitTerm"]          #初期状態排除期間
-
-        self.Systems = self.D_u // 3 + (0 if self.D_u % 3 == 0 else 1)#ローレンツ系の数
-
-        self.makeData()
-    
-    #時刻tの入出力データ取得
-    def getData(self, t: int) -> tuple:
-        return self.X[t], self.X[t + self.Tau]
-    
-    #データ生成
-    def makeData(self):
-        self.X = np.zeros([self.Length + self.Tau, self.D_u])
-        self.Z = np.zeros([self.Length + self.Tau, self.D_u])
-
-        np.random.seed(seed=999)
-
-        s = (np.random.rand(self.Systems, 3) - 0.5) * 10
-        
-        for t in range(self.InitTerm + self.Length + self.Tau):
-            if self.InitTerm <= t:
-                #self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
-                self.X[t - self.InitTerm] = s[0][0] * self.Scale        #1次元の信号に限り、列要素を変えることで、成分を変更できる。
-                #self.Z[t - self.InitTerm] = s[0][2] * self.Scale
-
-            
-            s_old = s
-            s = np.zeros([self.Systems, 3])
-
-            for s_i in range(self.Systems):
-                x = s_old[s_i][0]
-                y = s_old[s_i][1]
-                z = s_old[s_i][2]
-
-                prev_y = s_old[s_i - 1][1] if s_i != 0 else s_old[self.Systems - 1][1]
-                next_y = s_old[s_i + 1][1] if s_i != self.Systems - 1 else s_old[0][1]
-
-                s[s_i][0] = x + (-self.Sigma * (x - y)) * self.Dt
-                s[s_i][1] = y + (-x * z + self.Gamma * x - (y)) * self.Dt
-                s[s_i][2] = z + (x * y - self.Const_B * z) * self.Dt
-
-
 
 #--------------------------------------------------------------------
 class Task_NormalRosslor(Task):
@@ -320,11 +205,11 @@ class Task_NormalRosslor(Task):
         self.b = param["Task_NormalRosslor_b"]                  #レスラー方程式パラメータ
         self.c = param["Task_NormalRosslor_c"]                  #レスラー方程式パラメータ（μ）
 
-        self.makeData()
+        self.loadData()
         
     #時刻tの入出力データ取得
     def getData(self, t: int) -> tuple:
-        return self.X[t], self.X[t + self.Tau]
+        return self.X_Noise[t], self.X[t + self.Tau]
     
     #レスラー方程式の関数
     def Rosslor(self, old_x, old_y, old_z):
@@ -333,10 +218,26 @@ class Task_NormalRosslor(Task):
         z = self.b + old_z * (old_x - self.c)
 
         return x, y, z
+    
+    #データを読み込む or 生成する
+    def loadData(self):
+        if os.path.exists("./Input_Data/NormalRosslor_data_X.npy"):
+            #print("データをロードしています...")
+            self.X = np.load("./Input_Data/NormalRosslor_data_X.npy")
+            self.Y = np.load("./Input_Data/NormalRosslor_data_Y.npy")
+            self.Z = np.load("./Input_Data/NormalRosslor_data_Z.npy")
+            self.X_Noise = np.load("./Input_Data/NormalRosslor_data_X_Noise.npy")
+            self.Y_Noise = np.load("./Input_Data/NormalRosslor_data_Y_Noise.npy")
+            self.Z_Noise = np.load("./Input_Data/NormalRosslor_data_Z_Noise.npy")
+        else:
+            #print("データが見つかりません。新しく生成します...")
+            self.makeData()
 
     #データ生成
     def makeData(self):
         self.X = np.zeros([self.Length + self.Tau, 1])
+        self.Y = np.zeros([self.Length + self.Tau, 1])
+        self.Z = np.zeros([self.Length + self.Tau, 1])
 
         np.random.seed(seed=99)
         
@@ -347,6 +248,8 @@ class Task_NormalRosslor(Task):
             if self.InitTerm <= t:
                 #self.X[t - self.InitTerm] = s.reshape([-1])[:self.D_u] * self.Scale
                 self.X[t - self.InitTerm] = s[0][0] * self.Scale        #1次元の信号に限り、列要素を変えることで、成分を変更できる。
+                self.Y[t - self.InitTerm] = s[0][1] * self.Scale
+                self.Z[t - self.InitTerm] = s[0][2] * self.Scale
 
             s_old = s
             s = np.zeros([1, 3])
@@ -361,6 +264,19 @@ class Task_NormalRosslor(Task):
             s[0, :] = [x + (self.Dt / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
                        y + (self.Dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
                        z + (self.Dt / 6) * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2])]
+        
+        np.save("./Input_Data/NormalRosslor_data_X.npy", self.X)
+        np.save("./Input_Data/NormalRosslor_data_Y.npy", self.Y)
+        np.save("./Input_Data/NormalRosslor_data_Z.npy", self.Z)
+        
+        #ノイズ付与
+        self.X_Noise = self.X + np.random.normal(0, 0.05, self.X.shape)
+        self.Y_Noise = self.Y + np.random.normal(0, 0.05, self.Y.shape)
+        self.Z_Noise = self.Z + np.random.normal(0, 0.05, self.Z.shape)
+
+        np.save("./Input_Data/NormalRosslor_data_X_Noise.npy", self.X_Noise)
+        np.save("./Input_Data/NormalRosslor_data_Y_Noise.npy", self.Y_Noise)
+        np.save("./Input_Data/NormalRosslor_data_Z_Noise.npy", self.Z_Noise)
 
 class Task_NormalLorenz(Task):
     """
@@ -379,7 +295,7 @@ class Task_NormalLorenz(Task):
         self.beta = param["Task_NormalLorenz_Beta"]
         self.rho = param["Task_NormalLorenz_Rho"]
 
-        self.makeData()
+        self.loadData()
         
     def getData(self, t: int) -> tuple:
         return self.X[t], self.X[t + self.Tau]
@@ -389,9 +305,26 @@ class Task_NormalLorenz(Task):
         dy = x * (self.rho - z) - y
         dz = x * y - self.beta * z
         return dx, dy, dz
+    
+    #データを読み込む or 生成する
+    def loadData(self):
+        if os.path.exists("./Input_Data/NormalLorenz_data_X.npy"):
+            #print("データをロードしています...")
+            self.X = np.load("./Input_Data/NormalLorenz_data_X.npy")
+            self.Y = np.load("./Input_Data/NormalLorenz_data_Y.npy")
+            self.Z = np.load("./Input_Data/NormalLorenz_data_Z.npy")
+            self.X_Noise = np.load("./Input_Data/NormalLorenz_data_X_Noise.npy")
+            self.Y_Noise = np.load("./Input_Data/NormalLorenz_data_Y_Noise.npy")
+            self.Z_Noise = np.load("./Input_Data/NormalLorenz_data_Z_Noise.npy")
+        else:
+            #print("データが見つかりません。新しく生成します...")
+            self.makeData()
 
     def makeData(self):
         self.X = np.zeros([self.Length + self.Tau, 1])
+        self.Y = np.zeros([self.Length + self.Tau, 1])
+        self.Z = np.zeros([self.Length + self.Tau, 1])
+
         np.random.seed(seed=99)
         
         s = (np.random.rand(1, 3) - 0.5) * 10
@@ -399,6 +332,8 @@ class Task_NormalLorenz(Task):
         for t in range(self.InitTerm + self.Length + self.Tau):
             if self.InitTerm <= t:
                 self.X[t - self.InitTerm] = s[0][0] * self.Scale
+                self.Y[t - self.InitTerm] = s[0][1] * self.Scale
+                self.Z[t - self.InitTerm] = s[0][2] * self.Scale
             
             s_old = s.copy()
             s = np.zeros([1, 3])
@@ -413,10 +348,22 @@ class Task_NormalLorenz(Task):
             s[0, :] = [x + (self.Dt / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]),
                        y + (self.Dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
                        z + (self.Dt / 6) * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2])]
+            
+        np.save("./Input_Data/NormalLorenz_data_X.npy", self.X)
+        np.save("./Input_Data/NormalLorenz_data_Y.npy", self.Y)
+        np.save("./Input_Data/NormalLorenz_data_Z.npy", self.Z)
+
+        #ノイズ付与
+        self.X_Noise = self.X + np.random.normal(0, 0.05, self.X.shape)
+        self.Y_Noise = self.Y + np.random.normal(0, 0.05, self.Y.shape)
+        self.Z_Noise = self.Z + np.random.normal(0, 0.05, self.Z.shape)
+        
+        np.save("./Input_Data/NormalLorenz_data_X_Noise.npy", self.X_Noise)
+        np.save("./Input_Data/NormalLorenz_data_Y_Noise.npy", self.Y_Noise)
+        np.save("./Input_Data/NormalLorenz_data_Z_Noise.npy", self.Z_Noise)
 
 
 #--------------------------------------------------------------------
-
 class Task_tcVDP(Task):
     """
     van der Pol振動子の結合タスク
@@ -623,18 +570,26 @@ class Task_MackeyGlass_DDE(Task):
         self.Dt = param["Task_MackeyGlassDDE_Dt"]                       #時間スケール
         self.PredictTau = param["Task_PredictDDE_Tau"]                     #どれくらい先を予測するか
 
-        self.MackeyBeta = param["Task_MackeyGlassDDE_Beta"]                      #γの役割
-        self.MackeyGamma = param["Task_MackeyGlassDDE_Gamma"]                      #βの役割
-        self.MackeyN = param["Task_MackeyGlassDDE_N"]                      #乗数
+        self.Beta = param["Task_MackeyGlassDDE_Beta"]                      #βの役割
+        self.Gamma = param["Task_MackeyGlassDDE_Gamma"]                    #γの役割
+        self.N = param["Task_MackeyGlassDDE_N"]                      #乗数
         self.MackeyTau = param["Task_MackeyGlassDDE_Tau"]                     #どれくらい先を予測するか
         self.InitTerm = param["Task_MackeyGlassDDE_InitTerm"]          #初期状態排除期間
         
-        self.makeData()
-    
+        self.loadData()
+    1
     #時刻tの入出力データ取得
     def getData(self, t: int) -> tuple:
         return self.Y[t], self.Y[t + self.PredictTau]
     
+    # データを読み込む or 生成する
+    def loadData(self):
+        if os.path.exists("./Input_Data/mackey_glass_data.npy"):
+            print("データをロードしています...")
+            self.Y = np.load("./Input_Data/mackey_glass_data.npy")
+        else:
+            print("データが見つかりません。新しく生成します...")
+            self.makeData()
 
     #データ生成
     def makeData(self):
@@ -644,7 +599,10 @@ class Task_MackeyGlass_DDE(Task):
         times = np.linspace(0, t_max * self.Dt, t_max)  # dt = 0.001, ステップ数 20000
 
         def MackeyGlass(X, t, tau):
-            return (self.MackeyBeta * X(t - tau)) / (1 + pow(X(t - tau), self.MackeyN)) - self.MackeyGamma * X(t)
+            x_tau = X(t - tau) if t - tau >= 0 else 0
+            # Mackey-Glass方程式の定義
+            return (self.Beta * x_tau) / (1 + pow(x_tau, self.N)) - self.Gamma * X(t)
+            #return (self.MackeyBeta * X(t - tau)) / (1 + pow(X(t - tau), self.MackeyN)) - self.MackeyGamma * X(t)
     
         def DLE(t):
             return 0.1
@@ -656,5 +614,8 @@ class Task_MackeyGlass_DDE(Task):
         for i in range(self.InitTerm + self.Length + self.PredictTau):
             if self.InitTerm <= i:
                 self.Y[i - self.InitTerm] = solution[i]
+
+        #データを外部ファイルに保存
+        np.save("./Input_Data/mackey_glass_data.npy", self.Y)
 
 #--------------------------------------------------------------------
