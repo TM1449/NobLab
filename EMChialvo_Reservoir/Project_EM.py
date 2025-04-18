@@ -37,11 +37,11 @@ def Project_EMChialvo_2025_01_28_12_34():
     Param = {
         #==========================================================================================
         "Project_F_NRMSE" : True,                           #NRMSEを調査するか
-        "Project_F_MemoryCapacity" : True,                  #MCを調査するか
-        "Project_F_MLE" : True,                             #MLE（最大リアプノフ指数）を調査するか
+        "Project_F_MemoryCapacity" : False,                  #MCを調査するか
+        "Project_F_MLE" : False,                             #MLE（最大リアプノフ指数）を調査するか
         
-        "Project_F_CovMatrixRank" : True,                  #Covariance Matrix Rankを調査するか
-        "Project_F_DelayCapacity" : True,                   #Delay Capacityを調査するか
+        "Project_F_CovMatrixRank" : False,                  #Covariance Matrix Rankを調査するか
+        "Project_F_DelayCapacity" : False,                   #Delay Capacityを調査するか
 
         #------------------------------------------------------------------------------------------
         #------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ def Project_EMChialvo_2025_01_28_12_34():
         #------------------------------------------------------------------------------------------
         #ルンゲクッタ法通常ローレンツ方程式
         "Task_NormalLorenz_Scale" : 1/50,
-        "Task_NormalLorenz_Dt" : 0.01,
+        "Task_NormalLorenz_Dt" : 0.005,
         "Task_NormalLorenz_Tau" : 5,
         "Task_NormalLorenz_InitTerm" : 1000,
 
@@ -102,7 +102,7 @@ def Project_EMChialvo_2025_01_28_12_34():
         "Task_PredictDDE_Tau" : 5,                          #どれくらい先を予測するか
         
         "Task_MackeyGlassDDE_Scale" : 1 / 30,                 #信号のスケール
-        "Task_MackeyGlassDDE_Dt" : 0.5,                    #時間刻み幅
+        "Task_MackeyGlassDDE_Dt" : 0.2,                    #時間刻み幅
         
         "Task_MackeyGlassDDE_Beta" : 0.2,                       #β:0.2
         "Task_MackeyGlassDDE_Gamma" : 0.1,                     #γ:0.1
@@ -167,7 +167,9 @@ def Project_EMChialvo_2025_01_28_12_34():
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
 
             #------------------------------------------------------------------------------------------
-            "NRMSE_T_Task" : Task_EM.Task_MackeyGlass_DDE,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_NormalRosslor,                                #評価用タスク（Type型）
+            "Task_Noise" : False,                               #タスクにノイズを加えるか
+            "Task_Noise_Scale" : 0.025,                       #ノイズのスケール
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
             "NRMSE_T_Output" : Output_EM.Output_Single_NRMSE_2023_04_19_15_25,     #作図出力（Type型）
         
@@ -193,6 +195,8 @@ def Project_EMChialvo_2025_01_28_12_34():
             "MemoryCapacity_Length_Test" : 1000,                #評価用データ時間長
             "MemoryCapacity_MaxTau" : 100,                       #評価する最大遅延
             "MemoryCapacity_T_Task" : Task_EM.Task_MC,                                     #評価用タスク（Type型）
+            "Task_Noise" : False,                               #タスクにノイズを加えるか
+            "Task_Noise_Scale" : 0.025,                       #ノイズのスケール
             "MemoryCapacity_T_Model" : Model_EM.Model_EMChialvo,                           #モデル（Type型）
             "MemoryCapacity_T_Output" : Output_EM.Output_Single_MC_2023_05_25_13_28,       #作図出力（Type型）
         
@@ -221,7 +225,9 @@ def Project_EMChialvo_2025_01_28_12_34():
 
             "MLE_Epsilon" : 1e-06,                            #摂動の大きさ
 
-            "MLE_T_Task" : Task_EM.Task_MackeyGlass_DDE,
+            "MLE_T_Task" : Task_EM.Task_NormalRosslor,
+            "Task_Noise" : False,                        #タスクにノイズを加えるか
+            "Task_Noise_Scale" : 0.025,                       #ノイズのスケール
             "MLE_T_Model" : Model_EM.Model_EMChialvo,
             "MLE_T_Output" : Output_EM.Output_Single_MLE_2023_07_08_17_12,
 
@@ -247,7 +253,9 @@ def Project_EMChialvo_2025_01_28_12_34():
             "CovMatrixRank_Length_Burnin" : 1000,                      #空走用データ時間長
             "CovMatrixRank_Length_Test" : 5000,                        #評価用データ時間長
             
-            "CovMatrixRank_T_Task" : Task_EM.Task_MackeyGlass_DDE,
+            "CovMatrixRank_T_Task" : Task_EM.Task_NormalLorenz,
+            "Task_Noise" : False,                        #タスクにノイズを加えるか
+            "Task_Noise_Scale" : 0.025,                       #ノイズのスケール
             "CovMatrixRank_T_Model" : Model_EM.Model_EMChialvo,
             "CovMatrixRank_T_Output" : Output_EM.Output_Single_CovMatrixRank_2025_03_15_15_32,
 
@@ -275,7 +283,9 @@ def Project_EMChialvo_2025_01_28_12_34():
             "DelayCapacity_Length_Tdc" : 5000,                        #評価用データ時間長
             "DelayCapacity_Length_Taumax" : 50,
 
-            "DelayCapacity_T_Task" : Task_EM.Task_MackeyGlass_DDE,
+            "DelayCapacity_T_Task" : Task_EM.Task_NormalLorenz,
+            "Task_Noise" : False,                        #タスクにノイズを加えるか
+            "Task_Noise_Scale" : 0.025,                       #ノイズのスケール
             "DelayCapacity_T_Model" : Model_EM.Model_EMChialvo,
             "DelayCapacity_T_Output" : Output_EM.Output_Single_DelayCapacity_2025_03_15_15_32,
 

@@ -1,0 +1,31 @@
+Project_F_NRMSE,Project_F_MemoryCapacity,Project_F_MLE,Project_F_CovMatrixRank,Project_F_DelayCapacity,Task_SinCurve_RK_h,Task_MC_Tau,Task_NormalRosslor_Scale,Task_NormalRosslor_Dt,Task_NormalRosslor_Tau,Task_NormalRosslor_InitTerm,Task_NormalRosslor_a,Task_NormalRosslor_b,Task_NormalRosslor_c,Task_NormalLorenz_Scale,Task_NormalLorenz_Dt,Task_NormalLorenz_Tau,Task_NormalLorenz_InitTerm,Task_NormalLorenz_Sigma,Task_NormalLorenz_Beta,Task_NormalLorenz_Rho,Task_LogisticEquation_A,Task_LogisticEquation_Tau,Task_Lorenz96_Scale,Task_Lorenz96_Dt,Task_Lorenz96_Tau,Task_Lorenz96_InitTerm,Task_Lorenz96_N,Task_Lorenz96_F,Task_MackeyGlass_Scale,Task_Predict_Tau,Task_MackeyGlass_Tau,Task_MackeyGlass_InitTerm,Task_PredictDDE_Tau,Task_MackeyGlassDDE_Scale,Task_MackeyGlassDDE_Dt,Task_MackeyGlassDDE_Beta,Task_MackeyGlassDDE_Gamma,Task_MackeyGlassDDE_N,Task_MackeyGlassDDE_Tau,Task_MackeyGlassDDE_InitTerm,Task_vandelPol_Mu,Task_vandelPol_c,Task_vandelPol_TimeScale,Task_vandelPol_Dt,Task_vandelPol_Init,Task_vandelPol_Tau,Task_vandelPol_InitTerm,Model_NormalESN_D_u,Model_NormalESN_D_x,Model_NormalESN_D_y,Model_Reservoir_Neurons,Model_NormalESN_InputScale,SubReservoir_LeakingRate,SubReservoir_InputScale,SubReservoir_Rho,SubReservoir_Density,SubReservoir_ActivationFunc,EMChialvo_Reservoir_Density,LinerTransformer_Beta,MemoryCapacity_F_OutputLog,MemoryCapacity_D_u,MemoryCapacity_D_y,MemoryCapacity_Length_Burnin,MemoryCapacity_Length_Train,MemoryCapacity_Length_Test,MemoryCapacity_MaxTau,MemoryCapacity_T_Task,Task_Noise,Task_Noise_Scale,MemoryCapacity_T_Model,MemoryCapacity_T_Output,DirPath_Project,MemoryCapacity_F_OutputCharts,MemoryCapacity_F_OutputCharts_MCGraph,MemoryCapacity_R_MC,MemoryCapacity_R_Tau,MemoryCapacity_R_MC_Tau
+True,True,True,True,True,0.01,10,0.03333333333333333,0.025,5,1000,0.2,0.2,5.7,0.02,0.01,10,1000,10,2.6666666666666665,28,4,1,0.02,0.01,5,1000,10,8,0.02,2,0,1000,5,0.03333333333333333,0.2,0.2,0.1,10,22,1000,"[5, 5]","[0.001, 1]","[0.05, 0.5]",0.001,"[0.0, 0.0, 0.0, 0.001]",5,1000,1,100,1,10,0.1,1,0.1,0.8,0.95,<ufunc 'tanh'>,1,0.2,True,1,1,1000,5000,1000,100,<class 'Task_No.Task_MC'>,False,0.025,<class 'Model_No.Model_NormalESN'>,<class 'Output_No.Output_Single_MC_2023_05_25_13_28'>,./Normal_Reservoir/Results/Single_Task/MC,True,True,13.75470255326219,"[  1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18
+  19  20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36
+  37  38  39  40  41  42  43  44  45  46  47  48  49  50  51  52  53  54
+  55  56  57  58  59  60  61  62  63  64  65  66  67  68  69  70  71  72
+  73  74  75  76  77  78  79  80  81  82  83  84  85  86  87  88  89  90
+  91  92  93  94  95  96  97  98  99 100]","[9.99976999e-01 9.99918686e-01 9.99803703e-01 9.99571428e-01
+ 9.98752830e-01 9.97659147e-01 9.95000075e-01 9.87683464e-01
+ 9.75724068e-01 9.59247114e-01 9.18567483e-01 8.61965118e-01
+ 7.41080718e-01 5.49148581e-01 2.98717441e-01 2.10453751e-01
+ 1.00193876e-01 5.01728732e-02 2.50720942e-02 9.93037071e-03
+ 4.62430381e-03 2.14262263e-03 1.38611814e-03 7.13475948e-04
+ 3.65677241e-04 3.02682131e-04 1.24852741e-04 7.30985598e-04
+ 1.58777193e-03 1.87785789e-03 3.09682700e-03 9.77733944e-04
+ 8.79386174e-04 6.69285279e-04 5.43559936e-04 9.23979253e-04
+ 4.16019566e-04 3.54662040e-04 4.10330455e-04 1.84768565e-04
+ 1.70940035e-05 3.50057563e-05 6.13047388e-05 5.33787430e-04
+ 6.78407981e-04 3.30393221e-04 8.17793945e-04 6.87081184e-04
+ 7.18651818e-04 6.35110245e-04 1.00855712e-03 8.06749101e-04
+ 5.83229624e-05 4.56240076e-04 4.76895377e-04 2.20414331e-04
+ 3.53796288e-04 3.18662780e-04 4.85723539e-04 1.99786144e-04
+ 3.19315267e-05 5.32946186e-05 1.38944226e-04 2.80544821e-04
+ 1.77010104e-05 4.05969746e-05 3.27886468e-05 3.63121999e-05
+ 2.63602309e-04 2.97793979e-05 2.88578953e-05 5.65196674e-05
+ 1.25742613e-04 9.47848030e-05 3.57231474e-05 3.34220417e-04
+ 2.56034728e-04 3.63056181e-04 3.75391151e-04 6.59677401e-04
+ 2.08751808e-04 1.80864747e-04 1.96078600e-04 7.28614702e-05
+ 2.80179077e-05 1.09969824e-04 5.62735956e-05 3.85398637e-04
+ 1.35177929e-03 2.01460605e-03 2.15166979e-03 5.80305449e-03
+ 5.75256802e-03 6.15262838e-03 6.00370006e-03 4.77189615e-03
+ 2.78815137e-03 1.40916180e-03 1.32915076e-03 8.27968153e-04]"

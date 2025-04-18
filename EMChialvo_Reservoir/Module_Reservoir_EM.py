@@ -249,11 +249,11 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
     
     #順伝播
     def forward(self, u: np.ndarray) -> np.ndarray: 
-        self.x = (pow(self.x_old, 2) * np.exp(self.y_old - self.x_old) + self.k0 \
+        self.x = 0.1*(pow(self.x_old, 2) * np.exp(self.y_old - self.x_old) + self.k0 \
             + self.k * self.x_old * (self.alpha + 3 * self.beta * pow(self.phi_old, 2)) \
-                + np.dot(self.x_old, self.W_rec)) + np.dot(np.concatenate([self.Bias, u]), self.W_in)
-        self.y = self.a * self.y_old - self.b * self.x_old + self.c
-        self.phi = self.k1 * self.x_old - self.k2 * self.phi_old
+                + np.dot(self.x_old, self.W_rec)) + np.dot(np.concatenate([self.Bias, u]), self.W_in) + 0.9 * self.x_old
+        self.y = 0.1 * (self.a * self.y_old - self.b * self.x_old + self.c) + 0.9 * self.y_old
+        self.phi = 0.1 *(self.k1 * self.x_old - self.k2 * self.phi_old) + 0.9 * self.phi_old
 
         return self.x, self.y, self.phi
     

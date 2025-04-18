@@ -43,6 +43,8 @@ class Task:
         self.D_u = self.Param["Task_D_u"]               #入力信号次元
         self.D_y = self.Param["Task_D_y"]               #出力信号次元
         self.Length = self.Param["Task_Length"]         #データ生成期間
+        self.Noise = self.Param["Task_Noise"]             #ノイズの有無
+        self.NoiseScale = self.Param["Task_Noise_Scale"]   #ノイズのスケール
 
     #時刻tの入出力データ取得
     def getData(self, t: int) -> tuple: pass
@@ -190,6 +192,7 @@ class Task_NormalRosslor(Task):
     """
     レスラー方程式
     1次元のみ!!!!
+    事前に入力信号作成プログラム完成
     """
     #コンストラクタ
     def __init__(self, param: dict, evaluation: any):
@@ -209,7 +212,11 @@ class Task_NormalRosslor(Task):
         
     #時刻tの入出力データ取得
     def getData(self, t: int) -> tuple:
-        return self.X_Noise[t], self.X[t + self.Tau]
+        if self.Noise == True:
+            #入力信号にノイズを付与、教師信号はノイズなし
+            return self.X_Noise[t], self.X[t + self.Tau]
+        else:
+            return self.X[t], self.X[t + self.Tau]
     
     #レスラー方程式の関数
     def Rosslor(self, old_x, old_y, old_z):
@@ -221,14 +228,15 @@ class Task_NormalRosslor(Task):
     
     #データを読み込む or 生成する
     def loadData(self):
-        if os.path.exists("./Input_Data/NormalRosslor_data_X.npy"):
+        os.makedirs("./EMChialvo_Reservoir/Input_Data", exist_ok=True)  # ディレクトリがなければ作成
+        if os.path.exists("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_X.npy"):
             #print("データをロードしています...")
-            self.X = np.load("./Input_Data/NormalRosslor_data_X.npy")
-            self.Y = np.load("./Input_Data/NormalRosslor_data_Y.npy")
-            self.Z = np.load("./Input_Data/NormalRosslor_data_Z.npy")
-            self.X_Noise = np.load("./Input_Data/NormalRosslor_data_X_Noise.npy")
-            self.Y_Noise = np.load("./Input_Data/NormalRosslor_data_Y_Noise.npy")
-            self.Z_Noise = np.load("./Input_Data/NormalRosslor_data_Z_Noise.npy")
+            self.X = np.load("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_X.npy")
+            self.Y = np.load("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_Y.npy")
+            self.Z = np.load("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_Z.npy")
+            self.X_Noise = np.load("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_X_Noise.npy")
+            self.Y_Noise = np.load("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_Y_Noise.npy")
+            self.Z_Noise = np.load("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_Z_Noise.npy")
         else:
             #print("データが見つかりません。新しく生成します...")
             self.makeData()
@@ -265,18 +273,18 @@ class Task_NormalRosslor(Task):
                        y + (self.Dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
                        z + (self.Dt / 6) * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2])]
         
-        np.save("./Input_Data/NormalRosslor_data_X.npy", self.X)
-        np.save("./Input_Data/NormalRosslor_data_Y.npy", self.Y)
-        np.save("./Input_Data/NormalRosslor_data_Z.npy", self.Z)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_X.npy", self.X)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_Y.npy", self.Y)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_Z.npy", self.Z)
         
         #ノイズ付与
-        self.X_Noise = self.X + np.random.normal(0, 0.05, self.X.shape)
-        self.Y_Noise = self.Y + np.random.normal(0, 0.05, self.Y.shape)
-        self.Z_Noise = self.Z + np.random.normal(0, 0.05, self.Z.shape)
+        self.X_Noise = self.X + np.random.normal(0, self.NoiseScale, self.X.shape)
+        self.Y_Noise = self.Y + np.random.normal(0, self.NoiseScale, self.Y.shape)
+        self.Z_Noise = self.Z + np.random.normal(0, self.NoiseScale, self.Z.shape)
 
-        np.save("./Input_Data/NormalRosslor_data_X_Noise.npy", self.X_Noise)
-        np.save("./Input_Data/NormalRosslor_data_Y_Noise.npy", self.Y_Noise)
-        np.save("./Input_Data/NormalRosslor_data_Z_Noise.npy", self.Z_Noise)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_X_Noise.npy", self.X_Noise)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_Y_Noise.npy", self.Y_Noise)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalRosslor_data_Z_Noise.npy", self.Z_Noise)
 
 class Task_NormalLorenz(Task):
     """
@@ -298,7 +306,11 @@ class Task_NormalLorenz(Task):
         self.loadData()
         
     def getData(self, t: int) -> tuple:
-        return self.X[t], self.X[t + self.Tau]
+        if self.Noise == True:
+            #入力信号にノイズを付与、教師信号はノイズなし
+            return self.X_Noise[t], self.X[t + self.Tau]
+        else:
+            return self.X[t], self.X[t + self.Tau]
     
     def Lorenz(self, x, y, z):
         dx = self.sigma * (y - x)
@@ -308,14 +320,15 @@ class Task_NormalLorenz(Task):
     
     #データを読み込む or 生成する
     def loadData(self):
-        if os.path.exists("./Input_Data/NormalLorenz_data_X.npy"):
+        os.makedirs("./EMChialvo_Reservoir/Input_Data", exist_ok=True)  # ディレクトリがなければ作成
+        if os.path.exists("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_X.npy"):
             #print("データをロードしています...")
-            self.X = np.load("./Input_Data/NormalLorenz_data_X.npy")
-            self.Y = np.load("./Input_Data/NormalLorenz_data_Y.npy")
-            self.Z = np.load("./Input_Data/NormalLorenz_data_Z.npy")
-            self.X_Noise = np.load("./Input_Data/NormalLorenz_data_X_Noise.npy")
-            self.Y_Noise = np.load("./Input_Data/NormalLorenz_data_Y_Noise.npy")
-            self.Z_Noise = np.load("./Input_Data/NormalLorenz_data_Z_Noise.npy")
+            self.X = np.load("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_X.npy")
+            self.Y = np.load("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_Y.npy")
+            self.Z = np.load("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_Z.npy")
+            self.X_Noise = np.load("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_X_Noise.npy")
+            self.Y_Noise = np.load("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_Y_Noise.npy")
+            self.Z_Noise = np.load("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_Z_Noise.npy")
         else:
             #print("データが見つかりません。新しく生成します...")
             self.makeData()
@@ -349,18 +362,18 @@ class Task_NormalLorenz(Task):
                        y + (self.Dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]),
                        z + (self.Dt / 6) * (k1[2] + 2 * k2[2] + 2 * k3[2] + k4[2])]
             
-        np.save("./Input_Data/NormalLorenz_data_X.npy", self.X)
-        np.save("./Input_Data/NormalLorenz_data_Y.npy", self.Y)
-        np.save("./Input_Data/NormalLorenz_data_Z.npy", self.Z)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_X.npy", self.X)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_Y.npy", self.Y)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_Z.npy", self.Z)
 
         #ノイズ付与
-        self.X_Noise = self.X + np.random.normal(0, 0.05, self.X.shape)
-        self.Y_Noise = self.Y + np.random.normal(0, 0.05, self.Y.shape)
-        self.Z_Noise = self.Z + np.random.normal(0, 0.05, self.Z.shape)
+        self.X_Noise = self.X + np.random.normal(0, self.NoiseScale, self.X.shape)
+        self.Y_Noise = self.Y + np.random.normal(0, self.NoiseScale, self.Y.shape)
+        self.Z_Noise = self.Z + np.random.normal(0, self.NoiseScale, self.Z.shape)
         
-        np.save("./Input_Data/NormalLorenz_data_X_Noise.npy", self.X_Noise)
-        np.save("./Input_Data/NormalLorenz_data_Y_Noise.npy", self.Y_Noise)
-        np.save("./Input_Data/NormalLorenz_data_Z_Noise.npy", self.Z_Noise)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_X_Noise.npy", self.X_Noise)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_Y_Noise.npy", self.Y_Noise)
+        np.save("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_Z_Noise.npy", self.Z_Noise)
 
 
 #--------------------------------------------------------------------
@@ -577,18 +590,24 @@ class Task_MackeyGlass_DDE(Task):
         self.InitTerm = param["Task_MackeyGlassDDE_InitTerm"]          #初期状態排除期間
         
         self.loadData()
-    1
+    
     #時刻tの入出力データ取得
     def getData(self, t: int) -> tuple:
-        return self.Y[t], self.Y[t + self.PredictTau]
+        if self.Noise == True:
+            #入力信号にノイズを付与、教師信号はノイズなし
+            return self.Y_Noise[t], self.Y[t + self.PredictTau]
+        else:
+            return self.Y[t], self.Y[t + self.PredictTau]
     
     # データを読み込む or 生成する
     def loadData(self):
-        if os.path.exists("./Input_Data/mackey_glass_data.npy"):
-            print("データをロードしています...")
-            self.Y = np.load("./Input_Data/mackey_glass_data.npy")
+        os.makedirs("./EMChialvo_Reservoir/Input_Data", exist_ok=True)  # ディレクトリがなければ作成
+        if os.path.exists("./EMChialvo_Reservoir/Input_Data/mackey_glass_data.npy"):
+            #print("データをロードしています...")
+            self.Y = np.load("./EMChialvo_Reservoir/Input_Data/mackey_glass_data.npy")
+            self.Y_Noise = np.load("./EMChialvo_Reservoir/Input_Data/mackey_glass_data_Noise.npy")
         else:
-            print("データが見つかりません。新しく生成します...")
+            #print("データが見つかりません。新しく生成します...")
             self.makeData()
 
     #データ生成
@@ -602,7 +621,6 @@ class Task_MackeyGlass_DDE(Task):
             x_tau = X(t - tau) if t - tau >= 0 else 0
             # Mackey-Glass方程式の定義
             return (self.Beta * x_tau) / (1 + pow(x_tau, self.N)) - self.Gamma * X(t)
-            #return (self.MackeyBeta * X(t - tau)) / (1 + pow(X(t - tau), self.MackeyN)) - self.MackeyGamma * X(t)
     
         def DLE(t):
             return 0.1
@@ -616,6 +634,8 @@ class Task_MackeyGlass_DDE(Task):
                 self.Y[i - self.InitTerm] = solution[i]
 
         #データを外部ファイルに保存
-        np.save("./Input_Data/mackey_glass_data.npy", self.Y)
+        np.save("./EMChialvo_Reservoir/Input_Data/mackey_glass_data.npy", self.Y)
+        self.Y_Noise = self.Y + np.random.normal(0, self.NoiseScale, self.Y.shape)
+        np.save("./EMChialvo_Reservoir/Input_Data/mackey_glass_data_Noise.npy", self.Y_Noise)
 
 #--------------------------------------------------------------------
