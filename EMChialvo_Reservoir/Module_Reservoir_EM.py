@@ -54,82 +54,6 @@ class Module_Reservoir(Module_EM.Module):
     def clone(self): pass
     
 #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#利用可能モジュール
-class Module_SubReservoir(Module_Reservoir):
-    """
-    サブリザバーモジュール
-    どのモデルのリザバーもこのクラスを使うようにできたら良いなあ．
-    """
-    #コンストラクタ
-    def __init__(self, param: dict, parent: any):
-        super().__init__(param, parent)
-
-        #パラメータ取得
-        self.D_u = self.Param["SubReservoir_D_u"]                       #入力信号次元＋バイアス
-        self.D_x = self.Param["SubReservoir_D_x"]                       #ニューロン数
-        self.LeakingRate = self.Param["SubReservoir_LeakingRate"]       #リーク率
-        self.InputScale = self.Param["SubReservoir_InputScale"]         #入力スケーリング
-        self.Rho = self.Param["SubReservoir_Rho"]                       #スペクトル半径
-        self.Density = self.Param["SubReservoir_Density"]               #結合密度
-        self.ActivationFunc = self.Param["SubReservoir_ActivationFunc"] #活性化関数
-        self.Bias = np.ones([1])                                        #バイアス
-
-        #変数
-        self.s = np.zeros([self.D_x])                           #状態ベクトル
-        self.s_old = self.s                                     #1step前の状態ベクトル
-        #重み初期化
-        self.W_in = self._makeInputWeight()                     #入力重み
-        self.W_rec = self._makeRecurrentWeight()                #再帰重み
-
-    #入力重み生成
-    def _makeInputWeight(self) -> np.ndarray:
-        return np.concatenate([
-            np.random.rand(1, self.D_x),                        #バイアスに掛かる重み（正）
-            np.random.rand(self.D_u, self.D_x) * 2 - 1]         #入力信号に掛かる重み（正負）
-                              ) * self.InputScale               #入力スケールをかける
-    
-    #再帰重み生成
-    def _makeRecurrentWeight(self) -> np.ndarray:
-        np.random.seed(999)
-        W = np.random.rand(self.D_x, self.D_x) * 2 - 1
-        W = self._makeWSparse(W)
-        w, v = np.linalg.eig(W)
-        return self.Rho * W / np.amax(w.real)
-        
-    #疎行列化
-    def _makeWSparse(self, w: np.ndarray) -> np.ndarray:
-        s_w = w.reshape([-1])
-        s_w[np.random.choice(len(s_w), (int)(len(s_w) * (1 - self.Density)), replace = False)] = 0.
-        return s_w.reshape(w.shape[0], w.shape[1])
-    
-    #順伝播
-    def forward(self, u: np.ndarray) -> np.ndarray: 
-        self.s = (1 - self.LeakingRate) * self.s_old + \
-            self.LeakingRate * self.ActivationFunc(
-                np.dot(np.concatenate([self.Bias, u]), self.W_in) + 
-                np.dot(self.s_old, self.W_rec))
-        return self.s
-
-    #時間発展
-    def update(self):
-        self.s_old = self.s
-
-    #リザバーの初期化
-    def reset(self):
-        self.s = np.zeros([self.D_x])
-        self.s_old = self.s
-        
-    #ディープコピー
-    def clone(self):
-        new = Module_SubReservoir(self.Param.copy(), self.Parent)
-        
-        new.s = self.s
-        new.s_old = self.s_old
-        new.W_in = self.W_in
-        new.W_rec = self.W_rec
-
-        return new
-    
 #--------------------------------------------------------------------
 #Sishu提案モデル
 class Module_EMChialvo_Reservoir(Module_Reservoir):
@@ -160,6 +84,7 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         self.Rho = self.Param["Model_EMChialvo_Rho"]                        #スペクトル半径
         
         self.Density = self.Param["EMChialvo_Reservoir_Density"]
+        self.LeakRate = self.Param["EMChialvo_Reservoir_LeakRate"]       #リーク率
         self.Bias = np.ones([1])                                        #バイアス
 
         #++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -216,44 +141,17 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         W = self._makeWSparse(W)
         w , v = np.linalg.eig(W)
         Matrix = self.Rho * (W / np.max(np.abs(w)))
-        
-        """
-        #リング構造
-        W = np.zeros((self.D_x, self.D_x))  # 初期化
-        np.random.seed(None)
-        for i in range(self.D_x):
-            forward_index = (i + 1) % self.D_x
-            #backward_index = (i - 1) % self.D_x
-
-            W[i, forward_index] = np.random.uniform(-1,1)
-
-        w, v = np.linalg.eig(W)
-        Matrix = self.Rho * (W / np.max(np.abs(w)))
-        """
-        """
-        #ブロック構造
-        W = np.zeros((self.D_x, self.D_x))  # 初期化
-        group_size = 10
-        num_groups = self.D_x // group_size  # 100を10で割ってグループ数は10
-
-        for g in range(num_groups):
-            start = g * group_size         # グループの開始インデックス
-            end = start + group_size
-            # 対応するブロック（行[start:end], 列[start:end]）に乱数を代入
-            W[start:end, start:end] = np.random.rand(group_size, group_size) * 2 - 1
-        w, v = np.linalg.eig(W)
-        Matrix = self.Rho * (W / np.max(np.abs(w)))
-        """
 
         return Matrix
     
     #順伝播
     def forward(self, u: np.ndarray) -> np.ndarray: 
-        self.x = 0.1*(pow(self.x_old, 2) * np.exp(self.y_old - self.x_old) + self.k0 \
-            + self.k * self.x_old * (self.alpha + 3 * self.beta * pow(self.phi_old, 2)) \
-                + np.dot(self.x_old, self.W_rec)) + np.dot(np.concatenate([self.Bias, u]), self.W_in) + 0.9 * self.x_old
-        self.y = 0.1 * (self.a * self.y_old - self.b * self.x_old + self.c) + 0.9 * self.y_old
-        self.phi = 0.1 *(self.k1 * self.x_old - self.k2 * self.phi_old) + 0.9 * self.phi_old
+        self.x = (1 - self.LeakRate) * self.x_old + \
+            self.LeakRate * ((pow(self.x_old, 2) * np.exp(self.y_old - self.x_old) + self.k0 \
+            + self.k * self.x_old * (self.alpha + 3 * self.beta * pow(self.phi_old, 2)) + np.dot(self.x_old, self.W_rec))\
+                + np.dot(np.concatenate([self.Bias, u]), self.W_in))
+        self.y = (1 - self.LeakRate) * self.y_old + self.LeakRate * (self.a * self.y_old - self.b * self.x_old + self.c)
+        self.phi = (1 - self.LeakRate) *self.phi_old + self.LeakRate * (self.k1 * self.x_old - self.k2 * self.phi_old)
 
         return self.x, self.y, self.phi
     
@@ -278,9 +176,8 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
         1行目：基準軌道の1時刻前のニューロンの値
         2行目：基準軌道の現時刻のニューロンの値
         3行目：摂動軌道の1時刻前のニューロンの値
-        4行目：摂動軌道の現時刻のニューロンの値"
+        4行目：摂動軌道の現時刻のニューロンの値
         """
-        
         return self.x_old, self.y_old, self.phi_old, \
             self.x, self.y, self.phi, \
                 (self.x_old + x_D), (self.y_old + y_D), (self.phi_old + phi_D), \

@@ -53,7 +53,7 @@ def Project_EMChialvo_2025_01_28_12_34():
         #------------------------------------------------------------------------------------------
         #ルンゲクッタ法通常レスラー方程式
         "Task_NormalRosslor_Scale" : 1 / 30,
-        "Task_NormalRosslor_Dt" : 0.025,
+        "Task_NormalRosslor_Dt" : 0.02,
         "Task_NormalRosslor_Tau" : 5,
         "Task_NormalRosslor_InitTerm" : 1000,
 
@@ -146,7 +146,8 @@ def Project_EMChialvo_2025_01_28_12_34():
         "Model_EMChialvo_Rho" : 0.01,                      #スペクトル半径
 
         #------------------------------------------------------------------------------------------
-        "EMChialvo_Reservoir_Density" : 1,                          #結合密度        
+        "EMChialvo_Reservoir_Density" : 1,                          #結合密度
+        "EMChialvo_Reservoir_LeakRate" : 1,                        #リザバーのリークレート
         "LinerTransformer_Beta" : 1.0 * 1e-4,                      #正則化係数
         }
 
@@ -167,7 +168,7 @@ def Project_EMChialvo_2025_01_28_12_34():
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
 
             #------------------------------------------------------------------------------------------
-            "NRMSE_T_Task" : Task_EM.Task_NormalRosslor,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_EM.Task_NormalLorenz,                                #評価用タスク（Type型）
             "Task_Noise" : False,                               #タスクにノイズを加えるか
             "Task_Noise_Scale" : 0.025,                       #ノイズのスケール
             "NRMSE_T_Model" : Model_EM.Model_EMChialvo,                 #モデル（Type型）
@@ -225,7 +226,7 @@ def Project_EMChialvo_2025_01_28_12_34():
 
             "MLE_Epsilon" : 1e-06,                            #摂動の大きさ
 
-            "MLE_T_Task" : Task_EM.Task_NormalRosslor,
+            "MLE_T_Task" : Task_EM.Task_NormalLorenz,
             "Task_Noise" : False,                        #タスクにノイズを加えるか
             "Task_Noise_Scale" : 0.025,                       #ノイズのスケール
             "MLE_T_Model" : Model_EM.Model_EMChialvo,
