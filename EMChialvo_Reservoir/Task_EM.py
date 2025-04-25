@@ -216,7 +216,7 @@ class Task_NormalRosslor(Task):
             #入力信号にノイズを付与、教師信号はノイズなし
             return self.X_Noise[t], self.X[t + self.Tau]
         else:
-            return self.X[t], self.X[t + self.Tau]
+            return self.X[t], self.Z[t + self.Tau]
     
     #レスラー方程式の関数
     def Rosslor(self, old_x, old_y, old_z):
@@ -310,7 +310,7 @@ class Task_NormalLorenz(Task):
             #入力信号にノイズを付与、教師信号はノイズなし
             return self.X_Noise[t], self.X[t + self.Tau]
         else:
-            return self.X[t], self.X[t + self.Tau]
+            return self.X[t], self.Z[t + self.Tau]
     
     def Lorenz(self, x, y, z):
         dx = self.sigma * (y - x)
