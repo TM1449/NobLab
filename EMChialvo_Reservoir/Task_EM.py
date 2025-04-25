@@ -216,7 +216,7 @@ class Task_NormalRosslor(Task):
             #入力信号にノイズを付与、教師信号はノイズなし
             return self.X_Noise[t], self.X[t + self.Tau]
         else:
-            return self.X[t], self.Z[t + self.Tau]
+            return self.X[t], self.X[t + self.Tau]
     
     #レスラー方程式の関数
     def Rosslor(self, old_x, old_y, old_z):
@@ -310,7 +310,7 @@ class Task_NormalLorenz(Task):
             #入力信号にノイズを付与、教師信号はノイズなし
             return self.X_Noise[t], self.X[t + self.Tau]
         else:
-            return self.X[t], self.Z[t + self.Tau]
+            return self.X[t], self.X[t + self.Tau]
     
     def Lorenz(self, x, y, z):
         dx = self.sigma * (y - x)
@@ -374,6 +374,82 @@ class Task_NormalLorenz(Task):
         np.save("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_X_Noise.npy", self.X_Noise)
         np.save("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_Y_Noise.npy", self.Y_Noise)
         np.save("./EMChialvo_Reservoir/Input_Data/NormalLorenz_data_Z_Noise.npy", self.Z_Noise)
+
+
+class Task_Lorenz96(Task):
+    """
+    ローレンツ96
+    """
+    #コンストラクタ
+    def __init__(self, param: dict, evaluation: any):
+        super().__init__(param, evaluation)
+
+        #パラメータ取得
+        self.Scale = param["Task_Lorenz96_Scale"]                 #信号のスケール
+        self.Dt = param["Task_Lorenz96_Dt"]                       #時間スケール
+        self.Tau = param["Task_Lorenz96_Tau"]                     #どれくらい先を予測するか
+        self.InitTerm = param["Task_Lorenz96_InitTerm"]          #初期状態排除期間
+
+        self.N = param["Task_Lorenz96_N"]                       #次元数
+        self.F = param["Task_Lorenz96_F"]                       #外部強制力
+
+        self.loadData()
+    
+    #時刻tの入出力データ取得
+    def getData(self, t: int) -> tuple:
+        if self.Noise == True:
+            #入力信号にノイズを付与、教師信号はノイズなし
+            return self.X_Noise[t], self.X[t + self.Tau]
+        else:
+            return self.X[t], self.X[t + self.Tau]
+    
+    def Lorenz96(self, x):
+        dx = np.zeros(self.N)
+        for i in range(self.N):
+            dx[i] = (
+                (x[(i + 1) % self.N] - x[(i - 2) % self.N])
+                * x[(i - 1) % self.N]
+                - x[i]
+                + self.F
+            )
+        return dx
+    
+    def rk4_step(self, x, dt):
+        k1 = self.Lorenz96(x)
+        k2 = self.Lorenz96(x + dt * k1 / 2)
+        k3 = self.Lorenz96(x + dt * k2 / 2)
+        k4 = self.Lorenz96(x + dt * k3)
+        return x + dt * (k1 + 2 * k2 + 2 * k3 + k4) / 6
+    
+    def loadData(self):
+        os.makedirs("./EMChialvo_Reservoir/Input_Data", exist_ok=True)
+        if os.path.exists("./EMChialvo_Reservoir/Input_Data/Lorenz96_data_X.npy"):
+            self.X = np.load("./EMChialvo_Reservoir/Input_Data/Lorenz96_data_X.npy")
+            self.X_Noise = np.load("./EMChialvo_Reservoir/Input_Data/Lorenz96_data_X_Noise.npy")
+        else:
+            self.makeData()
+
+    #データ生成
+    def makeData(self):
+        np.random.seed(seed=999)
+        total_steps = self.InitTerm + self.Length + self.Tau
+        self.X = np.zeros((self.Length + self.Tau, self.D_u))
+        self.s = (np.random.rand(self.N) - 0.5) * 10
+
+        for i in range(total_steps):
+            if i >= self.InitTerm:
+                self.X[i - self.InitTerm] = self.s[:self.D_u] * self.Scale
+            self.s = self.rk4_step(self.s, self.Dt)
+
+        # ノイズを含むデータも保存
+        if self.Noise:
+            noise = np.random.normal(scale=self.NoiseScale, size=self.X.shape)
+            self.X_Noise = self.X + noise
+        else:
+            self.X_Noise = self.X.copy()
+
+        np.save("./EMChialvo_Reservoir/Input_Data/Lorenz96_data_X.npy", self.X)
+        np.save("./EMChialvo_Reservoir/Input_Data/Lorenz96_data_X_Noise.npy", self.X_Noise)
 
 
 #--------------------------------------------------------------------
@@ -469,53 +545,6 @@ class Task_LogisticEquation(Task):
 
         return self.next_x
     
-
-#--------------------------------------------------------------------
-class Task_Lorenz96(Task):
-    """
-    ローレンツ96
-    """
-    #コンストラクタ
-    def __init__(self, param: dict, evaluation: any):
-        super().__init__(param, evaluation)
-
-        #パラメータ取得
-        self.Scale = param["Task_Lorenz96_Scale"]                 #信号のスケール
-        self.Dt = param["Task_Lorenz96_Dt"]                       #時間スケール
-        self.Tau = param["Task_Lorenz96_Tau"]                     #どれくらい先を予測するか
-        self.InitTerm = param["Task_Lorenz96_InitTerm"]          #初期状態排除期間
-
-        self.N = param["Task_Lorenz96_N"]                       #次元数
-        self.F = param["Task_Lorenz96_F"]                       #外部強制力
-
-        self.makeData()
-    
-    #時刻tの入出力データ取得
-    def getData(self, t: int) -> tuple:
-        return self.X[t], self.X[t + self.Tau]
-    
-    def Lorenz96(self, x):
-        dx = np.zeros(self.N)
-        for i in range((self.N)):
-            dx[i] =  x[i] +  (((x[(i + 1) % self.N] - x[(i - 2)]) * x[i - 1]) - x[i] + self.F) * self.Dt
-
-        return dx
-
-    #データ生成
-    def makeData(self):
-        # 乱数シードの設定
-        np.random.seed(seed=999)
-        self.X = np.zeros((self.Length + self.Tau, self.D_u))
-
-        self.s = (np.random.rand(self.N) - 0.5) * 10
-
-        for i in range(self.InitTerm + self.Length + self.Tau):
-            if self.InitTerm <= i:
-                self.X[i - self.InitTerm] = self.s[-1] * self.Scale
-
-            self.s = self.Lorenz96(self.s)
-
-
 #--------------------------------------------------------------------
 class Task_Zeros(Task):
     """
