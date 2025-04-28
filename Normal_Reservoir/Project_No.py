@@ -38,7 +38,7 @@ def Project_ESN_2025_04_18_14_51():
         #==========================================================================================
         "Project_F_NRMSE" : True,                           #NRMSEを調査するか
         "Project_F_MemoryCapacity" : False,                  #MCを調査するか
-        "Project_F_MLE" : False,                             #MLE（最大リアプノフ指数）を調査するか
+        "Project_F_MLE" : True,                             #MLE（最大リアプノフ指数）を調査するか
         
         "Project_F_CovMatrixRank" : True,                  #Covariance Matrix Rankを調査するか
         "Project_F_DelayCapacity" : True,                   #Delay Capacityを調査するか
@@ -53,7 +53,7 @@ def Project_ESN_2025_04_18_14_51():
         #------------------------------------------------------------------------------------------
         #ルンゲクッタ法通常レスラー方程式
         "Task_NormalRosslor_Scale" : 1 / 30,
-        "Task_NormalRosslor_Dt" : 0.025,
+        "Task_NormalRosslor_Dt" : 0.01,
         "Task_NormalRosslor_Tau" : 5,
         "Task_NormalRosslor_InitTerm" : 1000,
 
@@ -63,7 +63,7 @@ def Project_ESN_2025_04_18_14_51():
 
         #------------------------------------------------------------------------------------------
         #ルンゲクッタ法通常ローレンツ方程式
-        "Task_NormalLorenz_Scale" : 1/50,
+        "Task_NormalLorenz_Scale" : 1 / 30,
         "Task_NormalLorenz_Dt" : 0.01,
         "Task_NormalLorenz_Tau" : 5,
         "Task_NormalLorenz_InitTerm" : 1000,
@@ -81,8 +81,8 @@ def Project_ESN_2025_04_18_14_51():
         #------------------------------------------------------------------------------------------
         #------------------------------------------------------------------------------------------
         #ローレンツ方程式96のパラメータ
-        "Task_Lorenz96_Scale" : 1/50,                       #ローレンツ方程式96の大きさ
-        "Task_Lorenz96_Dt" : 0.005,                          #時間刻み幅
+        "Task_Lorenz96_Scale" : 1 / 30,                       #ローレンツ方程式96の大きさ
+        "Task_Lorenz96_Dt" : 0.01,                          #時間刻み幅
         "Task_Lorenz96_Tau" : 5,                            #どれくらい先を予測するか
         "Task_Lorenz96_InitTerm" : 1000,                    #初期状態排除期間
         "Task_Lorenz96_N" : 10,                             #ニューロン数
@@ -134,12 +134,12 @@ def Project_ESN_2025_04_18_14_51():
         "SubReservoir_LeakingRate" : 1,                     #リーク率
         "SubReservoir_InputScale" : 0.1,                    #入力スケーリング
         "SubReservoir_Rho" : 0.9,                             #スペクトル半径
-        "SubReservoir_Density" : 0.95,                         #結合密度
+        "SubReservoir_Density" : 0.8,                         #結合密度
         "SubReservoir_ActivationFunc" : np.tanh,            #活性化関数
 
         #------------------------------------------------------------------------------------------
         "EMChialvo_Reservoir_Density" : 1,                          #結合密度        
-        "LinerTransformer_Beta" : 1.0 * 1e-4,                      #正則化係数
+        "LinerTransformer_Beta" : 1.0 * 1e-6,                      #正則化係数
         }
 
     #NRMSE評価
@@ -159,7 +159,7 @@ def Project_ESN_2025_04_18_14_51():
             "NRMSE_Length_Test" : 5000,                         #評価用データ時間長
 
             #------------------------------------------------------------------------------------------
-            "NRMSE_T_Task" : Task_No.Task_Lorenz96,                                #評価用タスク（Type型）
+            "NRMSE_T_Task" : Task_No.Task_NormalLorenz,                                #評価用タスク（Type型）
             "Task_Noise" : False,                               #タスクにノイズを加えるか
             "Task_Noise_Scale" : 0.025,                       #ノイズのスケール
             "NRMSE_T_Model" : Model_No.Model_NormalESN,                 #モデル（Type型）
@@ -245,7 +245,7 @@ def Project_ESN_2025_04_18_14_51():
             "CovMatrixRank_Length_Burnin" : 1000,                      #空走用データ時間長
             "CovMatrixRank_Length_Test" : 5000,                        #評価用データ時間長
             
-            "CovMatrixRank_T_Task" : Task_No.Task_Lorenz96,
+            "CovMatrixRank_T_Task" : Task_No.Task_NormalLorenz,
             "Task_Noise" : False,                        #タスクにノイズを加えるか
             "Task_Noise_Scale" : 0.025,                       #ノイズのスケール
             "CovMatrixRank_T_Model" : Model_No.Model_NormalESN,
@@ -273,9 +273,9 @@ def Project_ESN_2025_04_18_14_51():
             "DelayCapacity_Length_Burnin" : 1000,                      #空走用データ時間長
             
             "DelayCapacity_Length_Tdc" : 5000,                        #評価用データ時間長
-            "DelayCapacity_Length_Taumax" : 50,
+            "DelayCapacity_Length_Taumax" : 100,
 
-            "DelayCapacity_T_Task" : Task_No.Task_Lorenz96,
+            "DelayCapacity_T_Task" : Task_No.Task_NormalLorenz,
             "Task_Noise" : False,                        #タスクにノイズを加えるか
             "Task_Noise_Scale" : 0.025,                       #ノイズのスケール
             "DelayCapacity_T_Model" : Model_No.Model_NormalESN,

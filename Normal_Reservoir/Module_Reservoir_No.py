@@ -116,9 +116,7 @@ class Module_SubReservoir(Module_Reservoir):
         
         #摂動軌道の計算
         sP = (1 - self.LeakingRate) * (self.s_old + s_D) + \
-            self.LeakingRate * self.ActivationFunc(
-                np.dot(np.concatenate([self.Bias, u]), self.W_in) + 
-                np.dot((self.s_old + s_D), self.W_rec))
+            self.LeakingRate * self.ActivationFunc(np.dot(np.concatenate([self.Bias, u]), self.W_in) + np.dot((self.s_old + s_D), self.W_rec))
 
         return self.s_old, self.s, (self.s_old + s_D), sP
 

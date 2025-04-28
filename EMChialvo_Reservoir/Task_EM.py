@@ -65,7 +65,8 @@ class Task_SinCurve(Task):
 
         #パラメータ取得
         self.h = self.Param["Task_SinCurve_RK_h"]       #ルンゲクッタ法刻み幅
-        
+        self.Tau = param["Task_SinCurve_Tau"]                    #どれくらい先を予測するか
+
         self.makeData()
 
     #導関数
@@ -74,25 +75,25 @@ class Task_SinCurve(Task):
 
     #時刻tの入出力データ取得
     def getData(self, t: int) -> tuple: 
-        return self.X[t], self.Y[t]
+        return self.Y[t], self.Y[t + self.Tau]
 
     #データ生成
     def makeData(self):
-        self.X = np.zeros([self.Length, self.D_u])
-        self.Y = np.zeros([self.Length, self.D_y])
+        self.X = np.zeros([self.Length + self.Tau, self.D_u])
+        self.Y = np.zeros([self.Length + self.Tau, self.D_y])
 
         #位相と周波数，振幅をランダムに決定
         #[-π,π]
-        self.Phase = np.random.rand(self.D_u) * 2 * np.pi - np.pi
+        self.Phase =  0 #np.random.rand(self.D_u) * 2 * np.pi - np.pi
         #[1,5]
-        self.Frequency = np.random.rand(self.D_u) * 4 + 1
+        self.Frequency =  2 #np.random.rand(self.D_u)
         #[0.5,1.5]
-        self.Amplitude = np.random.rand(self.D_u) * 1 + 0.5
+        self.Amplitude = 1 #np.random.rand(self.D_u) * 1 + 0.5
 
         #初期値（積分定数C）
         x = self.Amplitude * np.sin(self.Phase)
         #ルンゲクッタ法
-        for ts in range(self.Length):
+        for ts in range(self.Length + self.Tau):
             self.X[ts] = x
             t = np.ones([self.D_u]) * ts * self.h
             k1 = self.h * self.f(x, t)
@@ -102,6 +103,7 @@ class Task_SinCurve(Task):
             x += (k1 + 2 * k2 + 2 * k3 + k4) / 6
             self.Y[ts] = x
         
+        self.Y = self.Y + 1
 #--------------------------------------------------------------------
 class Task_MC(Task):
     """

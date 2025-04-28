@@ -46,7 +46,8 @@ def Project_EMChialvo_2025_01_28_12_34():
         #------------------------------------------------------------------------------------------
         #------------------------------------------------------------------------------------------
         "Task_SinCurve_RK_h" : 0.01,                         #ルンゲクッタ法刻み幅
-        
+        "Task_SinCurve_Tau" : 30,
+
         "Task_MC_Tau" : 10,                                  #遅延量，MCのτ
         
         #------------------------------------------------------------------------------------------
@@ -65,7 +66,7 @@ def Project_EMChialvo_2025_01_28_12_34():
 
         #------------------------------------------------------------------------------------------
         #ルンゲクッタ法通常ローレンツ方程式
-        "Task_NormalLorenz_Scale" : 1 / 20,
+        "Task_NormalLorenz_Scale" : 1 / 50,
         "Task_NormalLorenz_Dt" : 0.01,
         "Task_NormalLorenz_Tau" : 5,
         "Task_NormalLorenz_InitTerm" : 1000,
@@ -144,13 +145,12 @@ def Project_EMChialvo_2025_01_28_12_34():
         "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
         "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
-        "Model_EMChialvo_k" : -3.0,                         #変数:k
+        "Model_EMChialvo_k" : -5,                         #変数:k
         "Model_EMChialvo_Rho" : 0.01,                      #スペクトル半径
 
         #------------------------------------------------------------------------------------------
         "EMChialvo_Reservoir_Density" : 1,                          #結合密度
-        "EMChialvo_Reservoir_LeakRate" : 1,                        #リザバーのリークレート
-        "LinerTransformer_Beta" : 1.0 * 1e-4,                      #正則化係数
+        "LinerTransformer_Beta" : 2.0 * 1e-1,                      #正則化係数
         }
     
     TaskSignal = Task_EM.Task_NormalLorenz
@@ -286,7 +286,7 @@ def Project_EMChialvo_2025_01_28_12_34():
             "DelayCapacity_Length_Burnin" : 1000,                      #空走用データ時間長
             
             "DelayCapacity_Length_Tdc" : 5000,                        #評価用データ時間長
-            "DelayCapacity_Length_Taumax" : 50,
+            "DelayCapacity_Length_Taumax" : 100,
 
             "DelayCapacity_T_Task" : TaskSignal,
             "Task_Noise" : False,                        #タスクにノイズを加えるか

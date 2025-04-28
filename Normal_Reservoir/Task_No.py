@@ -83,11 +83,11 @@ class Task_SinCurve(Task):
 
         #位相と周波数，振幅をランダムに決定
         #[-π,π]
-        self.Phase = np.random.rand(self.D_u) * 2 * np.pi - np.pi
+        self.Phase = 0 #np.random.rand(self.D_u) * 2 * np.pi - np.pi
         #[1,5]
-        self.Frequency = np.random.rand(self.D_u) * 4 + 1
+        self.Frequency = 1 #np.random.rand(self.D_u) * 4 + 1
         #[0.5,1.5]
-        self.Amplitude = np.random.rand(self.D_u) * 1 + 0.5
+        self.Amplitude = 1 #np.random.rand(self.D_u) * 1 + 0.5
 
         #初期値（積分定数C）
         x = self.Amplitude * np.sin(self.Phase)
