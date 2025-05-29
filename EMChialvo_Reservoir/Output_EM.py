@@ -165,7 +165,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
 
                 #====================================================================
                 #リザバー層内のx, yの状態
-                Title = None     #図題
+                """Title = None     #図題
                 fig = plt.figure(figsize = FigSize)
 
                 ax = fig.add_subplot(1, 1, 1)
@@ -213,6 +213,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.legend()
                 fig.savefig(self.Plt_Charts_Reservoir_YandPhi.Path + FileFormat)
                 plt.close()
+                """
 
                 #====================================================================
                 #リザバー層内の任意のニューロン数の値の状態
@@ -257,7 +258,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
 
                 #====================================================================
                 #Chialvo_X, ニューロン数, 時間軸を3Dに描写した
-                Title =  "Chialvo X" + self.AxisTag
+                """Title =  "Chialvo X" + self.AxisTag
                 fig = plt.figure(figsize = FigSize)
                 ax = fig.add_subplot(1,1,1, projection = '3d')
 
@@ -275,7 +276,7 @@ class Output_Single_NRMSE_2023_04_19_15_25(Output):
                 ax.legend()
                 plt.tight_layout()
                 fig.savefig(self.Plt_Charts_Reservoir_3DTime.Path + FileFormat)
-                plt.close()
+                plt.close()"""
 
                 #====================================================================
                 #リザバー層のヒートマップ

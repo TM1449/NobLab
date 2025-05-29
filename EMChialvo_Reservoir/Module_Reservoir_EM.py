@@ -147,8 +147,7 @@ class Module_EMChialvo_Reservoir(Module_Reservoir):
     def forward(self, u: np.ndarray) -> np.ndarray: 
         self.x = (pow(self.x_old, 2) * np.exp(self.y_old - self.x_old) + self.k0 \
             + self.k * self.x_old * (self.alpha + 3 * self.beta * pow(self.phi_old, 2)) \
-                + np.dot(self.x_old, self.W_rec))\
-                + np.dot(np.concatenate([self.Bias, u]), self.W_in)
+                + np.dot(self.x_old, self.W_rec)) + np.dot(np.concatenate([self.Bias, u]), self.W_in)
         self.y = self.a * self.y_old - self.b * self.x_old + self.c
         self.phi = self.k1 * self.x_old - self.k2 * self.phi_old
 

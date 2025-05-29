@@ -665,14 +665,14 @@ class Evaluation_CovMatrixRank(Evaluation):
         TH = (max(CovOmega.shape) * sys.float_info.epsilon * max(S))
         TH_Nolta = 1e-09
 
-        Gamma = np.linalg.matrix_rank(CovOmega)
-        print(f"通常の閾値：{TH}")
-        print(f"通常のランク：{Gamma}\n")
+        Gamma = np.linalg.matrix_rank(CovOmega, TH_Nolta)
+        #print(f"通常の閾値：{TH}")
+        #print(f"通常のランク：{Gamma}\n")
 
         #TH1 = TH * 10
-        Gamma1 = np.linalg.matrix_rank(CovOmega, TH_Nolta)
-        print(f"閾値を1e-08：{TH_Nolta}")
-        print(f"閾値を1e-08したランク：{Gamma1}\n")
+        #Gamma1 = np.linalg.matrix_rank(CovOmega, TH_Nolta)
+        #print(f"閾値を1e-08：{TH_Nolta}")
+        #print(f"閾値を1e-08したランク：{Gamma1}\n")
 
         #TH333 = 1e-08
         #Gamma333 = np.linalg.matrix_rank(CovOmega, TH333)
