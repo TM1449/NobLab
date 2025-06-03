@@ -36,11 +36,11 @@ def Project_EMChialvo_2025_01_28_12_34():
     #共通パラメータ
     Param = {
         #==========================================================================================
-        "Project_F_NRMSE" : True,                           #NRMSEを調査するか
+        "Project_F_NRMSE" : False,                           #NRMSEを調査するか
         "Project_F_MemoryCapacity" : False,                  #MCを調査するか
-        "Project_F_MLE" : True,                             #MLE（最大リアプノフ指数）を調査するか
+        "Project_F_MLE" : False,                             #MLE（最大リアプノフ指数）を調査するか
         
-        "Project_F_CovMatrixRank" : True,                  #Covariance Matrix Rankを調査するか
+        "Project_F_CovMatrixRank" : False,                  #Covariance Matrix Rankを調査するか
         "Project_F_DelayCapacity" : True,                   #Delay Capacityを調査するか
 
         #------------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ def Project_EMChialvo_2025_01_28_12_34():
         "Model_EMChialvo_alpha" : 0.1,                      #変数:alpha
         "Model_EMChialvo_beta" : 0.2,                       #変数:beta
 
-        "Model_EMChialvo_k" : -3,                         #変数:k
+        "Model_EMChialvo_k" : -5,                         #変数:k
         "Model_EMChialvo_Rho" : 0.01,                      #スペクトル半径
 
         #------------------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ def Project_EMChialvo_2025_01_28_12_34():
         }
     
     #一括でタスク変更用
-    TaskSignal = Task_EM.Task_NormalLorenz96
+    TaskSignal = Task_EM.Task_NormalLorenz
 
     #NRMSE評価
     if Param["Project_F_NRMSE"]:
