@@ -133,6 +133,79 @@ class Model_Chialvo(Model):
             self.phi[self.Length_Burnin :], \
                 self.Input_Signal[self.Length_Burnin :]
 
+class Model_IzhikevichFlux(Model):
+    """
+    離散化されたIzhikevichニューロンモデル（電磁束結合付き）
+    参考文献: Discrete hybrid Izhikevich neuron model... fileciteturn0file5
+    """
+    def __init__(self, param: dict, parent: any = None):
+        super().__init__(param, parent)
+
+        # モデルパラメータ
+        self.a     = self.Param["Izh_a"]    # 回復変数の時間スケール
+        self.b     = self.Param["Izh_b"]    # 回復変数の感度
+        self.c     = self.Param["Izh_c"]    # 電位リセット値
+        self.d     = self.Param["Izh_d"]    # 回復変数のリセット追加項
+        self.I     = self.Param["Izh_I"]    # 定常入力電流
+        # 電磁束結合強度とフラックス更新係数
+        self.k     = self.Param["Izh_k"]
+        self.k1    = self.Param["Izh_k1"]
+        self.k2    = self.Param["Izh_k2"]
+        # メモリ導電性 M(φ) = α + 3βφ^2
+        self.alpha = self.Param["Izh_alpha"]
+        self.beta  = self.Param["Izh_beta"]
+
+        # シミュレーション長さ設定
+        self.Length_Burnin = self.Param["Length_Burnin"]
+        self.Length_Eva    = self.Param["Length_Eva"]
+        self.Length_Plot   = self.Param["Length_Plot"]
+        self.Length_Total  = self.Length_Burnin + self.Length_Eva + self.Length_Plot
+
+        # 初期値設定
+        self.v0   = self.Param.get("Initial_Value_v", -65.0)
+        self.u0   = self.Param.get("Initial_Value_u", self.b * self.v0)
+        self.phi0 = self.Param.get("Initial_Value_phi", 0.0)
+
+        # 状態変数配列の確保
+        self.v   = np.zeros(self.Length_Total)
+        self.u   = np.zeros(self.Length_Total)
+        self.phi = np.zeros(self.Length_Total)
+        self.v[0]   = self.v0
+        self.u[0]   = self.u0
+        self.phi[0] = self.phi0
+
+    def __call__(self):
+        self.Input_Signal = np.zeros(self.Length_Total)
+
+        # シミュレーションループ
+        for i in range(self.Length_Total - 1):
+            # メモリ導電性の計算
+            M_phi = self.alpha + 3 * self.beta * (self.phi[i] ** 2)
+
+            # 離散化された差分方程式
+            v_next   = (self.v[i] + 0.04 * (self.v[i] ** 2) + 5 * self.v[i] + 140 + self.I - self.u[i] + self.k * self.v[i] * M_phi)
+            u_next   = self.u[i] + self.a * (self.b * self.v[i] - self.u[i])
+            phi_next = self.phi[i] + self.k1 * self.v[i] - self.k2 * self.phi[i]
+
+            # スパイク検出とリセット条件
+            if v_next >= 30:
+                self.v[i+1] = self.c
+                self.u[i+1] = u_next + self.d
+            else:
+                self.v[i+1] = v_next
+                self.u[i+1] = u_next
+
+            self.phi[i+1] = phi_next
+
+        # バーンイン期間を除いたデータを返却
+        return (
+            self.v[self.Length_Burnin:],
+            self.u[self.Length_Burnin:],
+            self.phi[self.Length_Burnin:],
+            self.Input_Signal[self.Length_Burnin:]
+        )
+
+
 class Model_Chialvo_OldNullcline(Model):
 
     #コンストラクタ

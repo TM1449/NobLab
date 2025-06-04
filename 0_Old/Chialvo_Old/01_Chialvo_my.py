@@ -18,9 +18,9 @@ beta = 0.2
 
 k = 0
 N = 100
-mu = 0.0
+mu = 0.005
 R = 10
-sigma = 0.0
+sigma = 0.00724
 t = 20000  #このtは、論文でいうn
 
 Rho = 1
@@ -158,7 +158,7 @@ ax = fig.add_subplot(111)
 plt.plot(chialvo_map.x[10,:],'.')
 plt.xlabel('Times')
 plt.ylabel('x')
-plt.show
+plt.show()
 
 
 #ヒートマップを表示する。

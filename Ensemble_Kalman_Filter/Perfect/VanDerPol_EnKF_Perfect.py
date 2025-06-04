@@ -1,216 +1,288 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# ===========================================================
+# 1. モデル＆フィルタ設定：Van der Pol 系のパラメータとノイズ
+# ===========================================================
+
 # -----------------------------
-# 1. モデル＆フィルタ設定
+# 1.1 真の Van der Pol 系パラメータ（ε を推定対象とする）
 # -----------------------------
+# Van der Pol 方程式（2次 ODE）を 1次系に変換した形式：
+#   x1' = x2
+#   x2' = ε (1 - x1^2) x2 - x1
+#
+# ここでは、ε（イプシロン）を未知パラメータとして同時推定し、
+# 真の値は eps = 1.0 とする。
 eps = 1.0                        # 真のパラメータ ε（未知とみなす）
-x00 = np.array([0.2, 0.1])       # 真の初期状態ベクトル [x1, x2]
 
-# 時間設定
+# -----------------------------
+# 1.2 真の初期状態ベクトル [x1, x2]
+# -----------------------------
+# 参照用に真の軌道をシミュレーションするための初期値
+x00 = np.array([0.2, 0.1])       # [x1, x2] の真の初期状態
+
+# -----------------------------
+# 1.3 時間離散化＆シミュレーション設定
+# -----------------------------
 dt = 0.1                         # タイムステップ Δt
-d2 = np.sqrt(dt)                 # ノイズのスケーリング用 sqrt(Δt)
-
-#print("d2の値:", d2)  # d2 の値を確認:0.31
-
-T = 50.0                         # シミュレーション全体時間
+sqrt_dt = np.sqrt(dt)            # プロセスノイズ付与時のスケーリング √Δt
+T = 50.0                         # シミュレーション全時間 (秒)
 N = int(T / dt)                  # ステップ数
 
-# ノイズ共分散
-R = 0.01                         # 観測ノイズ分散
-Q = np.array([[0.026, 0.0],      # x1, x2 のシステムノイズ共分散行列
-                [0.0,   0.01]])
-Q3 = 1e-5                  # ε のランダムウォーク分散
-
-# 観測行列（x2 のみ観測：これは絶対に変えない！）
-C = np.array([0.0, 1.0, 0.0])
+# -----------------------------
+# 1.4 ノイズ共分散の定義
+# -----------------------------
+# - 観測ノイズ R: x2 の観測時に加わるガウスノイズの分散
+# - システムノイズ Q: [x1, x2] のプロセスノイズ共分散行列
+# - ランダムウォークノイズ Q3: ε のランダムウォーク分散
+#
+# ε を定数と見做すなら Q3 は非常に小さく設定する
+R  = 0.01                        # 観測ノイズ分散（x2 の観測に使用）
+Q  = np.array([[0.026, 0.0],     # x1, x2 のプロセスノイズ共分散行列
+               [0.0,   0.01]])
+Q3 = 1e-7                        # ε のランダムウォークノイズ分散（非常に小さく設定）
 
 # -----------------------------
-# 2. 真のデータ生成
+# 1.5 観測モデルの定義：観測行列 C
 # -----------------------------
-x = np.zeros((3, N+1))           # 真の状態 [x1, x2, ε]
-y = np.zeros(N+1)                # 観測データ
+# 観測として「x2 のみを観測する」設定とし、観測値 y_k = x2 + 観測ノイズ
+# 拡張状態ベクトルは [x1, x2, ε] の3次元。C はそのうち x2 のみ選択する行列。
+#   y_obs = C @ [x1, x2, ε]^T + v
+C = np.array([0.0, 1.0, 0.0])    # 観測行列 (1×3)
 
-# 初期状態のセット
-x[0:2, 0] = x00
-x[2, 0] = eps
+# ===========================================================
+# 2. 真のデータ生成：Van der Pol 系の真の軌道と観測データをシミュレーション
+# ===========================================================
 
-# プロセスノイズと観測ノイズを用意
-vd = np.sqrt(R) * np.random.randn(N+1)                            # 観測ノイズ
-wd = np.vstack((np.sqrt(Q[0,0]) * np.random.randn(N+1),         # システムノイズ
-                np.sqrt(Q[1,1]) * np.random.randn(N+1)))        #wd ((2, N+1) の形状)
+# -----------------------------
+# 2.1 真の状態ベクトル x と観測 y を格納する配列を初期化
+# -----------------------------
+# x: 3行 × (N+1)列 の配列。各列が時刻 k における [x1, x2, ε]^T を表す。
+# y: N+1個の観測データ（x2 のみノイズ付きで取得）
+x = np.zeros((3, N + 1))
+y = np.zeros(N + 1)
 
-#print("wdの形状:", wd.shape)  # wd の形状確
-#print("ノイズ:", wd[:,0] * d2)  # wd の値を確認
+# -----------------------------
+# 2.2 真の初期状態を設定
+# -----------------------------
+# x[0:2,0] に真の初期状態 [x00] をセットし、
+# x[2,0] に真の ε の値をセット
+x[0:2, 0] = x00   # [x1, x2]
+x[2, 0]    = eps  # ε（定数として初期化）
 
+# -----------------------------
+# 2.3 真のプロセスノイズ wd と 観測ノイズ vd を生成
+# -----------------------------
+# - wd: 2行 × (N+1)列 の配列。各行がそれぞれ x1, x2 用のノイズ系列
+#     wd = sqrt(Q) * 標準正規乱数 * √Δt
+# - vd: (N+1)要素のベクトル。観測ノイズは x2 の観測に加わる
+wd = np.vstack((
+    np.sqrt(Q[0, 0]) * np.random.randn(N + 1),
+    np.sqrt(Q[1, 1]) * np.random.randn(N + 1),
+))
+vd = np.sqrt(R) * np.random.randn(N + 1)  # 観測ノイズ (x2 only)
 
-# 真の力学系をシミュレーションしつつ観測を取得
+# -----------------------------
+# 2.4 真の Van der Pol 系を離散化シミュレーション
+# -----------------------------
 for k in range(N):
+    # 2.4.1 i時刻の真の状態を取り出す
+    x1, x2, eps_true = x[:, k]
 
-    # x1 の更新（更新式＋ノイズ）
-    x[0, k+1] = x[0, k] + dt * x[1, k] \
-        + d2 * wd[0, k]
-    
-    # x2 の更新（Van der Pol の項）
-    vdp = eps * (1 - pow(x[0, k], 2)) * x[1, k] - x[0, k]
+    # 2.4.2 Van der Pol の式を計算
+    #    x1' = x2
+    #    x2' = ε (1 - x1^2) x2 - x1
+    x1_dot = x2
+    x2_dot = eps_true * (1 - x1**2) * x2 - x1
 
-    # x2 の更新（更新式＋ノイズ）
-    x[1, k+1] = x[1, k] + dt * vdp \
-        + d2 * wd[1, k]
-    
-    # ε（推定パラメータ：x[2,:]） は定数としてそのまま保持
-    x[2, k+1] = x[2, k]
+    # 2.4.3 次のステップの状態を Euler 法で予測し、プロセスノイズを加える
+    #   x[k+1] = x[k] + dt * [x1_dot, x2_dot] + √dt * wd[:, k]
+    x[0, k + 1] = x[0, k] + dt * x1_dot + sqrt_dt * wd[0, k]
+    x[1, k + 1] = x[1, k] + dt * x2_dot + sqrt_dt * wd[1, k]
+    # ε は真の定数としてランダムウォークを加えず一定値を維持
+    x[2, k + 1] = eps_true
 
-    # 観測（x2 のみ）にノイズを加える
+    # 2.4.4 観測生成：x2 に観測ノイズを加えたものを y[k] に格納
     y[k] = C @ x[:, k] + vd[k]
 
-# 最終ステップの観測
+# 最終ステップ (k=N) の観測も同様にノイズを加えて取得
 y[N] = C @ x[:, N] + vd[N]
 
+# ===========================================================
+# 3. EnKF の初期化：アンサンブル生成と初期設定
+# ===========================================================
 
 # -----------------------------
-# 3. EnKF 初期化
+# 3.1 拡張状態ベクトル次元と観測次元、アンサンブル数の定義
 # -----------------------------
-n = 3      # 状態次元数（x1, x2, ε）
-p = 1      # 観測次元数
-M = 500    # アンサンブルメンバー数
+n = 3      # 拡張状態次元 [x1, x2, ε]
+p = 1      # 観測次元 (x2 のみ)
+M = 500    # アンサンブルメンバー数 (大きめを選択)
 
-# 初期アンサンブル（平均0、分散0.5）
-#xep = np.sqrt(0.5) * np.random.randn(n, M)
-xep = np.random.normal(0, 0.5, (n, M))  # 平均0、分散0.5の正規分布
+# -----------------------------
+# 3.2 各メンバーの初期アンサンブルを構成
+# -----------------------------
+# 真の初期状態 [x00, eps] のまわりにランダムにばらつきを持たせる
+#   - x1, x2 は平均0 分散0.5 の正規分布で乱数を与え、真値に加算
+#   - ε は平均0, 分散0.5 の分布で乱数を与え、真値 (eps) に加算
+xep = np.random.normal(0, 0.5, (n, M))  # 平均0, 分散0.5 のノイズ行列
+for i in range(M):
+    xep[0:2, i] += x00                 # x1, x2 の初期値にノイズを加える
+    xep[2,   i] += eps                 # ε の初期値にノイズを加える
 
-# 推定結果格納用
-xhat = np.zeros((n, N+1))
+# -----------------------------
+# 3.3 推定結果を格納する配列の準備
+# -----------------------------
+# xhat: 各時刻でのアンサンブル平均 [x1, x2, ε] を保存
+xhat = np.zeros((n, N + 1))
+# eps_ensemble: 各メンバーの ε の推定値を時系列で保存（プロット用に利用）
+eps_ensemble = np.zeros((M, N + 1))
 
-eps_ensemble = np.zeros((M, N+1))  # ε のアンサンブル値保存用
-
-
-# フィルタ用の拡張システムノイズ共分散行列
+# -----------------------------
+# 3.4 拡張システムノイズ共分散行列 Qe と 観測ノイズ分散 Re の定義
+# -----------------------------
+#   Qe は 3×3 の共分散行列で、上2×2 が状態 [x1, x2] のノイズ共分散 Q、
+#   3行3列目に ε 用の Q3 を入れる。残りは 0。
 Qe = np.zeros((n, n))
-Qe[0:2, 0:2] = Q
-Qe[2, 2] = Q3                              # ε 用に小さいノイズ
-
-Re = R                                       # 観測ノイズ分散
-
-#ここまでOK
-
-# 一時的に使う配列群
-xef = np.zeros((n, M))       # 事後アンサンブル
-yep = np.zeros((p, M))       # 観測予測
-nu  = np.zeros((p, M))       # イノベーション
-Ex  = np.zeros((n, M))       # 状態偏差
-Ey  = np.zeros((p, M))       # 観測偏差
-
+Qe[0:2, 0:2] = Q   # [x1, x2] 用プロセスノイズ共分散
+Qe[2,    2] = Q3   # ε 用ランダムウォークノイズ分散
+Re = R             # 観測ノイズ分散（スカラー）
 
 # -----------------------------
-# 4. 推定ループ
+# 3.5 EnKF で使う一時変数を初期化
 # -----------------------------
-for k in range(N+1):
-    # --- 分析ステップ（観測更新） ---
-    # 観測予測を各メンバーで生成
-    ve = np.sqrt(Re) * np.random.randn(p, M)
+# xef: 解析後のアンサンブル一時格納 (3×M)
+# yep: 各メンバーの観測予測 (1×M)
+# nu:  イノベーション（観測誤差 y_obs[k] - y_pred）(1×M)
+xef = np.zeros((n, M))
+yep = np.zeros((p, M))
+nu  = np.zeros((p, M))
+
+# ===========================================================
+# 4. EnKF 推定ループ：各時刻で (1) 分析 → (2) 予測 を実行
+# ===========================================================
+for k in range(N + 1):
+    # -----------------------------
+    # 4.1 分析ステップ (Analysis)：観測更新
+    # -----------------------------
+    # (1) 各メンバーの観測予測を計算し、擾乱観測ノイズを加える
+    #     - 観測モデル: y_pred = C @ xep[:, i]
+    #     - 擾乱観測ノイズ v_i ~ N(0, R)
+    ve = np.sqrt(Re) * np.random.randn(p, M)  # 擾乱観測ノイズをメンバーごとに生成
     for i in range(M):
-        yep[:, i] = C @ xep[:, i] + ve[:, i] #初期Ensembleに観測ノイズを加える
-    
-    # アンサンブル平均を計算
-    x_mean = np.mean(xep, axis=1, keepdims=True)
-    y_mean = np.mean(yep, axis=1, keepdims=True)
-    
-    # 偏差を計算
-    Ex = xep - x_mean
-    Ey = yep - y_mean
-    
-    # 共分散行列を計算
-    Pxy = (Ex @ Ey.T) / (M - 1)
-    Pyy = (Ey @ Ey.T) / (M - 1)
-    
-    # カルマンゲインの計算
-    Kt = Pxy @ np.linalg.inv(Pyy)
-    
-    # 各メンバーを実際の観測 y[k] で更新
+        # 各メンバー i に対し観測予測: yep[i] = C @ x_prior + v_i
+        yep[:, i] = C @ xep[:, i] + ve[:, i]
+
+    # (2) アンサンブル平均と偏差を計算
+    x_mean = np.mean(xep, axis=1, keepdims=True)  # 状態平均 (3×1)
+    y_mean = np.mean(yep, axis=1, keepdims=True)  # 観測平均 (1×1)
+    Ex     = xep - x_mean                         # 各メンバーの状態偏差 (3×M)
+    Ey     = yep - y_mean                         # 各メンバーの観測偏差 (1×M)
+
+    # (3) サンプル共分散を計算
+    #  Pxy: 状態-観測間のサンプル共分散 (3×1)
+    #  Pyy: 観測-観測間のサンプル共分散 (1×1)
+    Pxy = (Ex @ Ey.T) / (M - 1)  # 3×1 行列
+    Pyy = (Ey @ Ey.T) / (M - 1)  # 1×1 行列
+
+    # (4) カルマンゲインを計算 K = Pxy * inv(Pyy)
+    K = Pxy @ np.linalg.inv(Pyy)  # (3×1) = (3×1) × (1×1)^{-1}
+
+    # (5) 観測データ y[k] を使って各メンバーを更新
     for i in range(M):
-        nu[:, i]  = y[k] - yep[:, i]
-        xef[:, i] = xep[:, i] + Kt @ nu[:, i]
-    
-    # アンサンブル平均をフィルタ推定値として保存
-    xhat[:, k] = np.mean(xef, axis=1)
-    # ε のアンサンブル値を保存
-    eps_ensemble[:, k] = xef[2, :]
-    
-    # --- 予測ステップ（時間更新） ---
-    we = np.random.multivariate_normal(np.zeros(n), Qe, size=M).T
+        # イノベーション（観測誤差） ν_i = y_obs[k] - y_pred_i
+        nu[:, i] = y[k] - yep[:, i]
+        # 更新: x_posterior = x_prior + K @ ν
+        xef[:, i] = xep[:, i] + K @ nu[:, i]
+
+    # (6) 解析後アンサンブルの平均を推定値として保存
+    xhat[:, k]         = np.mean(xef, axis=1)   # 推定平均 [x1, x2, ε]
+    eps_ensemble[:, k] = xef[2, :]               # 各メンバーの ε 値を保存
+
+    # -----------------------------
+    # 4.2 予測ステップ (Forecast)：時間更新
+    # -----------------------------
+    # 解析後の各メンバー xef[:, i] を用いて次ステップの予測を行う
+    # プロセスノイズ we_i ~ N(0, Qe) を各メンバーごとにサンプリング
+    we = np.random.multivariate_normal(np.zeros(n), Qe, size=M).T  # (3×M) のノイズ行列
+
     for i in range(M):
-        # x1 の予測
-        xep[0, i] = xef[0, i] + dt * xef[1, i] + d2 * we[0, i]
-        # x2 の予測
-        vdp_i = xef[2, i] * (1 - xef[0, i]**2) * xef[1, i] - xef[0, i]
-        xep[1, i] = xef[1, i] + dt * vdp_i + d2 * we[1, i]
-        # ε のランダムウォーク予測
-        xep[2, i] = xef[2, i] + d2 * we[2, i]
+        x1_i, x2_i, eps_i = xef[:, i]
 
+        # Van der Pol 系の RHS を計算
+        x1_dot = x2_i
+        x2_dot = eps_i * (1 - x1_i**2) * x2_i - x1_i
 
-# -----------------------------
-# 5. 推定誤差の計算
-# -----------------------------
-# x1,x2 のユークリッド誤差
-E_t = np.sqrt((x[0, :] - xhat[0, :])**2 + (x[1, :] - xhat[1, :])**2)
+        # 状態 x1, x2 の予測ステップ: Euler 法 + プロセスノイズ
+        xep[0, i] = x1_i + dt * x1_dot + sqrt_dt * we[0, i]
+        xep[1, i] = x2_i + dt * x2_dot + sqrt_dt * we[1, i]
 
-# プロット用の時間軸
-time = np.linspace(0, T, N+1)
+        # パラメータ ε のランダムウォーク予測: ε_new = ε_old + ノイズ
+        # もし Q3＝0 にすれば ε は定数として変化しないことになる
+        xep[2, i] = eps_i + sqrt_dt * we[2, i]
 
+# ===========================================================
+# 5. 推定誤差計算：状態推定誤差 E_t を算出
+# ===========================================================
+# 真の (x1, x2) と推定 (xhat1, xhat2) のユークリッド誤差を各時刻で計算
+state_error = np.sqrt(
+    (x[0, :] - xhat[0, :])**2 +
+    (x[1, :] - xhat[1, :])**2
+)
+time = np.linspace(0, T, N + 1)  # 時間軸（秒）
 
-# -----------------------------
-# 6. 結果プロット
-# -----------------------------
+# ===========================================================
+# 6. 結果プロット：状態・パラメータ推定結果と誤差を可視化
+# ===========================================================
+
+# (1) 状態 x1 の推定軌道 vs 真の軌道
 plt.figure(figsize=(8, 5))
-plt.plot(time, x[0, :], 'r-', label='True x1', linewidth=1.5)
-plt.plot(time, xhat[0, :], 'b--', label='EnKF estimate', linewidth=1.5)
+plt.plot(time, x[0, :],       'r-',  label='True x1',    linewidth=1.5)
+plt.plot(time, xhat[0, :],    'b--', label='EnKF estimate', linewidth=1.5)
 plt.xlabel('Time t (sec)')
 plt.ylabel('x1')
 plt.title('Estimation of x1 by EnKF')
-plt.axis([0, T, -4, 4])
 plt.grid(True)
 plt.legend()
 
+# (2) 状態 x2 の推定軌道 vs 真の軌道
 plt.figure(figsize=(8, 5))
-plt.plot(time, x[1, :], 'r-', label='True x2', linewidth=1.5)
-plt.plot(time, xhat[1, :], 'b--', label='EnKF estimate', linewidth=1.5)
+plt.plot(time, x[1, :],       'r-',  label='True x2',    linewidth=1.5)
+plt.plot(time, xhat[1, :],    'b--', label='EnKF estimate', linewidth=1.5)
 plt.xlabel('Time t (sec)')
 plt.ylabel('x2')
 plt.title('Estimation of x2 by EnKF')
-plt.axis([0, T, -4, 4])
 plt.grid(True)
 plt.legend()
 
+# (3) 状態推定誤差 E_t のプロット
 plt.figure(figsize=(8, 4))
-plt.plot(time, E_t, 'b-', linewidth=1.5)
+plt.plot(time, state_error, 'b-', linewidth=1.5)
 plt.xlabel('Time t (sec)')
 plt.ylabel('Error E_t')
 plt.title('State Estimation Error by EnKF')
-plt.axis([0, T, 0, 2])
 plt.grid(True)
 
+# (4) パラメータ ε の推定軌道 vs 真の定数値
 plt.figure(figsize=(8, 5))
-plt.plot(time, x[2, :], 'r-', label='True ε', linewidth=1.5)
-plt.plot(time, xhat[2, :], 'b--', label='EnKF estimate', linewidth=1.5)
+plt.plot(time, x[2, :],       'r-',  label='True ε',    linewidth=1.5)
+plt.plot(time, xhat[2, :],    'b--', label='EnKF estimate', linewidth=1.5)
 plt.xlabel('Time t (sec)')
 plt.ylabel('ε')
-plt.title('Parameter Estimation by EnKF')
-plt.axis([0, T, -1, 2])
+plt.title('Parameter Estimation of ε by EnKF')
 plt.grid(True)
 plt.legend()
 
-plt.figure(figsize=(8,5))
-# 各メンバーのε推定値をプロット
+# (5) 各アンサンブルメンバーの ε 推定軌跡と平均値
+plt.figure(figsize=(8, 5))
 for i in range(M):
-    plt.plot(time, eps_ensemble[i,:], linewidth=0.5, alpha=0.5)
-# アンサンブル平均を強調
-plt.plot(time, xhat[2,:], 'r-', linewidth=2, label='EnKF mean ε')
+    plt.plot(time, eps_ensemble[i, :], linewidth=0.5, alpha=0.5)
+plt.plot(time, xhat[2, :], 'r-', linewidth=2, label='EnKF mean ε')
 plt.xlabel('Time t (sec)')
 plt.ylabel('ε estimate')
 plt.title('Ensemble trajectories of ε')
-plt.legend()
 plt.grid(True)
+plt.legend()
 
 plt.show()
-# -----------------------------
