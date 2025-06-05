@@ -10,8 +10,12 @@ import seaborn as sns
 # -----------------------------
 # 1. モデルおよびネットワーク設定
 # -----------------------------
-N = 100             # ニューロン数
-R = 10              # リング結合における左右 R 個の近隣ノードを結ぶ
+N = 10             # ニューロン数
+R = 2              # リング結合における左右 R 個の近隣ノードを結ぶ
+
+# 拡張状態次元 n = 3N + 1（各ノードの x,y,φ と 推定パラメータ 1次元）
+n = 3 * N + 1
+p = N
 
 # Chialvo マップの固定パラメータ（真値として使う）
 a_true     = 0.89
@@ -25,9 +29,9 @@ k1_true    = 0.1
 k2_true    = 0.2
 
 # 真の推定対象パラメータ（用途に応じて k_true, mu_true, sigma_true のうち一つを推定対象にする）
-k_true     = 3.5       # 電磁結合強度
-mu_true    = 0       # スター結合強度（中心ノードと周辺ノード間）
-sigma_true = 0.001       # リング結合強度
+k_true     = 3.5      # 電磁結合強度
+sigma_true = 0.0001       # リング結合強度
+mu_true    = 0.001      # スター結合強度（中心ノードと周辺ノード間）
 
 # -----------------------------
 # 1.1 推定対象パラメータの指定
@@ -37,15 +41,19 @@ param_to_estimate = 'sigma'   # ← ここを 'k' または 'mu' または 'sigm
 
 # パラメータノイズ分散（EnKF におけるパラメータのランダムウォーク分散）
 Q_param = {
-    'k':     1e-5,
-    'mu':    1e-6,
-    'sigma': 1e-6
+    'k':     1e-8,
+    'mu':    1e-8,
+    'sigma': 1e-8
 }[param_to_estimate]
 
 # -----------------------------
 # 1.2 シミュレーション設定
 # -----------------------------
-T_steps = 2000          # 時間ステップ数
+Burn_in_steps = 15000     # バーンイン期間（初期値の安定化）
+T_steps = 5000          # 時間ステップ数
+
+# シミュレーション全体の時間ステップ数
+T_total = Burn_in_steps + T_steps  # 総時間ステップ数
 
 # -----------------------------
 # 1.3 ノイズ共分散設定
@@ -63,50 +71,50 @@ R_obs = 1e-8            # 観測ノイズ分散（x を観測）
 #    観測次元 p = N、観測行列 C は N×(3N+1) の行列で
 #    各行 i: 状態ベクトルの x_i 成分を 1 で抽出
 # -----------------------------
-# 拡張状態次元 n = 3N + 1（各ノードの x,y,φ と 推定パラメータ 1次元）
-n = 3 * N + 1
-p = N
+
 
 # 観測行列 C を作成
 # 拡張状態ベクトルの並びを [ x_1, x_2, …, x_N, y_1, …, y_N, φ_1, …, φ_N, θ ]
 # としたとき、各ノード i の x を観測するので、
 # C[i, i] = 1、それ以外の列は 0
-C = np.zeros((p, n))
-for i in range(N):
-    C[i, i] = 1.0
-
 # -----------------------------
 # 1.5 リングスター結合行列を作る関数
 #    mu: スター結合強度
 #    sigma: リング結合強度
 # -----------------------------
-def build_ring_star_matrix(N, R, mu, sigma):
+def build_ring_star_matrix(N, R, Mu, Sigma):
     """
     リングスター結合行列 (N×N) を返す。
     - リング結合: 各ノードは左右 R 個の近隣ノードと sigma 強度で結合
     - スター結合: 中心ノード (0 番) と他ノードが mu 強度で相互結合
     """
     # リング結合：まず隣接行列 A_ring（一次元ラップアラウンド）を作る
-    ring = np.identity(N)  # N×N の単位行列
-    
+    Ring = np.identity(N)  # N×N の単位行列
+    Ring[0, 0] = 0  # 中心ノードは除外
+
     for i in range(1, N):
         # 対角成分周辺に 1 を配置
-        ring[i: i+R+1, i: i+R+1] = 1
+        Ring[i: i+R+1, i: i+R+1] = 1
+
         # 左下と右上のラップアラウンド（範囲外：左下や右上）を考慮
-        ring[N-R+i-1:, i] = 1
-        ring[i, N-R+i-1:] = 1
+        Ring[N-R+i-1:, i] = 1
+        Ring[i, N-R+i-1:] = 1
+        
     # 対角成分は -2R に設定
-    for i in range(1, N):
-        ring[i, i] = -2 * R
+    for j in range(1, N):
+        Ring[j, j] = -2 * R
     
-    Ring_M = (sigma / (2 * R)) * ring
+    Ring_M = (Sigma / (2 * R)) * Ring
 
     # スター結合：ノード 0 が中心
     Star_M = np.zeros((N, N))
-    # 中心ノード 0 は他ノードと結合する：行 0 の off-diagonal を +mu、対角には −mu*(N-1)
-    Star_M[0, 0] = -mu * (N - 1)
-    Star_M[0, 1:] = mu
-    Star_M[1:, 0] = -mu
+    # 中心ノード 0 は他ノード0と結合する：行 0 の off-diagonal を +mu、対角には −mu*(N-1)
+    Star_M[0, 0] = -Mu * (N - 1)
+    Star_M[0, 1:] = Mu
+    Star_M[1:, 0] = -Mu
+
+    for z in range(1, N):
+        Star_M[z, z] += Mu
 
     # 合成
     return (Ring_M + Star_M)
@@ -122,18 +130,18 @@ true_params = {
 }
 
 # (1) 真の結合行列を生成
-A_true = build_ring_star_matrix(N, R, mu_true, sigma_true)
+#A_true = build_ring_star_matrix(N, R, mu_true, sigma_true)
 RingStar = build_ring_star_matrix(N, R, mu_true, sigma_true)
 
 # (2) 真の状態配列を初期化：拡張状態ベクトルは [ x_i, y_i, φ_i, θ_true ] の形で保持するが、
 #     状態配列では k は定数なので別に管理しておけばよい。ここでは便宜上、真の状態は
 #     separate arrays x_true, y_true, phi_true にしておく。
-x_true   = np.zeros((N, T_steps + 1))
-y_true   = np.zeros((N, T_steps + 1))
-phi_true = np.zeros((N, T_steps + 1))
+x_true   = np.zeros((N, T_total + 1))
+y_true   = np.zeros((N, T_total + 1))
+phi_true = np.zeros((N, T_total + 1))
 
 # 初期値ランダムシード設定
-np.random.seed(0)
+np.random.seed(None)
 x_true[:, 0] = np.random.uniform(-1, 1, N)
 y_true[:, 0] = np.random.uniform(-1, 1, N)
 phi_true[:, 0] = np.random.uniform(-1, 1, N)
@@ -147,94 +155,95 @@ sd_y   = np.sqrt(Qy)
 sd_phi = np.sqrt(Qphi)
 sd_r   = np.sqrt(R_obs)
 
+def M(xxx):
+    """メムダクト関数 M(φ) の定義"""
+    return alpha_true + 3.0 * beta_true * xxx**2
+
 # (5) 真の軌道をシミュレーション
-for t in range(T_steps):
-    # 5.1 ネットワーク結合入力：全ノードの x に対して A_true @ x_true[:, t]
-    coupling_input = A_true @ x_true[:, t]  # N 次元ベクトル
-
-    # 5.2 各ノード i を更新
-    for i in range(N):
-        xi  = x_true[i, t]
-        yi  = y_true[i, t]
-        phii = phi_true[i, t]
-
-        # メムダクト関数
-        M_phi = alpha_true + 3.0 * beta_true * phii**2
-
-        # x 更新：Chialvo マップ + 電磁誘導項 + 結合入力 + プロセスノイズ
-        x_true[i, t + 1] = (
-            xi**2 * np.exp(yi - xi)
-            + k0_true
-            + (theta_true * xi * M_phi if param_to_estimate == 'k' or param_to_estimate != 'k' else k_true * xi * M_phi)
-            + coupling_input[i]
-            + sd_x * np.random.randn()
-        )
-        # y 更新
-        y_true[i, t + 1] = (
-            a_true * yi
-            - b_true * xi
-            + c_true
-            + sd_y * np.random.randn()
-        )
-        # φ 更新
-        phi_true[i, t + 1] = (
-            k1_true * xi
-            - k2_true * phii
-            + sd_phi * np.random.randn()
-        )
+for t in range(0, T_total):
+    x_true[:, t + 1] = pow(x_true[:, t], 2) * np.exp(y_true[:, t] - x_true[:, t]) + k0_true \
+        + k_true * x_true[:, t] * M(phi_true[:, t]) + RingStar @ x_true[:, t]
+    y_true[:, t + 1] = a_true * y_true[:, t] - b_true * x_true[:, t] + c_true
+    phi_true[:, t + 1] = k1_true * x_true[:, t] - k2_true * phi_true[:, t]
 
 # (6) 観測データ生成：全ノードの x を観測し、ノイズを加える
-#     y_obs_data は形 (p,N_steps) = (N,T_steps+1)
-y_obs_data = np.zeros((p, T_steps + 1))
-"""
-for t in range(T_steps + 1):
-    y_obs_data[:, t] = x_true[:, t] + sd_r * np.random.randn(N)
-"""
+y_obs_data = np.zeros((N, T_steps))
+
+for t in range(Burn_in_steps, T_total):
+    index = t - Burn_in_steps  # 観測データのインデックス
+    y_obs_data[:, index] = x_true[:, index] + sd_r * np.random.randn(N)
+
+print(f"y_obs_data shape: {y_obs_data.shape}, {t}")
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
+plt.plot(x_true[:, T_total-1], '.', label='True x')
+plt.xlabel('Nodes')
+plt.ylabel('State value')
+plt.show()
+
+x_true_T = x_true.T  # ヒートマップ用に転置
+sns.heatmap(x_true_T[Burn_in_steps:], cmap='hsv')
+plt.title('True State Trajectory Heatmap')
+plt.xlabel('Time step')
+plt.ylabel('Node index')
+plt.gca().invert_yaxis()  # y軸の順序を反転
+plt.show()
+
+
+
 # ===========================================================
-# 3. EnKF 初期化：アンサンブル生成と初期設定
+# 3. EnKF 初期化：アンサンブル生成と初期設定ここから
 # ===========================================================
 M_ens = 100  # アンサンブルメンバー数
 
 # (1) 各メンバーの拡張状態ベクトル xep を初期化
 #     拡張状態次元は n = 3N + 1。並び順: [ x_1,...,x_N, y_1,...,y_N, φ_1,...,φ_N, θ ]
-xep = np.zeros((n, M_ens))
+
+xep = np.zeros((n, M_ens))  # 拡張状態ベクトル (n×M_ens)
 for m in range(M_ens):
-    # x,y,φ は真の初期値のまわりに小さなノイズを追加
-    xep[0:N,      m] = x_true[:, 0] + 0.1 * np.random.randn(N)
-    xep[N:2*N,    m] = y_true[:, 0] + 0.1 * np.random.randn(N)
-    xep[2*N:3*N,  m] = phi_true[:, 0] + 0.05 * np.random.randn(N)
-    # パラメータ θ は真の値のまわりに適度なランダムノイズ
-    xep[3*N,      m] = theta_true + 0.01 * np.random.randn()
+    # x, y, φ の初期値
+    x0_m   = x_true[:, 0] + 0.01 * np.random.randn(N)
+    y0_m   = y_true[:, 0] + 0.01 * np.random.randn(N)
+    phi0_m = phi_true[:, 0] + 0.01 * np.random.randn(N)
+    # パラメータ k の初期値
+    k0_m   = k_true + 0.01 * np.random.randn()
+
+    # 拡張状態ベクトルに詰め込む: [x, y, φ, θ]
+    xep[0:   N,      m] = x0_m
+    xep[N:   2*N,    m] = y0_m
+    xep[2*N: 3*N,    m] = phi0_m
+    xep[3*N,         m] = k0_m
+
 
 # (2) 推定結果を格納する配列
-xhat = np.zeros((n, T_steps + 1))      # 各時刻のアンサンブル平均
-xhat[:, 0] = np.mean(xep, axis=1)      # 初期推定平均
+x_ave = np.zeros((n, T_steps + 1))      # 各時刻のアンサンブル平均
+#print(f"x_ave shape: {x_ave.shape}")
+x_ave[:, 0] = np.mean(xep, axis=1)      # 初期推定平均
 
-# (3) システムノイズ共分散 Qe と 観測ノイズ分散 Re を定義
-#     Qe は n×n の対角行列：各成分に [ Qx (×N), Qy (×N), Qphi (×N), Q_param (×1) ]
+#print(xhat[:, 0], xhat.shape)
+
+# (3) 系のノイズ共分散 Qe と観測ノイズ分散 Re
 Qe = np.zeros((n, n))
-# x成分
+# x 成分ノイズ
 for i in range(N):
     Qe[i, i] = Qx
-# y成分
+# y 成分ノイズ
 for i in range(N, 2*N):
     Qe[i, i] = Qy
-# φ成分
+# φ 成分ノイズ
 for i in range(2*N, 3*N):
     Qe[i, i] = Qphi
-# パラメータ成分
+# θ 成分ノイズ
 Qe[3*N, 3*N] = Q_param
 
 Re = R_obs * np.eye(p)   # 観測ノイズ分散行列 (p×p)
 
 # (4) EnKF 内部で使うバッファ
-xef = np.zeros((n, M_ens))    # 解析後のアンサンブル格納
-yep = np.zeros((p, M_ens))    # 各メンバーの観測予測
-nu  = np.zeros((p, M_ens))    # イノベーション（観測誤差）格納
+yep = np.zeros((p, M_ens))    # 各メンバーの擾乱観測予測
+nu  = np.zeros((p, M_ens))    # イノベーション(観測誤差)
+xef = np.zeros((n, M_ens))    # 分析後の拡張状態
 
 # ===========================================================
 # 4. EnKF 推定ループ：各時刻で (1) 分析 → (2) 予測 を実行
@@ -248,7 +257,7 @@ for t in range(T_steps + 1):
     #     - 擾乱観測ノイズ v_i ~ N(0, Re)
     ve = np.sqrt(R_obs) * np.random.randn(p, M_ens)
     for m in range(M_ens):
-        yep[:, m] = C @ xep[:, m] + ve[:, m]
+        yep[:, m] = xep[0:N, m] + ve[:, m]
 
     # (2) アンサンブル平均と偏差を計算
     x_mean = np.mean(xep, axis=1, keepdims=True)  # (n×1)
@@ -269,7 +278,7 @@ for t in range(T_steps + 1):
         xef[:, m] = xep[:, m] + K_gain @ nu[:, m]        # 更新後の拡張状態 (n×1)
 
     # (6) 解析後アンサンブルの平均を推定結果として保存
-    xhat[:, t] = np.mean(xef, axis=1)
+    x_ave[:, t] = np.mean(xef, axis=1)
 
     # -----------------------------
     # 4.2 予測ステップ (Forecast)：時間更新
@@ -294,9 +303,6 @@ for t in range(T_steps + 1):
         else:  # param_to_estimate == 'k'
             A_m = build_ring_star_matrix(N, R, mu_true, sigma_true)
 
-        # (b) 結合入力
-        coupling_input_m = A_m @ xs  # N次元
-
         # (c) 各ノードの予測更新
         for i in range(N):
             xi   = xs[i]
@@ -306,13 +312,8 @@ for t in range(T_steps + 1):
             M_phii = alpha_true + 3.0 * beta_true * phii**2
 
             # x の先行予測
-            xep[i, m] = (
-                xi**2 * np.exp(yi - xi)
-                + k0_true
-                + (theta_m * xi * M_phii if param_to_estimate == 'k' else k_true * xi * M_phii)
-                + coupling_input_m[i]
-                + we[i, m]
-            )
+            xep[i, m] = (pow(xi, 2) * np.exp(yi - xi) + k0_true + \
+                         (theta_m * xi * M_phii if param_to_estimate == 'k' else k_true * xi * M_phii)+ coupling_input_m[i]+ we[i, m])
             # y の先行予測
             xep[N + i, m] = (
                 a_true * yi
