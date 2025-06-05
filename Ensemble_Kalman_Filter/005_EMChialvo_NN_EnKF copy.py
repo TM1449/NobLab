@@ -37,14 +37,9 @@ mu_true    = 0.001      # スター結合強度（中心ノードと周辺ノー
 # 1.1 推定対象パラメータの指定
 #    'k', 'mu', 'sigma' のうちいずれか一つを選択
 # -----------------------------
-param_to_estimate = 'sigma'   # ← ここを 'k' または 'mu' または 'sigma' に変更
 
 # パラメータノイズ分散（EnKF におけるパラメータのランダムウォーク分散）
-Q_param = {
-    'k':     1e-8,
-    'mu':    1e-8,
-    'sigma': 1e-8
-}[param_to_estimate]
+Q_k = 1e-8  # パラメータのランダムウォークノイズ分散
 
 # -----------------------------
 # 1.2 シミュレーション設定
@@ -122,12 +117,6 @@ def build_ring_star_matrix(N, R, Mu, Sigma):
 # ===========================================================
 # 2. 真のデータ生成：リングスター接続版改良 Chialvo マップを用いたシミュレーション
 # ===========================================================
-# 真のパラメータをまとめておく
-true_params = {
-    'k':     k_true,
-    'mu':    mu_true,
-    'sigma': sigma_true
-}
 
 # (1) 真の結合行列を生成
 #A_true = build_ring_star_matrix(N, R, mu_true, sigma_true)
@@ -147,7 +136,7 @@ y_true[:, 0] = np.random.uniform(-1, 1, N)
 phi_true[:, 0] = np.random.uniform(-1, 1, N)
 
 # (3) 真のパラメータ θ_true
-theta_true = true_params[param_to_estimate]
+theta_true = k_true
 
 # (4) ノイズ標準偏差
 sd_x   = np.sqrt(Qx)
@@ -207,6 +196,7 @@ for m in range(M_ens):
     x0_m   = x_true[:, 0] + 0.01 * np.random.randn(N)
     y0_m   = y_true[:, 0] + 0.01 * np.random.randn(N)
     phi0_m = phi_true[:, 0] + 0.01 * np.random.randn(N)
+
     # パラメータ k の初期値
     k0_m   = k_true + 0.01 * np.random.randn()
 
@@ -236,7 +226,7 @@ for i in range(N, 2*N):
 for i in range(2*N, 3*N):
     Qe[i, i] = Qphi
 # θ 成分ノイズ
-Qe[3*N, 3*N] = Q_param
+Qe[3*N, 3*N] = Q_k
 
 Re = R_obs * np.eye(p)   # 観測ノイズ分散行列 (p×p)
 
@@ -256,6 +246,7 @@ for t in range(T_steps + 1):
     #     - 観測モデル: y_pred^(i) = C @ xep[:, i]
     #     - 擾乱観測ノイズ v_i ~ N(0, Re)
     ve = np.sqrt(R_obs) * np.random.randn(p, M_ens)
+
     for m in range(M_ens):
         yep[:, m] = xep[0:N, m] + ve[:, m]
 
@@ -296,12 +287,6 @@ for t in range(T_steps + 1):
         theta_m = xef[3*N,     m]      # パラメータ θ
 
         # (a) そのメンバー固有の結合行列を構築（mu または sigma を更新率として持つ場合）
-        if param_to_estimate == 'mu':
-            A_m = build_ring_star_matrix(N, R, theta_m, sigma_true)
-        elif param_to_estimate == 'sigma':
-            A_m = build_ring_star_matrix(N, R, mu_true, theta_m)
-        else:  # param_to_estimate == 'k'
-            A_m = build_ring_star_matrix(N, R, mu_true, sigma_true)
 
         # (c) 各ノードの予測更新
         for i in range(N):
@@ -313,7 +298,7 @@ for t in range(T_steps + 1):
 
             # x の先行予測
             xep[i, m] = (pow(xi, 2) * np.exp(yi - xi) + k0_true + \
-                         (theta_m * xi * M_phii if param_to_estimate == 'k' else k_true * xi * M_phii)+ coupling_input_m[i]+ we[i, m])
+                         (theta_m * xi * M_phii)+ RingStar @ we[i, m])
             # y の先行予測
             xep[N + i, m] = (
                 a_true * yi
