@@ -30,17 +30,17 @@ vu00 = np.array([v0, u0])  # 初期状態 [v, u]
 # -----------------------------
 # 1.3 時間離散化とシミュレーション設定
 # -----------------------------
-dt      = 1e-4        # タイムステップ Δt [ms]
+dt      = 1e-5        # タイムステップ Δt [ms]
 sqrt_dt = np.sqrt(dt)  # プロセスノイズ付与時のスケーリング √Δt
 T       = 300.0        # 総シミュレーション時間 [ms]
-N       = int(T / dt)  # ステップ数
+N       = int(np.ceil(T / dt))  # ステップ数
 
 # 入力信号用の時間配列
 Input_Start = 10.0  # 開始時間 [ms]
 Input_End   = T     # 終了時間 [ms]
-dt_Plot   = 0.5   # プロット刻み幅 [ms]
-Plot_Time = np.arange(N)
-Amplitude = 10.0  # 刺激電流の振幅 [μA/cm^2]
+dt_Plot   = 0.1   # プロット刻み幅 [ms]
+Plot_Time = int(np.ceil(T / dt))
+Amplitude = 30.0  # 刺激電流の振幅 [μA/cm^2]
 
 # -----------------------------
 # 1.4 ノイズ共分散
@@ -91,8 +91,16 @@ def Input_Signal(Time_Max_D, dt_Sim_D, Input_Start_D, Input_End_D, Amplitude_D):
 # -----------------------------
 # 2.1 真の状態ベクトル x と観測 y を格納する配列を初期化
 # -----------------------------
-X_True = np.zeros((3, N + 1))   # 行: v, u, a
-Y_Obs  = np.zeros(N + 1)
+V_True = np.zeros(N)  # 行: v, u, a
+V_True[0] = v0  # 初期状態 v
+
+U_True = np.zeros(N)  # 行: v, u, a
+U_True[0] = u0  # 初期状態 u
+
+A_True = np.zeros(N)  # 行: v, u, a
+
+X_True = np.zeros((3, N))   # 行: v, u, a
+Y_Obs  = np.zeros(N)
 
 
 # -----------------------------
@@ -165,6 +173,8 @@ for i in tqdm(range(N)):
 
     # 観測
     Y_Obs[i] = C @ X_True[:, i] + vd[i]
+
+    
 
 t_ds, Y_Plot = Plot_Time[::int(dt_Plot / dt)], Y_Obs[::int(dt_Plot / dt)]  # プロット用の観測データ
 print(f"length of t_ds: {len(t_ds)}, length of Y_Plot: {len(Y_Plot)}")
