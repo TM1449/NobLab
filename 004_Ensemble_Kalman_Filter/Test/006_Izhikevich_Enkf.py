@@ -30,7 +30,7 @@ vu00 = np.array([v0, u0])  # 初期状態 [v, u]
 # -----------------------------
 # 1.3 時間離散化とシミュレーション設定
 # -----------------------------
-dt_sim      = 1e-3        # タイムステップ Δt [ms]
+dt_sim      = 1e-2        # タイムステップ Δt [ms]
 sqrt_dt = np.sqrt(dt_sim)  # プロセスノイズ付与時のスケーリング √Δt
 Time_max       = 50.0        # 総シミュレーション時間 [ms]
 Step_sim       = int(np.ceil(Time_max / dt_sim))  # ステップ数
@@ -75,7 +75,7 @@ def Input_Signal(Time_Max_D, dt_Sim_D, Input_Start_D, Input_End_D, Amplitude_D):
 Input_Start = 3.0  # 開始時間 [ms]
 Input_End   = Time_max     # 終了時間 [ms]
 
-dt_Plot   = 1e-3   # プロット刻み幅 [ms]
+dt_Plot   = 1e-2   # プロット刻み幅 [ms]
 Step_plot = int(np.ceil(Time_max / dt_sim))
 Amplitude = 30.0  # 刺激電流の振幅 [μA/cm^2]
 

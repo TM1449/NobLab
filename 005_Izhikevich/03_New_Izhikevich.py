@@ -77,7 +77,7 @@ if __name__ == "__main__":
     t = np.arange(0, time, dt)  # 時間配列
 
     # モデルパラメータ（Regular Spiking）
-    a, b, c, d = 0.1, 0.2, -65, 2
+    a, b, c, d = 0.02, 0.2, -65, 8
 
     # 入力電流の設定
     input_data = 10 * np.sin(0.1 * np.arange(0, time, dt))  # 正弦波入力
