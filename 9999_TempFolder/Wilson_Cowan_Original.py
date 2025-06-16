@@ -28,7 +28,7 @@ I_i = 7.0  # 外部入力の強さ
 P_base = 2.0  # 基本刺激
 pulseA = 3.0  # パルスの高さ（+3）
 pulseWidth = 10.0  # パルス幅 (ms)
-period = 20.0  # パルス周期 (ms)
+period = 50.0  # パルス周期 (ms)
 
 def Pulse(t_ms):
     """外部入力 を計算する関数"""

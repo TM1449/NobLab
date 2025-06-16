@@ -27,9 +27,18 @@ I_i          =  7.0                    # I への外部入力（定数）
 # ----- シグモイド関数 -----
 a_E, theta_E = 1.0,  5.0
 a_I, theta_I = 1.0, 20.0
-def logistic(x, a, theta): return 1.0 / (1.0 + np.exp(-a * (x - theta)))
-def S_E(x): return logistic(x, a_E, theta_E)
-def S_I(x): return logistic(x, a_I, theta_I)
+
+def logistic(x, a, theta): 
+    """ロジスティック関数"""
+    return 1.0 / (1.0 + np.exp(-a * (x - theta)))
+
+def S_E(x): 
+    """E ニューロンのシグモイド関数"""
+    return logistic(x, a_E, theta_E)
+
+def S_I(x): 
+    """I ニューロンのシグモイド関数"""
+    return logistic(x, a_I, theta_I)
 
 # ---------- 時変パルス入力 ----------
 P_base, pulseA = 2.0, 3.0
@@ -55,15 +64,9 @@ def wilson_cowan_deriv(E, I, I_E_t, I_I_t):
 
 for t in tqdm(range(Step - 1), desc='Truth (RK4)'):
     k1_E, k1_I = wilson_cowan_deriv(E_true[t], I_true[t], I_E[t], I_I[t])
-    k2_E, k2_I = wilson_cowan_deriv(E_true[t] + 0.5*dt*k1_E,
-                                    I_true[t] + 0.5*dt*k1_I,
-                                    I_E[t], I_I[t])
-    k3_E, k3_I = wilson_cowan_deriv(E_true[t] + 0.5*dt*k2_E,
-                                    I_true[t] + 0.5*dt*k2_I,
-                                    I_E[t], I_I[t])
-    k4_E, k4_I = wilson_cowan_deriv(E_true[t] +     dt*k3_E,
-                                    I_true[t] +     dt*k3_I,
-                                    I_E[t], I_I[t])
+    k2_E, k2_I = wilson_cowan_deriv(E_true[t] + 0.5*dt*k1_E, I_true[t] + 0.5*dt*k1_I, I_E[t], I_I[t])
+    k3_E, k3_I = wilson_cowan_deriv(E_true[t] + 0.5*dt*k2_E, I_true[t] + 0.5*dt*k2_I, I_E[t], I_I[t])
+    k4_E, k4_I = wilson_cowan_deriv(E_true[t] +     dt*k3_E, I_true[t] +     dt*k3_I, I_E[t], I_I[t])
     E_true[t+1] = E_true[t] + (dt/6)*(k1_E + 2*k2_E + 2*k3_E + k4_E)
     I_true[t+1] = I_true[t] + (dt/6)*(k1_I + 2*k2_I + 2*k3_I + k4_I)
 
