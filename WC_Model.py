@@ -1,12 +1,17 @@
+# 2025_0617 作成中
+# このモデルが本体となるようにする 
+
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
+from filterpy.kalman import UnscentedKalmanFilter, MerweScaledSigmaPoints
+
 # ---------- シミュレーション設定 ----------
 dt = 0.001  # シミュレーション刻み幅 (ms)
-T = 300.0   # 総シミュレーション時間 (ms)
+T_Total = 300.0   # 総シミュレーション時間 (ms)
 
-Step = int(T / dt)  # ステップ数
+Step = int(T_Total / dt)  # ステップ数
 time = np.arange(Step) * dt # 時間配列
 
 
@@ -45,43 +50,66 @@ def S_I(x):
     """I ニューロンのシグモイド関数"""
     return logistic(x, a_I, theta_I)
 
-
-def Sin_Wave(t, Amp, Period, phase):
+# ----- 入力信号作成 -----
+def Input_Signal(T_idx, Dt, Amp, Period, Type = None, Width = None, Noise = None):
     """
-    任意の時間軸 t 上に Sin 波を生成する。
+    任意の時間軸 t * dt 上に 任意の信号を生成する。
 
     Parameters
     ----------
     t : np.ndarray
         時間軸（ms など）。dtype は float。
-    amplitude : float, optional
-        波の振幅 A。デフォルト 1.0。
-    period : float, optional
-        周期 T（t と同じ単位）。デフォルト 100.0。
-    phase : float, optional
-        初期位相 φ [rad]。デフォルト 0.0。
-
+    dt : float
+        時間刻み幅 dt。
+    Amplitude : float, optional
+        波の振幅 A。
+    Period : float, optional
+        周期 T（t と同じ単位）。
+    Type : 
+        信号の種類。None（恒等関数）, np.sinなどで指定。
+    width : （None, np.sin, np.cos, 'pulse'）
+        （パルス波を指定したとき必須）パルス幅を指定。
+    Noise :
+        ノイズを指定した場合、加算する。
     Returns
     -------
     np.ndarray
-        同じ長さの Sin 波列  A·sin(2π·t/T + φ)
+        Type で指定した信号を返す。
     """
+    tt = np.asarray(T_idx) * dt
 
-    return Amp * np.sin(2 * np.pi * t / Period + phase)
+    if Type == None:
+        Sig = Amp * np.ones_like(tt)
+
+    elif Type in (np.sin, np.cos):
+        Sig = Amp * Type(2 * np.pi * tt / Period)
+
+    elif Type == 'pulse':
+        if Width is None:
+            raise ValueError("Width must be set for pulse input")
+        Sig = np.where((tt % Period) < Width, Amp, 00)
+
+    else:
+        raise ValueError("Unsupported Type")
+    
+    if Noise is not None:
+        sig += np.random.normal(0.0, Noise, size=tt.shape)
+
+    return Sig
 
 # ------外部刺激 P(t) ----
 def P(x):
-    return 3 + np.random.rand(1) * x * 100
-
+    return x
 
 # ------外部刺激 Q(t) ----
 def Q(x):
-    return 4 + x
+    return x
 
 
 # ----- 外部刺激信号生成 -----
-P_E = np.ones(Step)
-Q_I = np.ones(Step) * 4
+idx = np.arange(Step)
+P_E = Input_Signal(T_idx = idx, Dt = dt, Amp = 3.0, Period = 50, Type = 'pulse', Width = 20)
+Q_I = Input_Signal(T_idx = idx, Dt = dt, Amp = 7, Period = 50, Type = None, Width = None)
 
 # ----- 真の軌道を 4次 RKで生成 -----
 E_True = np.zeros(Step)
@@ -96,8 +124,6 @@ def Wilson_Cowan(E, I, Pt, Qt):
     return dE, dI
 
 for i in tqdm(range(Step -1), desc = 'Truth Wilson-Cowan Model (RK4)'):
-    P_E[i] = Sin_Wave(i * dt, 2 , 50, 0)
-
     k1_E, k1_I = Wilson_Cowan(E_True[i]                  , I_True[i]                  , P_E[i], Q_I[i])
     k2_E, k2_I = Wilson_Cowan(E_True[i] + 0.5 * dt * k1_E, I_True[i] + 0.5 * dt * k1_I, P_E[i], Q_I[i])
     k3_E, k3_I = Wilson_Cowan(E_True[i] + 0.5 * dt * k2_E, I_True[i] + 0.5 * dt * k2_I, P_E[i], Q_I[i])
@@ -105,8 +131,32 @@ for i in tqdm(range(Step -1), desc = 'Truth Wilson-Cowan Model (RK4)'):
 
     E_True[i + 1] = E_True[i] + (dt / 6) * (k1_E + 2 * k2_E + 2 * k3_E + k4_E)
     I_True[i + 1] = I_True[i] + (dt / 6) * (k1_I + 2 * k2_I + 2 * k3_I + k4_I)
+    
+plt.figure(figsize = (8, 4))
+plt.plot(time, E_True, 'r', lw=2, label='Excitatory (E)')
+plt.plot(time, I_True, 'b', lw=2, label='Inhibitory (I)')
+plt.xlabel('Time (ms)')
+plt.ylabel('Firing Rate')
+plt.title('Wilson–Cowan Simulation')
+plt.legend()
+plt.grid()
+plt.show()
 
 plt.figure(figsize = (8, 4))
-plt.plot(time, E_True)
-plt.plot(time, P_E)
+plt.plot(time, E_True, 'r', lw=2, label='Excitatory (E)')
+plt.plot(time, P_E, 'b', lw=2, label='Input Signal')
+plt.xlabel('Time (ms)')
+plt.ylabel('Firing Rate / Input')
+plt.title('External Input to E Neurons')
+plt.legend()
+plt.grid()
+plt.show()
+
+plt.figure(figsize = (8, 4))
+plt.plot(E_True, I_True, 'r', lw=2)
+plt.xlabel('E')
+plt.ylabel('I')
+plt.title('Wilson–Cowan Simulation')
+plt.legend()
+plt.grid()
 plt.show()
