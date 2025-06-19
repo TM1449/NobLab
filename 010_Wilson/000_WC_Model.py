@@ -5,8 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 
-from filterpy.kalman import UnscentedKalmanFilter, MerweScaledSigmaPoints
-
 # ---------- シミュレーション設定 ----------
 dt = 0.01  # シミュレーション刻み幅 (ms)
 T_Total = 300.0   # 総シミュレーション時間 (ms)
@@ -57,15 +55,6 @@ def Input_Signal(T_idx, Dt, Amp, Period, Width = None, Base = 0):
     Sig = np.where((tt % Period) < Width, Amp, 0.0) + Base
 
     return Sig
-
-# ------外部刺激 P(t) ----
-def P(x):
-    return x
-
-# ------外部刺激 Q(t) ----
-def Q(x):
-    return x
-
 
 # ----- 外部刺激信号生成 -----
 idx = np.arange(Step)
