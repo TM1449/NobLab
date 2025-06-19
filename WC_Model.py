@@ -8,7 +8,7 @@ from tqdm import tqdm
 from filterpy.kalman import UnscentedKalmanFilter, MerweScaledSigmaPoints
 
 # ---------- シミュレーション設定 ----------
-dt = 0.001  # シミュレーション刻み幅 (ms)
+dt = 0.01  # シミュレーション刻み幅 (ms)
 T_Total = 300.0   # 総シミュレーション時間 (ms)
 
 Step = int(T_Total / dt)  # ステップ数
@@ -51,49 +51,10 @@ def S_I(x):
     return logistic(x, a_I, theta_I)
 
 # ----- 入力信号作成 -----
-def Input_Signal(T_idx, Dt, Amp, Period, Type = None, Width = None, Noise = None):
-    """
-    任意の時間軸 t * dt 上に 任意の信号を生成する。
-
-    Parameters
-    ----------
-    t : np.ndarray
-        時間軸（ms など）。dtype は float。
-    dt : float
-        時間刻み幅 dt。
-    Amplitude : float, optional
-        波の振幅 A。
-    Period : float, optional
-        周期 T（t と同じ単位）。
-    Type : 
-        信号の種類。None（恒等関数）, np.sinなどで指定。
-    width : （None, np.sin, np.cos, 'pulse'）
-        （パルス波を指定したとき必須）パルス幅を指定。
-    Noise :
-        ノイズを指定した場合、加算する。
-    Returns
-    -------
-    np.ndarray
-        Type で指定した信号を返す。
-    """
-    tt = np.asarray(T_idx) * dt
-
-    if Type == None:
-        Sig = Amp * np.ones_like(tt)
-
-    elif Type in (np.sin, np.cos):
-        Sig = Amp * Type(2 * np.pi * tt / Period)
-
-    elif Type == 'pulse':
-        if Width is None:
-            raise ValueError("Width must be set for pulse input")
-        Sig = np.where((tt % Period) < Width, Amp, 00)
-
-    else:
-        raise ValueError("Unsupported Type")
+def Input_Signal(T_idx, Dt, Amp, Period, Width = None, Base = 0):
     
-    if Noise is not None:
-        sig += np.random.normal(0.0, Noise, size=tt.shape)
+    tt = np.asarray(T_idx) * Dt
+    Sig = np.where((tt % Period) < Width, Amp, 0.0) + Base
 
     return Sig
 
@@ -108,8 +69,8 @@ def Q(x):
 
 # ----- 外部刺激信号生成 -----
 idx = np.arange(Step)
-P_E = Input_Signal(T_idx = idx, Dt = dt, Amp = 3.0, Period = 50, Type = 'pulse', Width = 20)
-Q_I = Input_Signal(T_idx = idx, Dt = dt, Amp = 7, Period = 50, Type = None, Width = None)
+P_E = Input_Signal(T_idx = idx, Dt = dt, Amp = 3, Period = 50, Width = 10, Base = 2.0)
+Q_I = Input_Signal(T_idx = idx, Dt = dt, Amp = 7, Period = 1, Width = 3000, Base = 0)
 
 # ----- 真の軌道を 4次 RKで生成 -----
 E_True = np.zeros(Step)

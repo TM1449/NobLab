@@ -18,7 +18,8 @@ from filterpy.kalman import UnscentedKalmanFilter, MerweScaledSigmaPoints
 
 # ====================== シミュレーション設定 ======================
 DT      = 0.01   # [ms]
-T_TOTAL = 300.0   # [ms]
+T_TOTAL = 500.0   # [ms]
+
 N_STEP  = int(T_TOTAL / DT)
 TIME    = np.arange(N_STEP) * DT
 
@@ -26,22 +27,25 @@ TIME    = np.arange(N_STEP) * DT
 TAU_E = 20.0          # 時定数 [ms]
 TAU_I = 10.0          # 時定数 [ms]
 
-W_EE_TRUE = 16.0  # 結合強度 (真値)
-W_EI = 26.0       # 結合強度
+W_EE_TRUE = 16.0  # 固定値
+W_EI_TRUE = 26.0  # <-- 今回はこれを推定する
+
 W_IE = 20.0
 W_II = 1.0
 
 R_E  = 0.0
 R_I  = 0.0              # 不応期係数
 
-# --- 推定対象パラメータを列挙 (ここでは 2 つ) ---
-PARAM_NAMES = ["W_EE"]
-PARAM_TRUE  = np.array([W_EE_TRUE])
-PARAM_INIT  = np.array([15.0])   # 初期推定値 (真値と少しズラす)
+# --- 推定対象パラメータ ---
+PARAM_NAMES = ["W_EI"]
+PARAM_TRUE  = np.array([W_EI_TRUE])
+PARAM_INIT  = np.array([20.0])   # 初期値 (W_EI_TRUE とずらし)
+
 
 # ----- シグモイド関数係数 -----
 A_E = 1.0  
 TH_E = 5.0
+
 A_I = 1.0
 TH_I = 20.0
 
@@ -55,34 +59,42 @@ S_E = lambda x: logistic(x, A_E, TH_E)
 S_I = lambda x: logistic(x, A_I, TH_I)
 
 # ====================== 外部入力刺激 ======================
+def Input_Signal(T_idx, Dt, Amp, Period, Width = None, Base = 0):
+    
+    tt = np.asarray(T_idx) * Dt
+    Sig = np.where((tt % Period) < Width, Amp, 0.0) + Base
 
-def input_signal(idx: np.ndarray, dt: float, amp: float, period: float, width: float):
-    """単純なパルス波"""
-    t = idx * dt
-    return np.where((t % period) < width, amp, 0.0)
+    return Sig
 
 IDX = np.arange(N_STEP)
+
+#P_E = Input_Signal(IDX, DT, Amp=3, Period=50, Width=3000, Base=3)
+#Q_I = Input_Signal(IDX, DT, Amp=7, Period=1, Width=3000, Base=7)
+
+P_E = np.ones(N_STEP) * 3
+Q_I = np.ones(N_STEP) * 7
+"""
 P_E = input_signal(IDX, DT, amp=3.0, period=50.0, width=2000.0)
 Q_I = input_signal(IDX, DT, amp=7.0, period=50.0, width=5000.0)  # 定常入力
-
+"""
 # ====================== Wilson–Cowan 微分方程式 ======================
 
-def wilson_cowan_deriv(E: float, I: float, P_t: float, Q_t: float, W_EE: float, W_IE: float):
-    """Wilson–Cowan 微分方程式 (dE/dt, dI/dt)"""
-    dE = (-E + (1.0 - R_E * E) * S_E(W_EE * E - W_EI * I + P_t)) / TAU_E
+def wilson_cowan_deriv(E, I, P_t, Q_t, W_EI_est, W_IE):
+    dE = (-E + (1.0 - R_E * E) * S_E(W_EE_TRUE * E - W_EI_est * I + P_t)) / TAU_E
     dI = (-I + (1.0 - R_I * I) * S_I(W_IE * E - W_II * I + Q_t)) / TAU_I
     return dE, dI
 
 # ====================== 真の軌道生成 (RK4) ======================
 E_true = np.zeros(N_STEP)
 I_true = np.zeros(N_STEP)
+
 E_true[0], I_true[0] = 0.5, 0.4  # 初期値
 
 for k in tqdm(range(N_STEP - 1), desc="Truth (RK4)"):
-    k1_E, k1_I = wilson_cowan_deriv(E_true[k], I_true[k], P_E[k], Q_I[k], W_EE_TRUE, W_IE)
-    k2_E, k2_I = wilson_cowan_deriv(E_true[k]+0.5*DT*k1_E, I_true[k]+0.5*DT*k1_I, P_E[k], Q_I[k], W_EE_TRUE, W_IE)
-    k3_E, k3_I = wilson_cowan_deriv(E_true[k]+0.5*DT*k2_E, I_true[k]+0.5*DT*k2_I, P_E[k], Q_I[k], W_EE_TRUE, W_IE)
-    k4_E, k4_I = wilson_cowan_deriv(E_true[k]+    DT*k3_E, I_true[k]+    DT*k3_I, P_E[k], Q_I[k], W_EE_TRUE, W_IE)
+    k1_E, k1_I = wilson_cowan_deriv(E_true[k],              I_true[k],              P_E[k], Q_I[k], W_EI_TRUE, W_IE)
+    k2_E, k2_I = wilson_cowan_deriv(E_true[k]+ 0.5*DT*k1_E, I_true[k]+ 0.5*DT*k1_I, P_E[k], Q_I[k], W_EI_TRUE, W_IE)
+    k3_E, k3_I = wilson_cowan_deriv(E_true[k]+ 0.5*DT*k2_E, I_true[k]+ 0.5*DT*k2_I, P_E[k], Q_I[k], W_EI_TRUE, W_IE)
+    k4_E, k4_I = wilson_cowan_deriv(E_true[k]+     DT*k3_E, I_true[k]+     DT*k3_I, P_E[k], Q_I[k], W_EI_TRUE, W_IE)
     E_true[k+1] = E_true[k] + (DT/6.0)*(k1_E + 2*k2_E + 2*k3_E + k4_E)
     I_true[k+1] = I_true[k] + (DT/6.0)*(k1_I + 2*k2_I + 2*k3_I + k4_I)
 
@@ -101,19 +113,18 @@ step_counter = {"k": 0}
 
 def fx(x: np.ndarray, _dt):
     k = step_counter["k"]
-    E, I, W_EE_est = x
+    E, I, W_EI_est = x
 
-    # RK4 で E, I を 1 ステップ先へ
-    k1_E, k1_I = wilson_cowan_deriv(E, I, P_E[k], Q_I[k], W_EE_est, W_IE)
-    k2_E, k2_I = wilson_cowan_deriv(E+0.5*DT*k1_E, I+0.5*DT*k1_I, P_E[k], Q_I[k], W_EE_est, W_IE)
-    k3_E, k3_I = wilson_cowan_deriv(E+0.5*DT*k2_E, I+0.5*DT*k2_I, P_E[k], Q_I[k], W_EE_est, W_IE)
-    k4_E, k4_I = wilson_cowan_deriv(E+    DT*k3_E, I+    DT*k3_I, P_E[k], Q_I[k], W_EE_est, W_IE)
+    k1_E, k1_I = wilson_cowan_deriv(E, I, P_E[k], Q_I[k], W_EI_est, W_IE)
+    k2_E, k2_I = wilson_cowan_deriv(E+0.5*DT*k1_E, I+0.5*DT*k1_I, P_E[k], Q_I[k], W_EI_est, W_IE)
+    k3_E, k3_I = wilson_cowan_deriv(E+0.5*DT*k2_E, I+0.5*DT*k2_I, P_E[k], Q_I[k], W_EI_est, W_IE)
+    k4_E, k4_I = wilson_cowan_deriv(E+    DT*k3_E, I+    DT*k3_I, P_E[k], Q_I[k], W_EI_est, W_IE)
 
     E_next = E + (DT/6.0)*(k1_E + 2*k2_E + 2*k3_E + k4_E)
     I_next = I + (DT/6.0)*(k1_I + 2*k2_I + 2*k3_I + k4_I)
 
+    return np.array([E_next, I_next, W_EI_est])
 
-    return np.concatenate([[E_next, I_next, W_EE_est]])
 
 # --- hx: 観測モデル (E のみ) ---
 hx = lambda x: np.array([x[0]])
@@ -125,7 +136,7 @@ ukf.x = np.concatenate([[0.1, 0.3], PARAM_INIT])
 ukf.P = np.diag([0.1, 0.1, 1])
 
 # プロセス / 観測ノイズ (パラメータのランダムウォークを極小に設定)
-PROCESS_NOISE_W_EE = 2e-5            # W_EE のランダムウォーク強さ
+PROCESS_NOISE_W_EE = 1e-3            # W_EE のランダムウォーク強さ 2e-3
 
 ukf.Q = np.diag([1e-5, 1e-5, PROCESS_NOISE_W_EE])
 ukf.R = np.array([[OBS_NOISE_STD**2]])
@@ -133,14 +144,14 @@ ukf.R = np.array([[OBS_NOISE_STD**2]])
 # ====================== UKF ループ ======================
 E_est = np.zeros(N_STEP)
 I_est = np.zeros(N_STEP)
-W_EE_est_s = np.zeros(N_STEP)
+W_EI_est_s = np.zeros(N_STEP)
 
 for k in tqdm(range(N_STEP), desc="UKF with params"):
     ukf.predict()
     ukf.update(Z_obs[k])
 
     E_est[k], I_est[k] = ukf.x[:2]
-    W_EE_est_s[k] = ukf.x[2]
+    W_EI_est_s[k] = ukf.x[2]
     step_counter["k"] += 1
 
 # ====================== 結果可視化 ======================
@@ -165,9 +176,9 @@ plt.grid()
 
 # --- 推定パラメータ ---
 plt.subplot(3, 1, 3)
-plt.plot(TIME, W_EE_est_s, 'm', lw=1.0, label='est W_EE')
-plt.hlines(W_EE_TRUE, 0, T_TOTAL, colors='k', linestyles='dashed', label='true W_EE')
-plt.ylabel('Time [ms]')
+plt.plot(TIME, W_EI_est_s, 'm', lw=1.0, label='est W_EI')
+plt.hlines(W_EI_TRUE, 0, T_TOTAL, colors='k', linestyles='dashed', label='true W_EI')
+plt.ylabel('W_EI')
 plt.legend()
 plt.grid()
 
