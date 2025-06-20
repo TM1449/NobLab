@@ -4,13 +4,13 @@ import seaborn as sns
 from tqdm import tqdm
 
 # ---------- シミュレーション設定 ----------
-dt      = 0.005             # シミュレーション刻み幅 [ms]
+dt      = 0.01             # シミュレーション刻み幅 [ms]
 T_total = 300.0            # 総シミュレーション時間 [ms]
 Step    = int(T_total / dt) # ステップ数
 time    = np.arange(Step) * dt
 
 # ---------- コラム数設定 ----------
-Nc = 4  # 任意のコラム数に変更可能 (例: 2, 3, 4 ...)
+Nc = 20  # 任意のコラム数に変更可能 (例: 2, 3, 4 ...)
 
 # ---------- Wilson–Cowan パラメータ ----------
 tau_E, tau_I = 20.0, 10.0   # 時定数 [ms]
@@ -42,7 +42,8 @@ def input_signal(idx, dt, amp, period, width=None, base=0.0):
     return sig
 
 IDX = np.arange(Step)
-P_E = input_signal(IDX, dt, amp=3.0, period=20.0, width=10.0, base=2.0)
+#P_E = input_signal(IDX, dt, amp=3.0, period=20.0, width=10.0, base=2.0)
+P_E = np.ones(Step) * 2.0
 Q_I = np.ones(Step) * 7.0
 
 # ---------- 真の軌道生成 (4次RK) ----------
