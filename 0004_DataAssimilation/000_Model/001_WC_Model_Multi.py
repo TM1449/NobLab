@@ -4,8 +4,8 @@ import seaborn as sns
 from tqdm import tqdm
 
 # ---------- シミュレーション設定 ----------
-dt      = 0.01             # シミュレーション刻み幅 [ms]
-T_total = 300.0            # 総シミュレーション時間 [ms]
+dt      = 0.1             # シミュレーション刻み幅 [ms]
+T_total = 500.0            # 総シミュレーション時間 [ms]
 Step    = int(T_total / dt) # ステップ数
 time    = np.arange(Step) * dt
 
