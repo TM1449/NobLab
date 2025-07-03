@@ -36,11 +36,11 @@ def Project_EMChialvo_2025_01_28_12_34():
     #共通パラメータ
     Param = {
         #==========================================================================================
-        "Project_F_NRMSE" : False,                           #NRMSEを調査するか
-        "Project_F_MemoryCapacity" : False,                  #MCを調査するか
-        "Project_F_MLE" : False,                             #MLE（最大リアプノフ指数）を調査するか
+        "Project_F_NRMSE" : True,                           #NRMSEを調査するか
+        "Project_F_MemoryCapacity" : True,                  #MCを調査するか
+        "Project_F_MLE" : True,                             #MLE（最大リアプノフ指数）を調査するか
         
-        "Project_F_CovMatrixRank" : False,                  #Covariance Matrix Rankを調査するか
+        "Project_F_CovMatrixRank" : True,                  #Covariance Matrix Rankを調査するか
         "Project_F_DelayCapacity" : True,                   #Delay Capacityを調査するか
 
         #------------------------------------------------------------------------------------------

@@ -63,8 +63,8 @@ def Bandpass_Filter(data, lowcut, highcut, sampling_rate, order):
 
     return y
 
-low_cutoff = 8.0  # 下限周波数 (Hz)
-high_cutoff = 13.0  # 上限周波数 (Hz)
+low_cutoff = 30.0  # 下限周波数 (Hz)
+high_cutoff = 55.0  # 上限周波数 (Hz)
 order = 8  # フィルタの次数
 
 # フィルタを適用
@@ -96,12 +96,13 @@ def TimeDate():
     Date = Now.strftime('%Y_%m_%d_%H_%M_%S')
     return Date
 
-NowTime = TimeDate()
-
 def New_DirPath():
     Dir_Path = f"{Result_Directory}/{NowTime}"
     os.makedirs(Dir_Path, exist_ok=True)
-    
+
+# ==========================================
+NowTime = TimeDate()
+
 New_DirPath()
 
 # 1. 生データの時系列データをプロット
@@ -183,3 +184,130 @@ plt.legend()
 plt.tight_layout()
 plt.savefig(f"{Result_Directory}/{NowTime}/EEG_Filtered_Power_Spectrum.png")
 plt.show()
+
+# ==========================================
+# 3. IAAFTサロゲートの生成
+# ==========================================
+
+def iaaft(original_signal, max_iter=1000, tol=1e-12):
+    """
+    IAAFT (Iterative Amplitude Adjusted Fourier Transform) サロゲートデータを生成する。
+
+    :param original_signal: 元の時系列データ (1D numpy array)
+    :param max_iter: 最大反復回数
+    :param tol: 収束判定のための許容誤差
+    :return: IAAFTサロゲートデータ (1D numpy array)
+    """
+    # 1. 元の信号の振幅スペクトルと、ソートされた値を取得
+    original_amps = np.abs(np.fft.fft(original_signal))
+    sorted_original = np.sort(original_signal)
+
+    # 2. 元の信号をランダムにシャッフルして初期サロゲートを作成
+    surrogate = np.random.permutation(original_signal)
+
+    for i in range(max_iter):
+        # 3. 現在のサロゲートの位相スペクトルを取得
+        surrogate_fft = np.fft.fft(surrogate)
+        surrogate_phases = np.angle(surrogate_fft)
+
+        # 4. 元の信号の振幅と、現在のサロゲートの位相を組み合わせて新しいスペクトルを作成
+        new_fft = original_amps * np.exp(1j * surrogate_phases)
+
+        # 5. 逆フーリエ変換して、時間領域の信号に戻す
+        time_domain_surrogate = np.fft.ifft(new_fft).real
+        
+        # 6. 元の信号の振幅分布に合わせるため、値を置き換える
+        #    time_domain_surrogateの大小関係（順位）を保持したまま、
+        #    sorted_originalの値で置き換える
+        ranks = time_domain_surrogate.argsort().argsort()
+        new_surrogate = sorted_original[ranks]
+        
+        # 収束チェック
+        # 現在のサロゲートと前の反復のサロゲートの差が許容誤差以下であれば終了
+        current_rms = np.sqrt(np.mean((new_surrogate - surrogate)**2))
+        if current_rms < tol:
+            break
+            
+        surrogate = new_surrogate
+
+    return surrogate
+
+# フィルタリング後の信号からIAAFTサロゲートを1つ生成
+iaaft_surrogate = iaaft(Filtered_Signal)
+
+# ---------- IAAFTサロゲートデータの解析 ----------
+# フーリエ変換
+iaaft_fft = np.fft.fft(iaaft_surrogate)
+# パワースペクトルの計算
+iaaft_power = (np.abs(iaaft_fft) / N)**2
+# 周波数軸の計算
+iaaft_freq = np.fft.fftfreq(N, d = 1.0 / sampling_rate)
+
+# 片側スペクトルの範囲を抽出
+iaaft_freqs = iaaft_freq[:half_N]
+iaaft_power_half = iaaft_power[:half_N]
+# 2倍補正
+iaaft_power_half[1:-1] *= 2
+
+
+# ==========================================
+# 4. IAAFTサロゲートデータの描画
+# ==========================================
+
+# 6-1. IAAFTサロゲートの時系列データをプロット
+plt.figure(figsize=(8, 4))
+plt.plot(df['Time'], Filtered_Signal, label=f'Filtered Signal', color='orange', alpha=0.6)
+plt.plot(df['Time'], iaaft_surrogate, label='IAAFT Surrogate Signal', color='green', alpha=0.8)
+plt.xlabel('Time (s)')
+plt.ylabel('Amplitude')
+plt.title('Filtered Signal and IAAFT Surrogate')
+plt.grid()
+plt.legend()
+plt.tight_layout()
+plt.savefig(f"{Result_Directory}/{NowTime}/IAAFT_Surrogate_Time_Series.png")
+plt.show()
+
+# 6-2. フィルタリング後の時系列データのプロット（短い時間軸）
+plt.figure(figsize=(8, 4))
+plt.plot(df['Time'], Filtered_Signal, label=f'Filtered Signal({low_cutoff} - {high_cutoff} (Hz))', color='orange', alpha=0.6)
+plt.plot(df['Time'], iaaft_surrogate, label='IAAFT Surrogate Signal', color='green', alpha=0.8)
+plt.xlabel('Time (s)')
+plt.ylabel('Amplitude')
+plt.title('EEG Data (Short Time Series)')
+plt.xlim(0.5, 3.5)  # 最初の10秒間を表示
+plt.grid()
+plt.legend()
+plt.tight_layout()
+plt.savefig(f"{Result_Directory}/{NowTime}/EEG_Filtered_Time_Series_Short_short.png")
+plt.show()
+
+
+# 7. フィルタリング後の信号とIAAFTサロゲートのパワースペクトルを比較
+plt.figure(figsize=(8, 4))
+plt.plot(Filtered_freqs, Filtered_power, label=f'Filtered Power Spectrum', color='orange')
+plt.plot(iaaft_freqs, iaaft_power_half, label='IAAFT Surrogate Power Spectrum', color='green', linestyle='--', alpha=0.8)
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Power')
+plt.title('Power Spectrum Comparison')
+plt.xticks(np.arange(0,101,10))
+plt.grid()
+plt.xlim(0, sampling_rate / 2)
+plt.legend()
+plt.tight_layout()
+plt.savefig(f"{Result_Directory}/{NowTime}/IAAFT_Power_Spectrum_Comparison.png")
+plt.show()
+
+"""
+# 8. 振幅分布をヒストグラムで比較
+plt.figure(figsize=(8, 4))
+plt.hist(Filtered_Signal, bins=50, density=True, label='Filtered Signal', color='orange', alpha=0.7)
+plt.hist(iaaft_surrogate, bins=50, density=True, label='IAAFT Surrogate', color='green', alpha=0.7)
+plt.xlabel('Amplitude')
+plt.ylabel('Probability Density')
+plt.title('Amplitude Distribution Comparison')
+plt.legend()
+plt.grid()
+plt.tight_layout()
+plt.savefig(f"{Result_Directory}/{NowTime}/IAAFT_Amplitude_Distribution.png")
+plt.show()
+"""
